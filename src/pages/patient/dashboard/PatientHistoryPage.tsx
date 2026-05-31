@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { cn } from '../../../lib/cn'
+import { msTableWrap } from '../../../lib/msStyles'
 
 type FilterKey = 'hoje' | '7d' | '30d'
 type RowStatus = 'Confirmado' | 'Falso positivo' | 'Cancelado'
@@ -23,32 +24,33 @@ const MOCK: Row[] = [
 ]
 
 function badgeClass(s: RowStatus) {
-  if (s === 'Confirmado') return 'bg-emerald-100 text-emerald-800 ring-emerald-200/80'
-  if (s === 'Falso positivo') return 'bg-red-100 text-red-800 ring-red-200/80'
-  return 'bg-slate-100 text-slate-700 ring-slate-200/80'
+  if (s === 'Confirmado')
+    return 'bg-emerald-100 text-emerald-800 ring-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-200 dark:ring-emerald-800'
+  if (s === 'Falso positivo')
+    return 'bg-red-100 text-red-800 ring-red-200/80 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-800'
+  return 'bg-ms-subtle-strong text-ms-secondary ring-slate-200/80 dark:ring-ms-border'
 }
 
 export function PatientHistoryPage() {
   const [filter, setFilter] = useState<FilterKey>('hoje')
 
   const rows = useMemo(() => {
-    // Mock: mesmo conjunto para qualquer filtro; em produção filtraria por data
     return MOCK
   }, [filter])
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Histórico de Comunicação</h1>
-          <p className="mt-1 text-sm text-slate-600">Registro simulado de frases e níveis de atenção.</p>
+    <div className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-4 sm:gap-6">
+      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-semibold tracking-tight text-ms-primary sm:text-2xl">Histórico de Comunicação</h1>
+          <p className="mt-1 text-sm text-ms-secondary">Registro simulado de frases e níveis de atenção.</p>
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por período">
           {(
             [
               { key: 'hoje' as const, label: 'Hoje' },
-              { key: '7d' as const, label: 'Últimos 7 dias' },
-              { key: '30d' as const, label: 'Últimos 30 dias' },
+              { key: '7d' as const, label: '7 dias' },
+              { key: '30d' as const, label: '30 dias' },
             ] as const
           ).map(({ key, label }) => (
             <button
@@ -56,10 +58,10 @@ export function PatientHistoryPage() {
               type="button"
               onClick={() => setFilter(key)}
               className={cn(
-                'rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600',
+                'min-h-[44px] rounded-full px-3 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:focus-visible:outline-ms-accent',
                 filter === key
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50',
+                  ? 'bg-emerald-600 text-white shadow-sm dark:bg-ms-accent dark:hover:bg-ms-accent-hover'
+                  : 'bg-ms-surface text-ms-secondary ring-1 ring-ms-border hover:bg-ms-subtle',
               )}
             >
               {label}
@@ -68,29 +70,45 @@ export function PatientHistoryPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse text-left text-sm">
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-ms-border bg-ms-surface shadow-sm">
+        <div className={msTableWrap}>
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80">
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Hora</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Frase</th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Nível de Atenção
+              <tr className="border-b border-ms-border bg-ms-subtle/80">
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-ms-muted sm:px-4 sm:py-3">
+                  Hora
                 </th>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-ms-muted sm:px-4 sm:py-3">
+                  Frase
+                </th>
+                <th className="hidden px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-ms-muted sm:table-cell sm:px-4 sm:py-3">
+                  Atenção
+                </th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-ms-muted sm:px-4 sm:py-3">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={`${r.time}-${i}`} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/80">
-                  <td className="px-4 py-3 font-medium tabular-nums text-slate-800">{r.time}</td>
-                  <td className="px-4 py-3 font-semibold text-slate-900">{r.phrase}</td>
-                  <td className="px-4 py-3 tabular-nums text-slate-700">{r.attention}</td>
-                  <td className="px-4 py-3">
+                <tr
+                  key={`${r.time}-${i}`}
+                  className="border-b border-ms-border-subtle last:border-0 hover:bg-ms-subtle/80"
+                >
+                  <td className="whitespace-nowrap px-3 py-2.5 font-medium tabular-nums text-ms-primary sm:px-4 sm:py-3">
+                    {r.time}
+                  </td>
+                  <td className="max-w-[9rem] break-words px-3 py-2.5 font-semibold text-ms-primary sm:max-w-none sm:px-4 sm:py-3">
+                    {r.phrase}
+                    <span className="mt-0.5 block text-xs font-normal text-ms-muted sm:hidden">{r.attention}</span>
+                  </td>
+                  <td className="hidden whitespace-nowrap px-3 py-2.5 tabular-nums text-ms-secondary sm:table-cell sm:px-4 sm:py-3">
+                    {r.attention}
+                  </td>
+                  <td className="px-3 py-2.5 sm:px-4 sm:py-3">
                     <span
                       className={cn(
-                        'inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset',
+                        'inline-flex max-w-full rounded-full px-2 py-1 text-[11px] font-semibold leading-tight ring-1 ring-inset sm:text-xs',
                         badgeClass(r.status),
                       )}
                     >

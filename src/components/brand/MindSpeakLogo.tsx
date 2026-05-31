@@ -52,7 +52,7 @@ export function MindSpeakLogo({
         className={cn(s.mark, 'shrink-0 object-contain')}
         decoding="async"
       />
-      <span aria-hidden className={cn('font-semibold tracking-tight text-slate-900', s.text, wordmarkClassName)}>
+      <span aria-hidden className={cn('font-semibold tracking-tight text-ms-primary', s.text, wordmarkClassName)}>
         MindSpeak
       </span>
     </div>

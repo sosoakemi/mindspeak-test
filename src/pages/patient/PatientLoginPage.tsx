@@ -4,6 +4,7 @@ import { ArrowLeft, Eye, EyeOff, Hash, Key } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { Button, LinkButton } from '../../components/shared/Button'
 import { getPatientSession, savePatientSession } from '../../lib/patientSession'
+import { ThemeToggle } from '../../components/shared/ThemeToggle'
 
 const LOGO_SRC = '/logos/logoOficial-6dcbc4e8-0a72-4fd4-be0a-ca6942282816.png'
 
@@ -45,8 +46,11 @@ export function PatientLoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-b from-slate-100 to-white px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-x-hidden bg-gradient-to-b from-slate-100 to-ms-surface px-3 py-10 dark:from-[#030712] dark:to-ms-page sm:px-4 sm:py-12">
+      <div className="absolute right-3 top-3 z-10 sm:right-4 sm:top-4">
+        <ThemeToggle />
+      </div>
+      <div className="w-full min-w-0 max-w-md">
         <div className="mb-10 flex flex-col items-center text-center">
           <img
             src={LOGO_SRC}
@@ -56,22 +60,22 @@ export function PatientLoginPage() {
             height={88}
             decoding="async"
           />
-          <p className="mt-4 text-sm font-medium text-slate-600">Acesso do Paciente</p>
+          <p className="mt-4 text-sm font-medium text-ms-secondary">Acesso do Paciente</p>
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="rounded-2xl border border-slate-200/90 bg-white p-8 shadow-md shadow-slate-200/50"
+          className="rounded-2xl border border-ms-border/90 bg-ms-surface p-8 shadow-md shadow-slate-200/50"
           noValidate
         >
           <div className="space-y-5">
             <div>
-              <label htmlFor="patient-id" className="mb-1.5 block text-sm font-medium text-slate-700">
+              <label htmlFor="patient-id" className="mb-1.5 block text-sm font-medium text-ms-secondary">
                 ID do Paciente
               </label>
               <div className="relative">
                 <Hash
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ms-muted"
                   aria-hidden
                 />
                 <input
@@ -82,8 +86,8 @@ export function PatientLoginPage() {
                   value={patientId}
                   onChange={(e) => setPatientId(e.target.value)}
                   className={cn(
-                    'w-full rounded-xl border bg-slate-50 py-3 pl-10 pr-3 text-sm text-slate-900 outline-none ring-green-600/30 placeholder:text-slate-400 focus:bg-white focus:ring-2',
-                    errors.patientId ? 'border-red-300' : 'border-slate-200',
+                    'w-full rounded-xl border bg-ms-subtle py-3 pl-10 pr-3 text-sm text-ms-primary outline-none ring-green-600/30 placeholder:text-ms-muted focus:bg-ms-surface focus:ring-2',
+                    errors.patientId ? 'border-red-300' : 'border-ms-border',
                   )}
                   placeholder="Ex: #9821-BCI"
                 />
@@ -92,12 +96,12 @@ export function PatientLoginPage() {
             </div>
 
             <div>
-              <label htmlFor="patient-code" className="mb-1.5 block text-sm font-medium text-slate-700">
+              <label htmlFor="patient-code" className="mb-1.5 block text-sm font-medium text-ms-secondary">
                 Código de acesso
               </label>
               <div className="relative">
                 <Key
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ms-muted"
                   aria-hidden
                 />
                 <input
@@ -108,15 +112,15 @@ export function PatientLoginPage() {
                   value={accessCode}
                   onChange={(e) => setAccessCode(e.target.value)}
                   className={cn(
-                    'w-full rounded-xl border bg-slate-50 py-3 pl-10 pr-12 text-sm text-slate-900 outline-none ring-green-600/30 placeholder:text-slate-400 focus:bg-white focus:ring-2',
-                    errors.accessCode ? 'border-red-300' : 'border-slate-200',
+                    'w-full rounded-xl border bg-ms-subtle py-3 pl-10 pr-12 text-sm text-ms-primary outline-none ring-green-600/30 placeholder:text-ms-muted focus:bg-ms-surface focus:ring-2',
+                    errors.accessCode ? 'border-red-300' : 'border-ms-border',
                   )}
                   placeholder="Código fornecido pelo profissional"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCode((v) => !v)}
-                  className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+                  className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-ms-muted transition hover:bg-ms-subtle-strong hover:text-ms-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
                   aria-label={showCode ? 'Ocultar código' : 'Mostrar código'}
                 >
                   {showCode ? <EyeOff className="h-4 w-4" aria-hidden /> : <Eye className="h-4 w-4" aria-hidden />}
@@ -137,9 +141,9 @@ export function PatientLoginPage() {
             {isLoading ? 'Conectando…' : 'Acessar Interface'}
           </Button>
 
-          <p className="mt-6 text-center text-sm text-slate-500">Não tem código? Fale com seu profissional de saúde</p>
+          <p className="mt-6 text-center text-sm text-ms-muted">Não tem código? Fale com seu profissional de saúde</p>
 
-          <p className="mt-4 text-center text-sm text-slate-600">
+          <p className="mt-4 text-center text-sm text-ms-secondary">
             Primeiro acesso?{' '}
             <Link
               to="/patient/register"

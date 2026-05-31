@@ -43,15 +43,15 @@ export function PatientSignalsPage() {
   )
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <div className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Monitoramento de Sinais</h1>
-        <p className="mt-1 text-sm text-slate-600">Visualização simulada de atenção e bandas de frequência.</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-ms-primary">Monitoramento de Sinais</h1>
+        <p className="mt-1 text-sm text-ms-secondary">Visualização simulada de atenção e bandas de frequência.</p>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-900">Atenção ao longo do tempo</h2>
-        <p className="mt-1 text-xs text-slate-500">Últimos 30 pontos (mock)</p>
+      <div className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+        <h2 className="text-sm font-semibold text-ms-primary">Atenção ao longo do tempo</h2>
+        <p className="mt-1 text-xs text-ms-muted">Últimos 30 pontos (mock)</p>
         <div className="mt-4 h-72 w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -70,23 +70,23 @@ export function PatientSignalsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-900">Bandas EEG (mock)</h2>
-        <p className="mt-1 text-xs text-slate-500">Amplitude relativa por banda de frequência</p>
+      <div className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+        <h2 className="text-sm font-semibold text-ms-primary">Bandas EEG (mock)</h2>
+        <p className="mt-1 text-xs text-ms-muted">Amplitude relativa por banda de frequência</p>
         <ul className="mt-6 space-y-4">
           {EEG_BANDS.map((band, i) => {
             const v = eegValues[i] ?? 0
             return (
               <li key={band} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                <span className="w-28 shrink-0 text-xs font-medium text-slate-600">{band}</span>
+                <span className="w-28 shrink-0 text-xs font-medium text-ms-secondary">{band}</span>
                 <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-ms-subtle-strong">
                     <div
                       className={cn('h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500')}
                       style={{ width: `${Math.min(100, v)}%` }}
                     />
                   </div>
-                  <span className="w-10 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-800">
+                  <span className="w-10 shrink-0 text-right text-xs font-semibold tabular-nums text-ms-primary">
                     {v}%
                   </span>
                 </div>

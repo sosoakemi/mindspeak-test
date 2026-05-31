@@ -62,7 +62,7 @@ function SortableRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:gap-4',
+        'flex flex-col gap-3 rounded-xl border border-ms-border bg-ms-surface p-4 shadow-sm sm:flex-row sm:items-center sm:gap-4',
         isDragging && 'z-10 opacity-95 ring-2 ring-emerald-300',
       )}
     >
@@ -79,7 +79,7 @@ function SortableRow({
         <GripVertical className="h-5 w-5" aria-hidden />
       </Button>
       <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-        <span className="w-10 shrink-0 text-xs font-bold text-slate-400">{index + 1}</span>
+        <span className="w-10 shrink-0 text-xs font-bold text-ms-muted">{index + 1}</span>
         <div className="min-w-0 flex-1">
           <label className="sr-only" htmlFor={`phrase-${row.id}`}>
             Frase na posição {index + 1}
@@ -89,7 +89,7 @@ function SortableRow({
             value={row.text}
             onChange={(e) => onTextChange(row.id, e.target.value)}
             maxLength={80}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-semibold text-slate-900 outline-none ring-emerald-600/20 focus:bg-white focus:ring-2"
+            className="w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2.5 text-sm font-semibold text-ms-primary outline-none ring-emerald-600/20 focus:bg-ms-surface focus:ring-2"
           />
         </div>
         <Button
@@ -111,6 +111,7 @@ export function PatientPhrasesWorkspacePage() {
   const [rows, setRows] = useState<Row[]>(() => rowsFromPhrases(getEightPhrases()))
   const [replaceSlot, setReplaceSlot] = useState(1)
   const [replaceText, setReplaceText] = useState('')
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -146,7 +147,13 @@ export function PatientPhrasesWorkspacePage() {
   }
 
   const save = () => {
-    setEightPhrases(rows.map((r) => r.text))
+    try {
+      setEightPhrases(rows.map((r) => r.text))
+      setSaveStatus('saved')
+      window.setTimeout(() => setSaveStatus('idle'), 2500)
+    } catch {
+      setSaveStatus('error')
+    }
   }
 
   const restoreDefaults = () => {
@@ -163,18 +170,18 @@ export function PatientPhrasesWorkspacePage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-10">
+    <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col gap-10">
       <header>
         <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Comunicação</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Frases da grade</h1>
-        <p className="mt-2 text-sm text-slate-600">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ms-primary">Frases da grade</h1>
+        <p className="mt-2 text-sm text-ms-secondary">
           Estas oito frases aparecem na sessão de comunicação em tela cheia. Reordene, edite o texto e salve.
         </p>
       </header>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Editor">
+      <section className="rounded-2xl border border-ms-border bg-ms-surface p-5 shadow-sm sm:p-6" aria-label="Editor">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-slate-900">Reordenar e editar</h2>
+          <h2 className="text-sm font-semibold text-ms-primary">Reordenar e editar</h2>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="secondary" size="sm" icon={<RotateCcw className="h-4 w-4" aria-hidden />} onClick={restoreDefaults}>
               Restaurar padrão
@@ -183,6 +190,16 @@ export function PatientPhrasesWorkspacePage() {
               Salvar alterações
             </Button>
           </div>
+          {saveStatus === 'saved' ? (
+            <p className="mt-3 text-xs font-medium text-green-700 dark:text-emerald-400" role="status">
+              Frases salvas com sucesso.
+            </p>
+          ) : null}
+          {saveStatus === 'error' ? (
+            <p className="mt-3 text-xs text-red-600" role="alert">
+              Não foi possível salvar. Tente novamente.
+            </p>
+          ) : null}
         </div>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={ids} strategy={verticalListSortingStrategy}>
@@ -195,19 +212,19 @@ export function PatientPhrasesWorkspacePage() {
         </DndContext>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-label="Substituir frase">
-        <h2 className="text-sm font-semibold text-slate-900">Substituir uma posição</h2>
-        <p className="mt-1 text-xs text-slate-500">Escolha o número do card (1–8) e digite a nova frase.</p>
+      <section className="rounded-2xl border border-ms-border bg-ms-surface p-5 shadow-sm sm:p-6" aria-label="Substituir frase">
+        <h2 className="text-sm font-semibold text-ms-primary">Substituir uma posição</h2>
+        <p className="mt-1 text-xs text-ms-muted">Escolha o número do card (1–8) e digite a nova frase.</p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div>
-            <label htmlFor="slot" className="block text-xs font-medium text-slate-600">
+            <label htmlFor="slot" className="block text-xs font-medium text-ms-secondary">
               Posição
             </label>
             <select
               id="slot"
               value={replaceSlot}
               onChange={(e) => setReplaceSlot(Number(e.target.value))}
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none ring-emerald-600/20 focus:bg-white focus:ring-2 sm:w-32"
+              className="mt-1 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-emerald-600/20 focus:bg-ms-surface focus:ring-2 sm:w-32"
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <option key={n} value={n}>
@@ -217,7 +234,7 @@ export function PatientPhrasesWorkspacePage() {
             </select>
           </div>
           <div className="min-w-0 flex-1">
-            <label htmlFor="newPhrase" className="block text-xs font-medium text-slate-600">
+            <label htmlFor="newPhrase" className="block text-xs font-medium text-ms-secondary">
               Nova frase
             </label>
             <input
@@ -226,14 +243,14 @@ export function PatientPhrasesWorkspacePage() {
               onChange={(e) => setReplaceText(e.target.value)}
               maxLength={80}
               placeholder="Digite a frase"
-              className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none ring-emerald-600/20 focus:bg-white focus:ring-2"
+              className="mt-1 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm font-medium outline-none ring-emerald-600/20 focus:bg-ms-surface focus:ring-2"
             />
           </div>
           <Button type="button" variant="primary" size="md" onClick={applyReplace}>
             Aplicar na grade
           </Button>
         </div>
-        <p className="mt-3 text-xs text-slate-400">Depois de aplicar, use &quot;Salvar alterações&quot; acima para persistir.</p>
+        <p className="mt-3 text-xs text-ms-muted">Depois de aplicar, use &quot;Salvar alterações&quot; acima para persistir.</p>
       </section>
     </div>
   )

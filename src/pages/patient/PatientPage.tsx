@@ -13,9 +13,25 @@ import {
   UserRound,
   XCircle,
 } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { cn } from '../../lib/cn'
 import { usePatientBci, type SystemPhase } from '../../hooks/usePatientBci'
 import { Button, LinkButton } from '../../components/shared/Button'
+import { PatientHeaderActions } from '../../components/patient/PatientHeaderActions'
+import { PatientSyncButton } from '../../components/patient/PatientSyncButton'
+import { clearPatientSession, getPatientSession } from '../../lib/patientSession'
+import { useMobileSidebar } from '../../hooks/useMobileSidebar'
+import {
+  msNavActive,
+  msNavInactive,
+  msPage,
+  msSidebarAside,
+  msSidebarClosed,
+  msMainPad,
+  msSidebarOpen,
+  msSurface,
+} from '../../lib/msStyles'
+import { Menu, X } from 'lucide-react'
 
 export type PatientPageProps = {
   patientId?: string
@@ -35,7 +51,7 @@ const wordMeta: Record<
   { icon: typeof CheckCircle2; wrapClass: string; iconClass: string }
 > = {
   SIM: { icon: CheckCircle2, wrapClass: 'bg-blue-50 text-blue-600', iconClass: '' },
-  NÃO: { icon: XCircle, wrapClass: 'bg-slate-100 text-slate-500', iconClass: '' },
+  NÃO: { icon: XCircle, wrapClass: 'bg-ms-subtle-strong text-ms-muted', iconClass: '' },
   'PRECISO DE AJUDA': { icon: HelpCircle, wrapClass: 'bg-red-50 text-red-600', iconClass: '' },
   'ESTOU BEM': { icon: Smile, wrapClass: 'bg-emerald-50 text-emerald-600', iconClass: '' },
   ÁGUA: { icon: Droplets, wrapClass: 'bg-sky-50 text-sky-600', iconClass: '' },
@@ -49,6 +65,8 @@ export function PatientPage({
   patientName = 'Paciente',
   onLogout,
 }: PatientPageProps = {}) {
+  const nav = useNavigate()
+  const session = getPatientSession()
   const {
     words,
     attention,
@@ -61,103 +79,119 @@ export function PatientPage({
     startDemo,
     reset,
   } = usePatientBci()
+  const { open, close, openSidebar } = useMobileSidebar()
 
   return (
-    <div className="flex min-h-dvh bg-slate-100 text-slate-900">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="flex items-center gap-3 border-b border-slate-100 p-5">
+    <div className={cn('flex min-h-dvh overflow-x-hidden', msPage)}>
+      {open ? (
+        <button type="button" className="fixed inset-0 z-30 bg-black/50 lg:hidden" aria-label="Fechar menu" onClick={close} />
+      ) : null}
+      <aside
+        className={cn(msSidebarAside, open ? msSidebarOpen : msSidebarClosed)}
+        aria-label="Menu lateral"
+      >
+        <div className="flex items-center justify-between gap-3 border-b border-ms-border-subtle p-4 lg:p-5">
+          <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-600 text-sm font-semibold text-white">
             <UserRound className="h-6 w-6" aria-hidden />
           </div>
           <div>
             <p className="text-sm font-semibold">{patientName}</p>
-            <p className="text-xs text-slate-500">ID: {patientId}</p>
+            <p className="text-xs text-ms-muted">ID: {patientId}</p>
           </div>
+          </div>
+          <button
+            type="button"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-ms-secondary hover:bg-ms-subtle lg:hidden"
+            onClick={close}
+            aria-label="Fechar menu"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
         </div>
         <div className="p-4">
-          <Button type="button" variant="primary" fullWidth>
-            Sincronizar
-          </Button>
+          <PatientSyncButton />
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3" aria-label="Navegação">
-          <div className="flex items-center gap-3 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm font-medium text-emerald-900">
-            <MessageCircle className="h-5 w-5 shrink-0" aria-hidden />
-            Comunicação
-          </div>
-          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600">
-            <BarChart3 className="h-5 w-5 shrink-0 text-slate-400" aria-hidden />
-            Sinais
-          </div>
-          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600">
-            <History className="h-5 w-5 shrink-0 text-slate-400" aria-hidden />
-            Histórico
-          </div>
-          <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-600">
-            <HelpCircle className="h-5 w-5 shrink-0 text-slate-400" aria-hidden />
-            Suporte
-          </div>
+          {(
+            [
+              { to: '/patient/dashboard', label: 'Comunicação', icon: MessageCircle, end: true },
+              { to: '/patient/dashboard/sinais', label: 'Sinais', icon: BarChart3, end: false },
+              { to: '/patient/dashboard/historico', label: 'Histórico', icon: History, end: false },
+              { to: '/patient/dashboard/suporte', label: 'Suporte', icon: HelpCircle, end: false },
+            ] as const
+          ).map(({ to, label, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              onClick={close}
+              className={({ isActive }) =>
+                cn(
+                  'flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                  isActive ? msNavActive : msNavInactive,
+                )
+              }
+            >
+              <Icon className="h-5 w-5 shrink-0" aria-hidden />
+              {label}
+            </NavLink>
+          ))}
         </nav>
-        <div className="mt-auto space-y-1 border-t border-slate-100 p-3">
-          <div className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-slate-600">
-            <Settings className="h-4 w-4" aria-hidden />
+        <div className="mt-auto space-y-1 border-t border-ms-border-subtle p-3">
+          <LinkButton
+            to="/patient/dashboard/configuracoes"
+            variant="ghost"
+            size="sm"
+            fullWidth
+            className="justify-start px-2"
+            icon={<Settings className="h-4 w-4" aria-hidden />}
+            onClick={close}
+          >
             Configurações
-          </div>
-          {onLogout ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start px-2"
-              icon={<LogOut className="h-4 w-4" aria-hidden />}
-              onClick={onLogout}
-            >
-              Sair
-            </Button>
-          ) : (
-            <LinkButton
-              to="/"
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start px-2"
-              icon={<LogOut className="h-4 w-4" aria-hidden />}
-            >
-              Sair
-            </LinkButton>
-          )}
+          </LinkButton>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start px-2 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+            icon={<LogOut className="h-4 w-4" aria-hidden />}
+            onClick={() => {
+              if (onLogout) onLogout()
+              else if (session) {
+                clearPatientSession()
+                nav('/patient/login', { replace: true })
+              } else {
+                nav('/')
+              }
+            }}
+          >
+            Sair
+          </Button>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-end gap-3 border-b border-slate-200 bg-white px-8 py-4">
-          <span className="sr-only">Ações secundárias</span>
-          <Button
+        <header className={cn('flex items-center justify-between gap-3 border-b border-ms-border px-4 py-3 sm:px-6 lg:px-8 lg:py-4', msSurface)}>
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
-            className="rounded-full px-2"
-            aria-label="Perfil"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-ms-border text-ms-secondary hover:bg-ms-subtle lg:hidden"
+            onClick={openSidebar}
+            aria-label="Abrir menu"
           >
-            <UserRound className="h-5 w-5" aria-hidden />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="rounded-full px-2"
-            aria-label="Configurações rápidas"
-          >
-            <Settings className="h-5 w-5" aria-hidden />
-          </Button>
+            <Menu className="h-5 w-5" aria-hidden />
+          </button>
+          <PatientHeaderActions />
         </header>
 
-        <main className="flex flex-1 flex-col gap-8 overflow-auto px-8 py-8">
+        <main className={cn('flex flex-1 flex-col gap-6 overflow-x-hidden overflow-y-auto sm:gap-8', msMainPad)}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-violet-600">
                 Status da conexão
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-4">
-                <h1 className="text-4xl font-semibold tracking-tight text-slate-900">
+                <h1 className="text-2xl font-semibold tracking-tight text-ms-primary sm:text-3xl lg:text-4xl">
                   {Math.min(100, Math.max(0, attention))}% Neural Sync
                 </h1>
                 <div className="flex h-10 items-end gap-0.5" aria-hidden>
@@ -170,7 +204,7 @@ export function PatientPage({
                   ))}
                 </div>
               </div>
-              <p className="mt-2 text-sm text-slate-600">Aguardando comando neural…</p>
+              <p className="mt-2 text-sm text-ms-secondary">Aguardando comando neural…</p>
             </div>
           </div>
 
@@ -187,12 +221,12 @@ export function PatientPage({
                   <article
                     key={word}
                     className={cn(
-                      'flex min-h-[140px] flex-col items-center justify-center gap-4 rounded-2xl border bg-white p-6 text-center shadow-sm transition',
+                      'flex min-h-[140px] flex-col items-center justify-center gap-4 rounded-2xl border bg-ms-surface p-6 text-center shadow-sm transition',
                       confirmed && 'border-emerald-600 bg-emerald-50 shadow-emerald-900/10',
                       !confirmed &&
                         highlighted &&
                         'border-emerald-500 shadow-[0_0_0_1px_rgb(16_185_129_0.55),0_0_24px_rgb(16_185_129_0.25)]',
-                      !confirmed && !highlighted && 'border-slate-200',
+                      !confirmed && !highlighted && 'border-ms-border',
                       locking && 'animate-ms-pulse-glow',
                     )}
                     aria-current={highlighted ? 'true' : undefined}
@@ -205,7 +239,7 @@ export function PatientPage({
                     >
                       <Icon className={cn('h-8 w-8', meta.iconClass)} aria-hidden />
                     </div>
-                    <p className="text-lg font-semibold leading-snug tracking-tight text-slate-900 sm:text-xl">
+                    <p className="text-lg font-semibold leading-snug tracking-tight text-ms-primary sm:text-xl">
                       {word}
                     </p>
                   </article>
@@ -215,12 +249,12 @@ export function PatientPage({
           </section>
 
           <section className="grid gap-6 lg:grid-cols-2" aria-label="Monitoramento e demonstração">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">Nível de atenção</h2>
-              <p className="mt-1 text-xs text-slate-500">
+            <div className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+              <h2 className="text-sm font-semibold text-ms-primary">Nível de atenção</h2>
+              <p className="mt-1 text-xs text-ms-muted">
                 Limiar de confirmação em {threshold}% — mantenha o foco por 1,5s sobre a palavra destacada.
               </p>
-              <div className="relative mt-5 h-4 overflow-hidden rounded-full bg-slate-100" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={attention} aria-label="Atenção">
+              <div className="relative mt-5 h-4 overflow-hidden rounded-full bg-ms-subtle-strong" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={attention} aria-label="Atenção">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-[width] duration-150"
                   style={{ width: `${Math.min(100, Math.max(0, attention))}%` }}
@@ -231,26 +265,26 @@ export function PatientPage({
                   title={`Limiar ${threshold}%`}
                 />
               </div>
-              <div className="mt-2 flex justify-between text-xs font-medium text-slate-500">
+              <div className="mt-2 flex justify-between text-xs font-medium text-ms-muted">
                 <span>0%</span>
-                <span className="text-slate-800">{attention}%</span>
+                <span className="text-ms-primary">{attention}%</span>
                 <span>100%</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-900">Painel de status</h2>
+            <div className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+              <h2 className="text-sm font-semibold text-ms-primary">Painel de status</h2>
               <dl className="mt-4 space-y-3 text-sm">
-                <div className="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                  <dt className="text-slate-500">Palavra em foco</dt>
-                  <dd className="text-right font-semibold text-slate-900">{focusedWordLabel}</dd>
+                <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
+                  <dt className="text-ms-muted">Palavra em foco</dt>
+                  <dd className="text-right font-semibold text-ms-primary">{focusedWordLabel}</dd>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Estado do sistema</dt>
+                  <dt className="text-ms-muted">Estado do sistema</dt>
                   <dd className="text-right font-semibold text-emerald-900">{phaseLabel[phase]}</dd>
                 </div>
               </dl>
-              <div className="mt-6 flex flex-wrap gap-3 border-t border-slate-100 pt-5">
+              <div className="mt-6 flex flex-wrap gap-3 border-t border-ms-border-subtle pt-5">
                 <Button
                   type="button"
                   variant="primary"
@@ -269,17 +303,17 @@ export function PatientPage({
                   Resetar
                 </Button>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-slate-500">
+              <p className="mt-4 text-xs leading-relaxed text-ms-muted">
                 Área de demonstração: em uso clínico real, estes controles podem permanecer ocultos ao paciente.
               </p>
             </div>
           </section>
 
           <div className="grid gap-4 pb-8 lg:grid-cols-[2fr_1fr]">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-ms-border bg-ms-surface p-5 shadow-sm">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900">Sinal neurológico (EEG)</h2>
-                <span className="text-xs font-medium text-slate-500">Simulação visual</span>
+                <h2 className="text-sm font-semibold text-ms-primary">Sinal neurológico (EEG)</h2>
+                <span className="text-xs font-medium text-ms-muted">Simulação visual</span>
               </div>
               <div className="flex h-28 items-end gap-1 rounded-xl bg-sky-50/80 p-3">
                 {Array.from({ length: 40 }).map((_, i) => (
@@ -292,16 +326,16 @@ export function PatientPage({
               </div>
               <div className="mt-3 flex justify-end gap-2 text-right">
                 <div>
-                  <p className="text-lg font-bold text-slate-900">12,4 μV</p>
-                  <p className="text-xs text-slate-500">Média de pico</p>
+                  <p className="text-lg font-bold text-ms-primary">12,4 μV</p>
+                  <p className="text-xs text-ms-muted">Média de pico</p>
                 </div>
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-ms-border bg-ms-surface p-5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Ambiente</p>
-                  <p className="mt-2 text-3xl font-semibold text-slate-900">24°C</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-ms-muted">Ambiente</p>
+                  <p className="mt-2 text-3xl font-semibold text-ms-primary">24°C</p>
                 </div>
                 <Thermometer className="h-8 w-8 text-emerald-600" aria-hidden />
               </div>

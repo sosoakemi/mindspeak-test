@@ -1,9 +1,54 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --ms-bg: #f4f6f8;
+  --ms-surface: #ffffff;
+  --ms-primary: #0f172a;
+  --ms-secondary: #475569;
+  --ms-muted: #64748b;
+  --ms-border: #e2e8f0;
+  --ms-border-subtle: #f1f5f9;
+  --ms-subtle: #f8fafc;
+  --ms-subtle-strong: #f1f5f9;
+  --ms-accent: #2563eb;
+  --ms-accent-hover: #1d4ed8;
+  --ms-accent-soft: #dbeafe;
+  --ms-accent-muted: #3b82f6;
+}
+
+.dark {
+  --ms-bg: #030712;
+  --ms-surface: #0f172a;
+  --ms-primary: #f9fafb;
+  --ms-secondary: #e2e8f0;
+  --ms-muted: #94a3b8;
+  --ms-border: #1e293b;
+  --ms-border-subtle: #111827;
+  --ms-subtle: #030712;
+  --ms-subtle-strong: #1e293b;
+  --ms-accent: #3b82f6;
+  --ms-accent-hover: #2563eb;
+  --ms-accent-soft: #172554;
+  --ms-accent-muted: #60a5fa;
+}
+
 @theme {
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --color-ms-bg: #f4f6f8;
-  --color-ms-surface: #ffffff;
+  --color-ms-page: var(--ms-bg);
+  --color-ms-surface: var(--ms-surface);
+  --color-ms-primary: var(--ms-primary);
+  --color-ms-secondary: var(--ms-secondary);
+  --color-ms-muted: var(--ms-muted);
+  --color-ms-border: var(--ms-border);
+  --color-ms-border-subtle: var(--ms-border-subtle);
+  --color-ms-subtle: var(--ms-subtle);
+  --color-ms-subtle-strong: var(--ms-subtle-strong);
+  --color-ms-accent: var(--ms-accent);
+  --color-ms-accent-hover: var(--ms-accent-hover);
+  --color-ms-accent-soft: var(--ms-accent-soft);
+  --color-ms-accent-muted: var(--ms-accent-muted);
   --color-ms-forest: #064e3b;
   --color-ms-forest-deep: #022c22;
   --color-ms-mint: #d1fae5;
@@ -17,7 +62,12 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    @apply antialiased text-slate-900;
+    @apply antialiased text-ms-primary;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -25,11 +75,34 @@
       scroll-behavior: auto;
     }
   }
+
   body {
-    @apply m-0 min-h-dvh bg-[var(--color-ms-bg)] font-sans;
+    @apply m-0 min-h-dvh overflow-x-hidden bg-ms-page font-sans;
   }
+
   #root {
-    @apply min-h-dvh;
+    @apply min-h-dvh min-w-0 overflow-x-hidden;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  .ms-table-wrap {
+    @apply w-full max-w-full overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ms-table-wrap table {
+    @apply w-full min-w-[20rem] text-xs sm:min-w-[28rem] sm:text-sm;
+  }
+
+  .ms-modal-panel {
+    @apply w-full max-w-[calc(100vw-2rem)] rounded-2xl border border-ms-border bg-ms-surface p-4 shadow-xl sm:max-w-md sm:p-6;
   }
 }
 

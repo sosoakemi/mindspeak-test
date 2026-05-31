@@ -8,13 +8,13 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-green-600 text-white hover:bg-green-700 hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700',
+    'bg-green-600 text-white hover:bg-green-700 hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 dark:bg-ms-accent dark:hover:bg-ms-accent-hover dark:shadow-blue-900/30 dark:focus-visible:outline-ms-accent-muted',
   secondary:
-    'border border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400',
+    'border border-ms-border bg-ms-surface text-ms-secondary hover:border-gray-400 hover:bg-ms-subtle active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 dark:border-ms-border dark:hover:border-ms-accent/50 dark:hover:bg-ms-subtle-strong',
   danger:
     'bg-red-600 text-white hover:bg-red-700 hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-800',
   ghost:
-    'bg-transparent text-green-600 hover:bg-green-50 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 min-h-[44px] px-4 py-2',
+    'bg-transparent text-green-600 hover:bg-green-50 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 min-h-[44px] px-4 py-2 dark:text-ms-accent-muted dark:hover:bg-blue-950/40 dark:focus-visible:outline-ms-accent',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {

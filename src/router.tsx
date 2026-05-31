@@ -14,6 +14,7 @@ import { PatientHistoryPage } from './pages/patient/dashboard/PatientHistoryPage
 import { PatientSupportPage } from './pages/patient/dashboard/PatientSupportPage'
 import { PatientCommunicatePage } from './pages/patient/PatientCommunicatePage'
 import { PatientPhrasesWorkspacePage } from './pages/patient/dashboard/PatientPhrasesWorkspacePage'
+import { PatientSettingsPage } from './pages/patient/dashboard/PatientSettingsPage'
 import { DashboardLayout } from './pages/dashboard/DashboardLayout'
 import { DashboardOverviewPage } from './pages/dashboard/DashboardOverviewPage'
 import { MonitorPage } from './pages/dashboard/MonitorPage'
@@ -30,7 +31,8 @@ export const router = createBrowserRouter([
       { path: '/login', element: <LoginPage /> },
       { path: '/cadastro', element: <RegisterPage /> },
       { path: '/forgot-password', element: <ForgotPasswordPage /> },
-      { path: '/patient', element: <PatientPage /> },
+      { path: '/patient', element: <Navigate to="/patient/dashboard" replace /> },
+      { path: '/patient/demo', element: <PatientPage /> },
       { path: '/patient/login', element: <PatientLoginPage /> },
       { path: '/patient/register', element: <PatientRegisterPage /> },
       { path: '/patient/communicate', element: <PatientCommunicatePage /> },
@@ -45,6 +47,7 @@ export const router = createBrowserRouter([
           { path: 'historico', element: <PatientHistoryPage /> },
           { path: 'suporte', element: <PatientSupportPage /> },
           { path: 'palavras', element: <PatientPhrasesWorkspacePage /> },
+          { path: 'configuracoes', element: <PatientSettingsPage /> },
           { path: 'editor', element: <Navigate to="/patient/dashboard/palavras" replace /> },
           { path: 'adicionar', element: <Navigate to="/patient/dashboard/palavras" replace /> },
           { path: '*', element: <Navigate to="/patient/dashboard" replace /> },

@@ -5,14 +5,28 @@ import {
   History,
   LayoutDashboard,
   LogOut,
+  Menu,
   MessageSquareText,
   Settings,
+  X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
 import { mockProfessional } from '../../data/mockDashboard'
 import { DashboardAlertsProvider, useDashboardAlerts } from './alerts-context'
 import { Button } from '../../components/shared/Button'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
+import { ThemeToggle } from '../../components/shared/ThemeToggle'
+import { useMobileSidebar } from '../../hooks/useMobileSidebar'
+import {
+  msNavActive,
+  msNavInactive,
+  msPage,
+  msSidebarAside,
+  msMainPad,
+  msSidebarClosed,
+  msSidebarOpen,
+  msSurface,
+} from '../../lib/msStyles'
 
 const nav = [
   { to: '/dashboard', label: 'Visão Geral', end: true, icon: LayoutDashboard },
@@ -35,26 +49,51 @@ function UnreadAlertsBadge() {
 
 function DashboardShell() {
   const navFn = useNavigate()
+  const { open, close, openSidebar } = useMobileSidebar()
 
   return (
-    <div className="flex min-h-dvh bg-[#f4f6f8] text-slate-900">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-100 p-5">
-          <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
-          <p className="mt-2 text-[11px] text-slate-500">Interface clínica</p>
+    <div className={cn('flex min-h-dvh overflow-x-hidden', msPage)}>
+      {open ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          aria-label="Fechar menu"
+          onClick={close}
+        />
+      ) : null}
+
+      <aside
+        className={cn(
+          msSidebarAside,
+          open ? msSidebarOpen : msSidebarClosed,
+        )}
+        aria-label="Menu lateral"
+      >
+        <div className="flex items-center justify-between border-b border-ms-border-subtle p-4 lg:p-5">
+          <div className="min-w-0 flex-1">
+            <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
+            <p className="mt-2 text-[11px] text-ms-muted">Interface clínica</p>
+          </div>
+          <button
+            type="button"
+            className="ml-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-ms-secondary hover:bg-ms-subtle lg:hidden"
+            onClick={close}
+            aria-label="Fechar menu"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
         </div>
-        <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Principal">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Principal">
           {nav.map(({ to, label, end, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
+              onClick={close}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
-                  isActive
-                    ? 'bg-emerald-50 text-emerald-950 ring-1 ring-emerald-100'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
+                  'flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                  isActive ? msNavActive : msNavInactive,
                 )
               }
             >
@@ -64,7 +103,7 @@ function DashboardShell() {
             </NavLink>
           ))}
         </nav>
-        <div className="space-y-2 border-t border-slate-100 p-4">
+        <div className="space-y-2 border-t border-ms-border-subtle p-4">
           <Button type="button" variant="primary" fullWidth onClick={() => navFn('/dashboard/monitor')}>
             Nova sessão
           </Button>
@@ -81,22 +120,50 @@ function DashboardShell() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-8 py-4">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Profissional logado</p>
-            <p className="text-sm font-semibold text-slate-900">{mockProfessional.name}</p>
+        <header
+          className={cn(
+            'flex flex-wrap items-center justify-between gap-2 border-b border-ms-border px-3 py-3 sm:gap-3 sm:px-6 lg:px-8 lg:py-4',
+            msSurface,
+          )}
+        >
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-ms-border text-ms-secondary hover:bg-ms-subtle lg:hidden"
+              onClick={openSidebar}
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" aria-hidden />
+            </button>
+            <div className="min-w-0">
+              <p className="text-xs font-medium uppercase tracking-wide text-ms-muted">Profissional logado</p>
+              <p className="truncate text-sm font-semibold text-ms-primary">{mockProfessional.name}</p>
+            </div>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            icon={<LogOut className="h-4 w-4" aria-hidden />}
-            onClick={() => navFn('/login')}
-          >
-            Sair
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle size="compact" />
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="hidden sm:inline-flex"
+              icon={<LogOut className="h-4 w-4" aria-hidden />}
+              onClick={() => navFn('/login')}
+            >
+              Sair
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="sm:hidden"
+              aria-label="Sair"
+              icon={<LogOut className="h-4 w-4" aria-hidden />}
+              onClick={() => navFn('/login')}
+            />
+          </div>
         </header>
-        <main className="flex-1 overflow-auto p-8">
+        <main className={cn('flex-1 overflow-x-hidden overflow-y-auto', msMainPad)}>
           <Outlet />
         </main>
       </div>

@@ -11,8 +11,10 @@ import {
 } from 'recharts'
 import { Activity, Headset, Wifi } from 'lucide-react'
 import { mockPatient } from '../../data/mockDashboard'
+import { useChartTheme } from '../../hooks/useChartTheme'
 
 export function MonitorPage() {
+  const chart = useChartTheme()
   const waves = useMemo(() => {
     return Array.from({ length: 120 }).map((_, i) => {
       const x = i / 8
@@ -25,11 +27,11 @@ export function MonitorPage() {
   }, [])
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-6 sm:space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Monitoramento</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-ms-secondary">
             Paciente {mockPatient.name} · {mockPatient.bed}
           </p>
         </div>
@@ -38,28 +40,28 @@ export function MonitorPage() {
             <Wifi className="h-4 w-4" aria-hidden />
             Sincronizado
           </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700">
-            <Headset className="h-4 w-4 text-slate-500" aria-hidden />
+          <span className="inline-flex items-center gap-2 rounded-full bg-ms-subtle-strong px-3 py-1 font-medium text-ms-secondary">
+            <Headset className="h-4 w-4 text-ms-muted" aria-hidden />
             Headset EEG
           </span>
         </div>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold text-slate-900">Interface neural</h2>
+          <h2 className="text-sm font-semibold text-ms-primary">Interface neural</h2>
           <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800">
             <Activity className="h-4 w-4" aria-hidden />
             98,4% neural sync
           </span>
         </div>
-        <p className="mb-4 text-xs text-slate-500">Ondas simuladas · Alpha (azul) e Beta (roxo)</p>
+        <p className="mb-4 text-xs text-ms-muted">Ondas simuladas · Alpha (azul) e Beta (roxo)</p>
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={waves} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="i" hide />
-              <YAxis domain={[-1.2, 1.2]} width={28} tick={{ fontSize: 10, fill: '#64748b' }} />
+              <YAxis domain={[-1.2, 1.2]} width={28} tick={{ fontSize: 10, fill: chart.axis }} />
               <Tooltip
                 formatter={(v, name) => {
                   const n = Number(v ?? 0)
@@ -67,14 +69,19 @@ export function MonitorPage() {
                   return [n.toFixed(2), label]
                 }}
                 labelFormatter={() => 'Amostra'}
-                contentStyle={{ borderRadius: 12 }}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: `1px solid ${chart.tooltipBorder}`,
+                  background: chart.tooltipBg,
+                  color: chart.tooltipText,
+                }}
               />
               <Legend />
               <Line
                 type="monotone"
                 dataKey="alpha"
                 name="Alpha (8–12 Hz)"
-                stroke="#2563eb"
+                stroke={chart.lineAlpha}
                 strokeOpacity={0.85}
                 dot={false}
                 strokeWidth={2}
@@ -84,7 +91,7 @@ export function MonitorPage() {
                 type="monotone"
                 dataKey="beta"
                 name="Beta (13–30 Hz)"
-                stroke="#7c3aed"
+                stroke={chart.lineBeta}
                 strokeOpacity={0.75}
                 dot={false}
                 strokeWidth={2}
@@ -101,10 +108,10 @@ export function MonitorPage() {
           { k: 'Sinal alfa', v: '85% match', s: 'Foco cognitivo médio', tone: 'blue' },
           { k: 'Latência neural', v: '14 ms', s: 'Tempo de resposta nominal', tone: 'violet' },
         ].map((c) => (
-          <article key={c.k} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{c.k}</p>
-            <p className="mt-3 text-2xl font-semibold text-slate-900">{c.v}</p>
-            <p className="mt-2 text-sm text-slate-600">{c.s}</p>
+          <article key={c.k} className="rounded-2xl border border-ms-border bg-ms-surface p-5 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">{c.k}</p>
+            <p className="mt-3 text-2xl font-semibold text-ms-primary">{c.v}</p>
+            <p className="mt-2 text-sm text-ms-secondary">{c.s}</p>
             <div className="mt-4 flex h-10 items-end gap-1">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div

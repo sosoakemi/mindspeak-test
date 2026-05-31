@@ -17,6 +17,9 @@ import {
   severityMeta,
 } from '../../data/mockDashboard'
 import { useDashboardAlerts } from './alerts-context'
+import { useChartTheme } from '../../hooks/useChartTheme'
+import { msAccentBox, msCardPad, msPill, msStatRow } from '../../lib/msStyles'
+import { cn } from '../../lib/cn'
 
 function severityIcon(sev: ReturnType<typeof severityFromPhrase>) {
   if (sev === 'critico') return ShieldAlert
@@ -26,6 +29,7 @@ function severityIcon(sev: ReturnType<typeof severityFromPhrase>) {
 
 export function DashboardOverviewPage() {
   const { alerts } = useDashboardAlerts()
+  const chart = useChartTheme()
 
   const chartData = useMemo(() => {
     const now = Date.now()
@@ -41,24 +45,26 @@ export function DashboardOverviewPage() {
   const recent = [...alerts].sort((a, b) => b.time.localeCompare(a.time)).slice(0, 4)
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Visão geral</h1>
-        <p className="mt-1 text-sm text-slate-600">Monitoramento do paciente em tempo quase real (mock).</p>
+    <div className="min-w-0 space-y-6 sm:space-y-8">
+      <div className="min-w-0">
+        <h1 className="text-xl font-semibold tracking-tight text-emerald-950 dark:text-emerald-100 sm:text-2xl">
+          Visão geral
+        </h1>
+        <p className="mt-1 text-sm text-ms-secondary">Monitoramento do paciente em tempo quase real (mock).</p>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <article className={msCardPad}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold text-slate-900">{mockPatient.name}</h2>
-              <p className="mt-1 text-sm text-slate-600">{mockPatient.bed}</p>
-              <p className="mt-2 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+              <h2 className="text-lg font-semibold text-ms-primary">{mockPatient.name}</h2>
+              <p className="mt-1 text-sm text-ms-secondary">{mockPatient.bed}</p>
+              <p className={cn('mt-2', msPill)}>
                 {mockPatient.diagnosis}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Sensor</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">Sensor</p>
               <p
                 className={
                   mockPatient.sensorConnected
@@ -78,37 +84,37 @@ export function DashboardOverviewPage() {
               </p>
             </div>
           </div>
-          <div className="mt-6 grid gap-4 border-t border-slate-100 pt-6 sm:grid-cols-2">
+          <div className="mt-6 grid gap-4 border-t border-ms-border-subtle pt-6 sm:grid-cols-2">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Última seleção</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">{mockPatient.lastSelection}</p>
-              <p className="text-xs text-slate-500">às {mockPatient.lastSelectionAt}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-ms-muted">Última seleção</p>
+              <p className="mt-1 text-2xl font-semibold text-ms-primary">{mockPatient.lastSelection}</p>
+              <p className="text-xs text-ms-muted">às {mockPatient.lastSelectionAt}</p>
             </div>
-            <div className="rounded-xl bg-emerald-50/80 p-4 ring-1 ring-emerald-100">
-              <p className="text-xs font-semibold text-emerald-900">Resumo rápido</p>
-              <p className="mt-2 text-sm leading-relaxed text-emerald-950/90">
+            <div className={msAccentBox}>
+              <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">Resumo rápido</p>
+              <p className="mt-2 text-sm leading-relaxed text-emerald-950/90 dark:text-emerald-100/90">
                 Sistema estável. Priorize revisão de frases críticas se houver aumento de alertas vermelhos.
               </p>
             </div>
           </div>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Estatísticas do dia</h2>
+        <article className={msCardPad}>
+          <h2 className="text-sm font-semibold text-ms-primary">Estatísticas do dia</h2>
           <dl className="mt-4 space-y-4">
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-              <dt className="text-sm text-slate-600">Total de seleções</dt>
-              <dd className="text-lg font-semibold tabular-nums text-slate-900">{mockDayStats.totalSelections}</dd>
+            <div className={msStatRow}>
+              <dt className="text-sm text-ms-secondary">Total de seleções</dt>
+              <dd className="text-lg font-semibold tabular-nums text-ms-primary">{mockDayStats.totalSelections}</dd>
             </div>
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-              <dt className="text-sm text-slate-600">Precisão</dt>
+            <div className={msStatRow}>
+              <dt className="text-sm text-ms-secondary">Precisão</dt>
               <dd className="text-lg font-semibold tabular-nums text-emerald-800">
                 {mockDayStats.accuracyPct}%
               </dd>
             </div>
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-              <dt className="text-sm text-slate-600">Tempo médio</dt>
-              <dd className="text-lg font-semibold tabular-nums text-slate-900">
+            <div className={msStatRow}>
+              <dt className="text-sm text-ms-secondary">Tempo médio</dt>
+              <dd className="text-lg font-semibold tabular-nums text-ms-primary">
                 {mockDayStats.avgTimeSec}s
               </dd>
             </div>
@@ -116,17 +122,17 @@ export function DashboardOverviewPage() {
         </article>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className={msCardPad}>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">Atenção (últimos 60s)</h2>
-            <p className="text-xs text-slate-500">Simulação local · integração WebSocket depois</p>
+            <h2 className="text-sm font-semibold text-ms-primary">Atenção (últimos 60s)</h2>
+            <p className="text-xs text-ms-muted">Simulação local · integração WebSocket depois</p>
           </div>
-          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100">
+          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 ring-1 ring-blue-100 dark:bg-blue-950/50 dark:text-blue-200 dark:ring-blue-800">
             Tempo real (mock)
           </span>
         </div>
-        <div className="h-64 w-full">
+        <div className="h-52 w-full min-w-0 sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <defs>
@@ -135,11 +141,16 @@ export function DashboardOverviewPage() {
                   <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="t" tick={{ fontSize: 10, fill: '#64748b' }} interval={9} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: '#64748b' }} width={32} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} vertical={false} />
+              <XAxis dataKey="t" tick={{ fontSize: 10, fill: chart.axis }} interval={9} />
+              <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: chart.axis }} width={32} />
               <Tooltip
-                contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0' }}
+                contentStyle={{
+                  borderRadius: 12,
+                  border: `1px solid ${chart.tooltipBorder}`,
+                  background: chart.tooltipBg,
+                  color: chart.tooltipText,
+                }}
                 formatter={(v) => [`${Number(v ?? 0)}%`, 'Atenção']}
               />
               <Area
@@ -156,9 +167,9 @@ export function DashboardOverviewPage() {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <article className={msCardPad}>
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-slate-900">Alertas recentes</h2>
+            <h2 className="text-sm font-semibold text-ms-primary">Alertas recentes</h2>
             <LinkButton to="/dashboard/alerts" variant="ghost" size="sm" className="!px-0 !text-green-700">
               Ver central →
             </LinkButton>
@@ -171,7 +182,7 @@ export function DashboardOverviewPage() {
               return (
                 <li
                   key={a.id}
-                  className={`flex items-start gap-3 rounded-xl bg-slate-50/80 p-3 ring-1 ring-slate-100 ${meta.rowClass}`}
+                  className={`flex items-start gap-3 rounded-xl bg-ms-subtle/80 p-3 ring-1 ring-ms-border-subtle ${meta.rowClass}`}
                 >
                   <span
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ${meta.badgeClass}`}
@@ -179,9 +190,9 @@ export function DashboardOverviewPage() {
                     <Icon className="h-4 w-4" aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{a.time}</p>
-                    <p className="truncate text-sm font-semibold text-slate-900">{a.phrase}</p>
-                    <p className="text-xs text-slate-600">{meta.label}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">{a.time}</p>
+                    <p className="truncate text-sm font-semibold text-ms-primary">{a.phrase}</p>
+                    <p className="text-xs text-ms-secondary">{meta.label}</p>
                   </div>
                 </li>
               )
@@ -189,8 +200,8 @@ export function DashboardOverviewPage() {
           </ul>
         </article>
 
-        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Ações rápidas</h2>
+        <article className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-ms-primary">Ações rápidas</h2>
           <div className="mt-4 flex flex-col gap-3">
             <LinkButton
               to="/dashboard/settings"
@@ -212,13 +223,13 @@ export function DashboardOverviewPage() {
               type="button"
               variant="secondary"
               fullWidth
-              icon={<Wrench className="h-4 w-4 text-slate-600" aria-hidden />}
+              icon={<Wrench className="h-4 w-4 text-ms-secondary" aria-hidden />}
             >
               Recalibrar
             </Button>
           </div>
-          <p className="mt-4 flex items-center gap-2 text-xs text-slate-500">
-            <Cpu className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+          <p className="mt-4 flex items-center gap-2 text-xs text-ms-muted">
+            <Cpu className="h-4 w-4 shrink-0 text-ms-muted" aria-hidden />
             Ações executam fluxo real quando o backend estiver disponível.
           </p>
         </article>

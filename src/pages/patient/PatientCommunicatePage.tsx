@@ -11,6 +11,8 @@ import { cn } from '../../lib/cn'
 import { getEightPhrases, PHRASES_CHANGED_EVENT } from '../../data/patientPhrases'
 import { getPhraseVisual } from './patientPhraseIcons'
 import { getPatientSession } from '../../lib/patientSession'
+import { getPatientPreferences } from '../../lib/patientPreferences'
+import { incrementTodaySelectionCount } from '../../lib/patientStats'
 import { Button } from '../../components/shared/Button'
 
 const LOGO_SRC = '/logos/logoOficial-6dcbc4e8-0a72-4fd4-be0a-ca6942282816.png'
@@ -29,6 +31,7 @@ function rand(min: number, max: number) {
 }
 
 function speakPhrase(text: string) {
+  if (!getPatientPreferences().soundEnabled) return
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   window.speechSynthesis.cancel()
   const u = new SpeechSynthesisUtterance(text)
@@ -112,6 +115,7 @@ export function PatientCommunicatePage() {
     setBarFlash(true)
     window.setTimeout(() => setBarFlash(false), FLASH_BAR_MS)
 
+    incrementTodaySelectionCount()
     speakPhrase(text)
 
     setScanPaused(true)
@@ -311,7 +315,7 @@ export function PatientCommunicatePage() {
           </div>
           <div className="flex flex-col gap-0.5 text-center text-sm text-slate-300 sm:flex-row sm:justify-center sm:gap-6">
             <span className="font-medium tabular-nums">Nível de Atenção: {attClamped}%</span>
-            <span className="tabular-nums text-slate-400">Limiar: {THRESHOLD}%</span>
+            <span className="tabular-nums text-ms-muted">Limiar: {THRESHOLD}%</span>
           </div>
         </section>
       </main>
@@ -329,7 +333,9 @@ export function PatientCommunicatePage() {
         >
           <div className="flex max-w-[95vw] flex-col items-center gap-4 text-center">
             <CheckCircle2 className="h-20 w-20 text-emerald-400 sm:h-24 sm:w-24" aria-hidden />
-            <p className="text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl">{overlayPhrase}</p>
+            <p className="max-w-full text-balance px-2 text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+              {overlayPhrase}
+            </p>
           </div>
         </div>
       ) : null}
@@ -338,7 +344,7 @@ export function PatientCommunicatePage() {
         className="fixed bottom-3 left-3 right-3 z-40 flex flex-col gap-2 rounded-xl border border-slate-700/80 bg-slate-900/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:right-4 sm:max-w-md"
         aria-label="Controles de demonstração"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Demo</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-ms-muted">Demo</p>
         <div className="flex flex-wrap gap-2">
           {!demoRunning ? (
             <Button type="button" variant="secondary" size="sm" icon={<Play className="h-4 w-4" aria-hidden />} onClick={startDemo}>
@@ -361,7 +367,7 @@ export function PatientCommunicatePage() {
           </Button>
         </div>
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-xs text-slate-500">Velocidade:</span>
+          <span className="text-xs text-ms-muted">Velocidade:</span>
           {(
             [
               { label: 'Lenta (3s)', ms: 3000 },

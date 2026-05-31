@@ -39,11 +39,11 @@ export function AlertsPage() {
   const hasUnread = sorted.some((a) => !a.read)
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-6 sm:space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Central de alertas</h1>
-          <p className="mt-1 text-sm text-slate-600">Priorização por severidade · dados mockados.</p>
+          <p className="mt-1 text-sm text-ms-secondary">Priorização por severidade · dados mockados.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -82,7 +82,7 @@ export function AlertsPage() {
         ))}
       </div>
 
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-2xl border border-ms-border bg-ms-surface shadow-sm">
         <ul className="divide-y divide-slate-100" aria-label="Lista de alertas">
           {visible.map((a) => {
             const sev = severityFromPhrase(a.phrase)
@@ -106,9 +106,9 @@ export function AlertsPage() {
                     <Icon className="h-5 w-5" aria-hidden />
                   </span>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{a.time}</p>
-                    <p className="mt-1 truncate text-sm font-semibold text-slate-900">{a.phrase}</p>
-                    <p className="mt-1 text-xs text-slate-600">{meta.label}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">{a.time}</p>
+                    <p className="mt-1 truncate text-sm font-semibold text-ms-primary">{a.phrase}</p>
+                    <p className="mt-1 text-xs text-ms-secondary">{meta.label}</p>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-3 sm:justify-end">
@@ -117,7 +117,7 @@ export function AlertsPage() {
                       Não lido
                     </span>
                   ) : (
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200">
+                    <span className="rounded-full bg-ms-subtle-strong px-2.5 py-1 text-[11px] font-semibold text-ms-secondary ring-1 ring-slate-200">
                       Visto
                     </span>
                   )}

@@ -5,14 +5,30 @@ export type PatientSessionPayload = {
   patientName: string
   /** ISO string */
   connectedAt: string
+  /** ISO string — última sincronização bem-sucedida */
+  lastSyncAt?: string
+  sensorConnected?: boolean
+}
+
+export const PATIENT_SESSION_CHANGED_EVENT = 'mindspeak-patient-session-changed'
+
+function notifySessionChanged() {
+  window.dispatchEvent(new CustomEvent(PATIENT_SESSION_CHANGED_EVENT))
 }
 
 export function savePatientSession(data: PatientSessionPayload) {
   try {
     localStorage.setItem(PATIENT_SESSION_STORAGE_KEY, JSON.stringify(data))
+    notifySessionChanged()
   } catch {
     // ignore quota / private mode
   }
+}
+
+export function patchPatientSession(patch: Partial<PatientSessionPayload>) {
+  const current = getPatientSession()
+  if (!current) return
+  savePatientSession({ ...current, ...patch })
 }
 
 export function getPatientSession(): PatientSessionPayload | null {
@@ -25,7 +41,13 @@ export function getPatientSession(): PatientSessionPayload | null {
     if (typeof o.patientId !== 'string' || typeof o.patientName !== 'string' || typeof o.connectedAt !== 'string') {
       return null
     }
-    return { patientId: o.patientId, patientName: o.patientName, connectedAt: o.connectedAt }
+    return {
+      patientId: o.patientId,
+      patientName: o.patientName,
+      connectedAt: o.connectedAt,
+      lastSyncAt: typeof o.lastSyncAt === 'string' ? o.lastSyncAt : undefined,
+      sensorConnected: typeof o.sensorConnected === 'boolean' ? o.sensorConnected : undefined,
+    }
   } catch {
     return null
   }

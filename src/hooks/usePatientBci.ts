@@ -4,22 +4,24 @@ import {
   getEightPhrases,
   PHRASES_CHANGED_EVENT,
 } from '../data/patientPhrases'
+import { getPatientPreferences, PATIENT_PREFS_CHANGED_EVENT } from '../lib/patientPreferences'
+import { incrementTodaySelectionCount } from '../lib/patientStats'
 
 /** @deprecated use DEFAULT_PATIENT_PHRASES from `data/patientPhrases` */
 export const PATIENT_WORDS = DEFAULT_PATIENT_PHRASES
 
 export type SystemPhase = 'aguardando' | 'varrendo' | 'selecionando' | 'confirmado'
 
-const THRESHOLD = 75
 const SCAN_MS = 2000
-const LOCK_MS = 1500
 const TICK_MS = 50
+
 
 function rand(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
 
 function speak(text: string) {
+  if (!getPatientPreferences().soundEnabled) return
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   window.speechSynthesis.cancel()
   const u = new SpeechSynthesisUtterance(text)
@@ -29,6 +31,7 @@ function speak(text: string) {
 }
 
 export function usePatientBci() {
+  const [prefs, setPrefs] = useState(() => getPatientPreferences())
   const [phrases, setPhrases] = useState(() => getEightPhrases())
   const [demoActive, setDemoActive] = useState(false)
   const [attention, setAttention] = useState(42)
@@ -58,6 +61,12 @@ export function usePatientBci() {
       window.removeEventListener(PHRASES_CHANGED_EVENT, sync)
       window.removeEventListener('storage', sync)
     }
+  }, [])
+
+  useEffect(() => {
+    const onPrefs = () => setPrefs(getPatientPreferences())
+    window.addEventListener(PATIENT_PREFS_CHANGED_EVENT, onPrefs)
+    return () => window.removeEventListener(PATIENT_PREFS_CHANGED_EVENT, onPrefs)
   }, [])
 
   useEffect(() => {
@@ -163,7 +172,9 @@ export function usePatientBci() {
         return
       }
 
-      const over = attentionRef.current >= THRESHOLD
+      const thresh = prefs.attentionThreshold
+      const lockDuration = Math.round(prefs.confirmDwellSec * 1000)
+      const over = attentionRef.current >= thresh
       const hi = highlightRef.current
 
       if (ph === 'selecionando') {
@@ -174,10 +185,11 @@ export function usePatientBci() {
           return
         }
         lockAccRef.current += TICK_MS
-        if (lockAccRef.current >= LOCK_MS) {
+        if (lockAccRef.current >= lockDuration) {
           phaseRef.current = 'confirmado'
           setPhase('confirmado')
           setConfirmedIndex(hi)
+          incrementTodaySelectionCount()
           speak(String(words[hi] ?? ''))
           confirmUntilRef.current = now + 4000
           lockAccRef.current = 0
@@ -204,12 +216,12 @@ export function usePatientBci() {
     }, TICK_MS)
 
     return () => clearInterval(id)
-  }, [demoActive])
+  }, [demoActive, prefs.attentionThreshold, prefs.confirmDwellSec])
 
   return {
     words: phrases,
     attention,
-    threshold: THRESHOLD,
+    threshold: prefs.attentionThreshold,
     highlightIndex,
     phase,
     confirmedIndex,

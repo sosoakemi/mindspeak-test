@@ -59,7 +59,7 @@ function SortablePhraseRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:gap-4',
+        'flex flex-col gap-3 rounded-xl border border-ms-border bg-ms-surface p-4 shadow-sm md:flex-row md:items-center md:gap-4',
         isDragging && 'z-10 opacity-90 ring-2 ring-green-300',
       )}
     >
@@ -84,7 +84,7 @@ function SortablePhraseRow({
             id={`text-${row.id}`}
             value={row.text}
             onChange={(e) => onChange(row.id, { text: e.target.value })}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium outline-none ring-green-600/20 focus:bg-white focus:ring-2"
+            className="w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm font-medium outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2"
           />
         </div>
         <div>
@@ -95,7 +95,7 @@ function SortablePhraseRow({
             id={`alert-${row.id}`}
             value={row.alert}
             onChange={(e) => onChange(row.id, { alert: e.target.value as AlertSeverity })}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-white focus:ring-2"
+            className="w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2"
           >
             <option value="critico">Crítico</option>
             <option value="moderado">Moderado</option>
@@ -103,7 +103,7 @@ function SortablePhraseRow({
           </select>
         </div>
         <div className="flex flex-wrap items-center gap-2 md:justify-end">
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+          <span className="rounded-full bg-ms-subtle-strong px-3 py-1 text-xs font-semibold text-ms-secondary ring-1 ring-slate-200">
             Posição {row.gridPosition}
           </span>
           <Button
@@ -173,18 +173,18 @@ export function PhrasesPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-6 sm:space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Editar palavras e frases</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-ms-secondary">
           Organize a grade, níveis de alerta e voz · arraste o ícone à esquerda para reordenar.
         </p>
       </div>
 
       <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="space-y-4 rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-slate-900">Frases configuradas</h2>
+            <h2 className="text-sm font-semibold text-ms-primary">Frases configuradas</h2>
             <Button type="button" variant="primary" size="md" icon={<Plus className="h-4 w-4" aria-hidden />} onClick={addPhrase}>
               Adicionar frase
             </Button>
@@ -192,14 +192,14 @@ export function PhrasesPage() {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label htmlFor="voice" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <label htmlFor="voice" className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
                 Voz TTS
               </label>
               <select
                 id="voice"
                 value={voice}
                 onChange={(e) => setVoice(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-white focus:ring-2"
+                className="mt-2 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2"
               >
                 {voices.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -209,7 +209,7 @@ export function PhrasesPage() {
               </select>
             </div>
             <div>
-              <label htmlFor="audio" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <label htmlFor="audio" className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
                 Áudio personalizado
               </label>
               <input
@@ -217,9 +217,9 @@ export function PhrasesPage() {
                 name="audio"
                 type="file"
                 accept="audio/*"
-                className="mt-2 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-900 hover:file:bg-green-100"
+                className="mt-2 block w-full text-sm text-ms-secondary file:mr-3 file:rounded-lg file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-900 hover:file:bg-green-100"
               />
-              <p className="mt-1 text-[11px] text-slate-500">Upload ou gravação serão integrados ao backend.</p>
+              <p className="mt-1 text-[11px] text-ms-muted">Upload ou gravação serão integrados ao backend.</p>
             </div>
           </div>
 
@@ -234,14 +234,14 @@ export function PhrasesPage() {
           </DndContext>
         </div>
 
-        <aside className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900">Pré-visualização da grade (2×4)</h2>
-          <p className="text-xs text-slate-500">Reflete a ordem atual após arrastar e soltar.</p>
+        <aside className="space-y-4 rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-ms-primary">Pré-visualização da grade (2×4)</h2>
+          <p className="text-xs text-ms-muted">Reflete a ordem atual após arrastar e soltar.</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {preview.map((r) => (
               <div
                 key={r.id}
-                className="flex min-h-[96px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50 p-3 text-center text-xs font-semibold leading-snug text-slate-900"
+                className="flex min-h-[96px] flex-col items-center justify-center rounded-xl border border-ms-border bg-ms-subtle p-3 text-center text-xs font-semibold leading-snug text-ms-primary"
               >
                 {r.text}
               </div>
