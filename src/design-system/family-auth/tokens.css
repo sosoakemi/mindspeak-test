@@ -1,0 +1,70 @@
+/* Portal Familiar — auth UI tokens (scoped via [data-family-auth]) */
+
+[data-family-auth] {
+  --fa-bg: #f9fafb;
+  --fa-surface: #ffffff;
+  --fa-text: #111827;
+  --fa-text-secondary: #4b5563;
+  --fa-text-muted: #6b7280;
+  --fa-label: #9ca3af;
+  --fa-input-bg: #f3f4f6;
+  --fa-input-bg-focus: #eef0f3;
+  --fa-border: #e5e7eb;
+  --fa-cta: #111827;
+  --fa-cta-hover: #1f2937;
+  --fa-cta-active: #030712;
+  --fa-link: #064e3b;
+  --fa-link-hover: #022c22;
+  --fa-badge-bg: #ecfdf5;
+  --fa-badge-text: #064e3b;
+  --fa-mint: #d1fae5;
+  --fa-progress-active: #064e3b;
+  --fa-progress-inactive: #e5e7eb;
+  --fa-error: #dc2626;
+  --fa-error-bg: #fef2f2;
+  --fa-success: #059669;
+  --fa-shadow: 0 12px 40px -12px rgb(17 24 39 / 0.12);
+  --fa-radius: 12px;
+  --fa-radius-sm: 8px;
+  --fa-radius-pill: 9999px;
+  --fa-space-1: 4px;
+  --fa-space-2: 8px;
+  --fa-space-3: 12px;
+  --fa-space-4: 16px;
+  --fa-space-5: 20px;
+  --fa-space-6: 24px;
+  --fa-space-8: 32px;
+  --fa-space-10: 40px;
+  --fa-space-12: 48px;
+  --fa-text-xs: 0.75rem;
+  --fa-text-sm: 0.875rem;
+  --fa-text-base: 1rem;
+  --fa-text-lg: 1.125rem;
+  --fa-text-xl: 1.25rem;
+  --fa-text-2xl: 1.5rem;
+  --fa-text-3xl: 1.875rem;
+  --fa-leading-tight: 1.25;
+  --fa-leading-normal: 1.5;
+}
+
+.dark [data-family-auth] {
+  --fa-bg: #030712;
+  --fa-surface: #0f172a;
+  --fa-text: #f9fafb;
+  --fa-text-secondary: #cbd5e1;
+  --fa-text-muted: #94a3b8;
+  --fa-label: #64748b;
+  --fa-input-bg: #1e293b;
+  --fa-input-bg-focus: #334155;
+  --fa-border: #334155;
+  --fa-cta: #f9fafb;
+  --fa-cta-hover: #e5e7eb;
+  --fa-cta-active: #d1d5db;
+  --fa-link: #34d399;
+  --fa-link-hover: #6ee7b7;
+  --fa-badge-bg: #064e3b;
+  --fa-badge-text: #d1fae5;
+  --fa-progress-active: #34d399;
+  --fa-progress-inactive: #334155;
+  --fa-shadow: 0 12px 40px -12px rgb(0 0 0 / 0.45);
+}

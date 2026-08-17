@@ -1,18 +1,18 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Lock, Mail } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { cn } from '../../lib/cn'
-import { Button, LinkButton } from '../../components/shared/Button'
-import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
-import { AuthPageShell } from '../../components/layout/AuthPageShell'
-import { msCard, msInputBase, msInputBorder, msInputError, msLabel } from '../../lib/msStyles'
+import { FamilyAuthShell } from '../../components/layout/FamilyAuthShell'
+import { savePatientSession } from '../../lib/patientSession'
+import { saveAuthSession } from '../../lib/authSession'
+import { BackendApiError, login } from '../../lib/backendApi'
+import { AuthButton, AuthCard, AuthInput, FamilyAuthHero } from '../../components/ui/family-auth'
 
 export function LoginPage() {
   const nav = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({})
+  const [isLoading, setIsLoading] = useState(false)
 
   const validate = () => {
     const next: typeof errors = {}
@@ -24,101 +24,106 @@ export function LoginPage() {
     return Object.keys(next).length === 0
   }
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!validate()) return
-    nav('/dashboard', { replace: true })
+    setIsLoading(true)
+    try {
+      const response = await login({ email: email.trim(), password })
+      if (response.user.role !== 'caregiver') {
+        setErrors({ form: 'Esta conta não é de familiar/cuidador. Use o portal clínico.' })
+        return
+      }
+      saveAuthSession({
+        accessToken: response.access_token,
+        user: {
+          id: response.user.id,
+          email: response.user.email,
+          fullName: response.user.full_name,
+          role: response.user.role,
+          organizationId: response.user.organization_id,
+        },
+      })
+      savePatientSession({
+        patientId: String(response.user.id),
+        patientName: response.user.full_name,
+        connectedAt: new Date().toISOString(),
+      })
+      nav('/patient/dashboard', { replace: true })
+    } catch (err) {
+      if (err instanceof BackendApiError && err.status === 401) {
+        setErrors({ form: 'E-mail ou senha inválidos.' })
+      } else {
+        setErrors({ form: 'Não foi possível entrar agora. Tente novamente.' })
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <AuthPageShell>
-      <div className="mb-10 flex flex-col items-center text-center">
-        <MindSpeakLogo layout="horizontal" size="lg" />
-        <p className="mt-3 text-sm text-ms-secondary">Acesso da equipe clínica</p>
+    <FamilyAuthShell layout="split" hero={<FamilyAuthHero variant="login" />}>
+      <div className="mb-8 sm:mb-10">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--fa-text)] sm:text-3xl">Portal Familiar</h1>
+        <p className="mt-2 text-sm text-[var(--fa-text-muted)] sm:text-base">
+          Entre com suas credenciais autorizadas
+        </p>
       </div>
 
-      <form onSubmit={onSubmit} className={cn(msCard, 'p-6 sm:p-8')} noValidate>
+      <AuthCard as="form" onSubmit={onSubmit} className="p-6 sm:p-8" noValidate>
         <div className="space-y-5">
-          <div>
-            <label htmlFor="email" className={msLabel}>
-              E-mail
-            </label>
-            <div className="relative">
-              <Mail
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ms-muted"
-                aria-hidden
-              />
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={cn(
-                  msInputBase,
-                  'pl-10 pr-3',
-                  errors.email ? msInputError : msInputBorder,
-                )}
-                placeholder="nome@hospital.org"
-              />
-            </div>
-            {errors.email ? <p className="mt-1.5 text-xs text-red-600">{errors.email}</p> : null}
-          </div>
+          {errors.form ? (
+            <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              {errors.form}
+            </p>
+          ) : null}
+          <AuthInput
+            label="E-mail"
+            name="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="nome@exemplo.com"
+            icon={<Mail className="h-4 w-4" aria-hidden />}
+            error={errors.email}
+          />
 
-          <div>
-            <label htmlFor="password" className={msLabel}>
-              Senha
-            </label>
-            <div className="relative">
-              <Lock
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ms-muted"
-                aria-hidden
-              />
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={cn(
-                  msInputBase,
-                  'pl-10 pr-3',
-                  errors.password ? msInputError : msInputBorder,
-                )}
-                placeholder="••••••••"
-              />
-            </div>
-            {errors.password ? <p className="mt-1.5 text-xs text-red-600">{errors.password}</p> : null}
-          </div>
+          <AuthInput
+            label="Senha"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            icon={<Lock className="h-4 w-4" aria-hidden />}
+            error={errors.password}
+            labelAction={
+              <Link
+                to="/familiar/forgot-password"
+                className="text-xs font-semibold text-[var(--fa-link)] underline-offset-2 hover:text-[var(--fa-link-hover)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fa-link)]"
+              >
+                Esqueci minha senha
+              </Link>
+            }
+          />
         </div>
 
-        <Button type="submit" variant="primary" fullWidth className="mt-8">
-          Entrar
-        </Button>
+        <AuthButton type="submit" isLoading={isLoading} className="mt-8">
+          Próximo passo
+        </AuthButton>
 
-        <div className="mt-6 flex flex-col items-center gap-2 text-center">
-          <LinkButton to="/forgot-password" variant="ghost" size="sm">
-            Esqueci minha senha
-          </LinkButton>
-          <p className="text-sm text-ms-secondary">
-            Primeiro acesso?{' '}
-            <Link
-              to="/cadastro"
-              className="font-semibold text-green-700 underline-offset-2 hover:text-green-800 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 dark:text-green-400 dark:hover:text-green-300"
-            >
-              Criar conta
-            </Link>
-          </p>
-        </div>
-      </form>
-
-      <p className="mt-8 text-center">
-        <LinkButton to="/" variant="ghost" size="sm">
-          Voltar ao início
-        </LinkButton>
-      </p>
-    </AuthPageShell>
+        <p className="mt-6 text-center text-sm text-[var(--fa-text-muted)]">
+          Não possui acesso?{' '}
+          <Link
+            to="/familiar/cadastro"
+            className="font-bold text-[var(--fa-text)] underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fa-link)]"
+          >
+            Criar conta
+          </Link>
+        </p>
+      </AuthCard>
+    </FamilyAuthShell>
   )
 }

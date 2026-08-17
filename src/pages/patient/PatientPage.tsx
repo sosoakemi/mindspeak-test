@@ -160,9 +160,9 @@ export function PatientPage({
               if (onLogout) onLogout()
               else if (session) {
                 clearPatientSession()
-                nav('/patient/login', { replace: true })
+                nav('/acesso', { replace: true })
               } else {
-                nav('/')
+                nav('/acesso')
               }
             }}
           >

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   CheckCircle2,
   Crosshair,
   Pause,
   Play,
+  Radio,
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
@@ -13,9 +14,9 @@ import { getPhraseVisual } from './patientPhraseIcons'
 import { getPatientSession } from '../../lib/patientSession'
 import { getPatientPreferences } from '../../lib/patientPreferences'
 import { incrementTodaySelectionCount } from '../../lib/patientStats'
+import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button } from '../../components/shared/Button'
-
-const LOGO_SRC = '/logos/logoOficial-6dcbc4e8-0a72-4fd4-be0a-ca6942282816.png'
+import { useLiveSession } from '../../hooks/useLiveSession'
 
 const THRESHOLD = 75
 const LOCK_MS = 1500
@@ -50,8 +51,19 @@ function attentionBarClass(v: number) {
   return 'bg-green-500'
 }
 
+const liveStatusLabel: Record<'idle' | 'connecting' | 'open' | 'closed', string> = {
+  idle: 'Aguardando',
+  connecting: 'Conectando…',
+  open: 'Conectado',
+  closed: 'Reconectando…',
+}
+
 export function PatientCommunicatePage() {
   const nav = useNavigate()
+  const [searchParams] = useSearchParams()
+  const liveSessionId = searchParams.get('session')
+  const isLive = Boolean(liveSessionId)
+
   const [phrases, setPhrases] = useState(() => getEightPhrases())
   const [scanIndex, setScanIndex] = useState(0)
   const [scanMs, setScanMs] = useState(2000)
@@ -61,6 +73,7 @@ export function PatientCommunicatePage() {
   const [overlayPhrase, setOverlayPhrase] = useState<string | null>(null)
   const [flashCardIndex, setFlashCardIndex] = useState<number | null>(null)
   const [barFlash, setBarFlash] = useState(false)
+  const [liveStarted, setLiveStarted] = useState(false)
 
   const attentionRef = useRef(45)
   const lockMsRef = useRef(0)
@@ -78,6 +91,22 @@ export function PatientCommunicatePage() {
   scanIndexRef.current = scanIndex
   scanPausedRef.current = scanPaused
 
+  const handleSpeakEvent = useCallback((event: { text: string; confidence: number }) => {
+    speakPhrase(event.text)
+    incrementTodaySelectionCount()
+    setOverlayPhrase(event.text)
+    window.setTimeout(() => setOverlayPhrase(null), OVERLAY_MS)
+    setBarFlash(true)
+    window.setTimeout(() => setBarFlash(false), FLASH_BAR_MS)
+  }, [])
+
+  const live = useLiveSession(isLive && liveStarted ? liveSessionId : null, handleSpeakEvent)
+
+  const displayWords = useMemo(
+    () => (isLive ? live.words.map((w) => w.text) : phrases),
+    [isLive, live.words, phrases],
+  )
+
   useEffect(() => {
     const sync = () => setPhrases(getEightPhrases())
     window.addEventListener(PHRASES_CHANGED_EVENT, sync)
@@ -90,7 +119,7 @@ export function PatientCommunicatePage() {
 
   useEffect(() => {
     if (!getPatientSession()) {
-      nav('/patient/login', { replace: true })
+      nav('/acesso', { replace: true })
     }
   }, [nav])
 
@@ -125,9 +154,9 @@ export function PatientCommunicatePage() {
     }, POST_CONFIRM_SCAN_PAUSE_MS)
   }, [])
 
-  /* Scan advance */
+  /* Scan advance (modo demo — em modo ao vivo quem manda é o backend) */
   useEffect(() => {
-    if (!demoRunning || scanPaused) return
+    if (isLive || !demoRunning || scanPaused) return
     const id = window.setInterval(() => {
       setScanIndex((i) => {
         const len = phrasesRef.current.length || 8
@@ -135,7 +164,7 @@ export function PatientCommunicatePage() {
       })
     }, scanMs)
     return () => clearInterval(id)
-  }, [demoRunning, scanPaused, scanMs])
+  }, [isLive, demoRunning, scanPaused, scanMs])
 
   /* Reset lock when highlight moves */
   useEffect(() => {
@@ -145,9 +174,9 @@ export function PatientCommunicatePage() {
     }
   }, [scanIndex])
 
-  /* Attention simulation + selection */
+  /* Attention simulation + selection (modo demo) */
   useEffect(() => {
-    if (!demoRunning) return
+    if (isLive || !demoRunning) return
 
     let last = performance.now()
     const id = window.setInterval(() => {
@@ -191,7 +220,7 @@ export function PatientCommunicatePage() {
     }, ATTENTION_MS)
 
     return () => clearInterval(id)
-  }, [demoRunning, confirmSelection])
+  }, [isLive, demoRunning, confirmSelection])
 
   /* Prime speech voices (Safari) */
   useEffect(() => {
@@ -231,20 +260,33 @@ export function PatientCommunicatePage() {
     forcedFocusUntilRef.current = performance.now() + FORCE_FOCUS_MS
   }
 
-  const attClamped = Math.min(100, Math.max(0, attention))
+  const startLiveSession = () => {
+    // gesto do usuário exigido pelo Safari/iOS pra destravar a Web Speech API.
+    if (window.speechSynthesis) {
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(''))
+    }
+    setLiveStarted(true)
+  }
+
+  const attClamped = isLive
+    ? Math.min(100, Math.max(0, Math.round(live.focusLevel)))
+    : Math.min(100, Math.max(0, attention))
   const barFillClass = barFlash ? 'bg-green-400 motion-safe:animate-pulse' : attentionBarClass(attClamped)
+  const highlightedIndex = isLive ? live.scanningIndex : scanIndex
+  const isHighlighting = isLive ? liveStarted && live.status === 'open' && !live.paused : demoRunning && !scanPaused
+  const connectionLabel = isLive ? liveStatusLabel[live.status] : 'Conectado'
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-900 text-slate-100">
       <header className="flex h-12 max-h-12 shrink-0 items-center justify-between border-b border-slate-800 px-3 sm:px-4">
-        <img src={LOGO_SRC} alt="MindSpeak" className="h-7 w-auto max-w-[140px] object-contain object-left" width={140} height={28} decoding="async" />
+        <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
             <span className="relative flex h-2 w-2" aria-hidden>
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none motion-reduce:opacity-0" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            <span className="hidden sm:inline">Conectado</span>
+            <span className="hidden sm:inline">{connectionLabel}</span>
           </div>
           <Button
             type="button"
@@ -265,8 +307,8 @@ export function PatientCommunicatePage() {
           role="list"
           aria-label="Grade de frases"
         >
-          {phrases.map((word, index) => {
-            const highlighted = demoRunning && index === scanIndex && !scanPaused
+          {displayWords.map((word, index) => {
+            const highlighted = isHighlighting && index === highlightedIndex
             const flash = flashCardIndex === index
             const { icon: Icon, wrap } = getPhraseVisual(word, 'dark')
             return (
@@ -317,6 +359,12 @@ export function PatientCommunicatePage() {
             <span className="font-medium tabular-nums">Nível de Atenção: {attClamped}%</span>
             <span className="tabular-nums text-ms-muted">Limiar: {THRESHOLD}%</span>
           </div>
+          {isLive ? (
+            <p className="text-center text-xs text-ms-muted">
+              Qualidade do sinal: {live.signalQuality}%
+              {live.paused ? ' · sinal ruim, aguardando' : ''}
+            </p>
+          ) : null}
         </section>
       </main>
 
@@ -342,52 +390,75 @@ export function PatientCommunicatePage() {
 
       <div
         className="fixed bottom-3 left-3 right-3 z-40 flex flex-col gap-2 rounded-xl border border-slate-700/80 bg-slate-900/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:right-4 sm:max-w-md"
-        aria-label="Controles de demonstração"
+        aria-label={isLive ? 'Controles da sessão ao vivo' : 'Controles de demonstração'}
       >
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-ms-muted">Demo</p>
-        <div className="flex flex-wrap gap-2">
-          {!demoRunning ? (
-            <Button type="button" variant="secondary" size="sm" icon={<Play className="h-4 w-4" aria-hidden />} onClick={startDemo}>
-              Iniciar Demo
-            </Button>
-          ) : (
-            <Button type="button" variant="secondary" size="sm" icon={<Pause className="h-4 w-4" aria-hidden />} onClick={pauseDemo}>
-              Pausar Demo
-            </Button>
-          )}
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            icon={<Crosshair className="h-4 w-4" aria-hidden />}
-            onClick={simulateFocus}
-            disabled={!demoRunning}
-          >
-            Simular Foco
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-xs text-ms-muted">Velocidade:</span>
-          {(
-            [
-              { label: 'Lenta (3s)', ms: 3000 },
-              { label: 'Normal (2s)', ms: 2000 },
-              { label: 'Rápida (1s)', ms: 1000 },
-            ] as const
-          ).map((opt) => (
-            <button
-              key={opt.ms}
-              type="button"
-              onClick={() => setScanMs(opt.ms)}
-              className={cn(
-                'rounded-lg px-2.5 py-1.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400',
-                scanMs === opt.ms ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700',
+        {isLive ? (
+          <>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-ms-muted">
+              Sessão ao vivo
+            </p>
+            {!liveStarted ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon={<Radio className="h-4 w-4" aria-hidden />}
+                onClick={startLiveSession}
+              >
+                Iniciar sessão ao vivo
+              </Button>
+            ) : (
+              <p className="text-xs text-slate-300">{liveStatusLabel[live.status]}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-ms-muted">Demo</p>
+            <div className="flex flex-wrap gap-2">
+              {!demoRunning ? (
+                <Button type="button" variant="secondary" size="sm" icon={<Play className="h-4 w-4" aria-hidden />} onClick={startDemo}>
+                  Iniciar Demo
+                </Button>
+              ) : (
+                <Button type="button" variant="secondary" size="sm" icon={<Pause className="h-4 w-4" aria-hidden />} onClick={pauseDemo}>
+                  Pausar Demo
+                </Button>
               )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                icon={<Crosshair className="h-4 w-4" aria-hidden />}
+                onClick={simulateFocus}
+                disabled={!demoRunning}
+              >
+                Simular Foco
+              </Button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-xs text-ms-muted">Velocidade:</span>
+              {(
+                [
+                  { label: 'Lenta (3s)', ms: 3000 },
+                  { label: 'Normal (2s)', ms: 2000 },
+                  { label: 'Rápida (1s)', ms: 1000 },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.ms}
+                  type="button"
+                  onClick={() => setScanMs(opt.ms)}
+                  className={cn(
+                    'rounded-lg px-2.5 py-1.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400',
+                    scanMs === opt.ms ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700',
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

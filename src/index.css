@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import './design-system/family-auth/tokens.css';
+@import './design-system/secure-access/tokens.css';
+@import './site/site-dark.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -57,6 +60,18 @@
   --color-ms-purple-soft: #ede9fe;
   --color-ms-blue: #2563eb;
   --color-ms-blue-soft: #dbeafe;
+
+  /* Tokens do site institucional (páginas públicas) */
+  --font-display: 'Sora', system-ui, sans-serif;
+  --color-navy-950: #050d1a;
+  --color-navy-900: #0a192f;
+  --color-navy-800: #0f2744;
+  --color-navy-700: #163a5f;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-mint-100: #e6faf5;
+  --color-mint-200: #ccf5eb;
 }
 
 @layer base {
@@ -148,5 +163,20 @@
 
   .animate-ms-float {
     animation: none;
+  }
+}
+
+/* ===== Site institucional (páginas públicas do colega) ===== */
+.site-scope {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer utilities {
+  .team-grid-bg {
+    background-color: #ffffff;
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 }

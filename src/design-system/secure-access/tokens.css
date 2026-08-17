@@ -1,0 +1,44 @@
+/* Acesso Seguro — selection screen tokens (scoped via [data-secure-access]) */
+
+[data-secure-access] {
+  --sa-bg: #f8fafc;
+  --sa-container: #020b2d;
+  --sa-container-glow: 0 24px 80px -16px rgb(2 11 45 / 0.45);
+  --sa-container-text: #ffffff;
+  --sa-subtitle: rgb(255 255 255 / 0.55);
+  --sa-divider: rgb(255 255 255 / 0.12);
+  --sa-card-bg: #ffffff;
+  --sa-card-text: #111827;
+  --sa-card-muted: #6b7280;
+  --sa-card-icon-bg: #f3f4f6;
+  --sa-card-selected-bg: #ddf5e8;
+  --sa-card-selected-border: #22c55e;
+  --sa-card-selected-icon: #16a34a;
+  --sa-card-shadow: 0 4px 24px -4px rgb(17 24 39 / 0.08);
+  --sa-card-selected-shadow: 0 12px 32px -8px rgb(34 197 94 / 0.35);
+  --sa-continue: #22c55e;
+  --sa-continue-hover: #16a34a;
+  --sa-continue-disabled: #9ca3af;
+  --sa-footer: #94a3b8;
+  --sa-radius-container: 32px;
+  --sa-radius-card: 24px;
+  --sa-space-4: 16px;
+  --sa-space-6: 24px;
+  --sa-space-8: 32px;
+  --sa-space-10: 40px;
+  --sa-space-12: 48px;
+}
+
+.dark [data-secure-access] {
+  --sa-bg: #030712;
+  --sa-container: #0f172a;
+  --sa-container-glow: 0 24px 80px -16px rgb(0 0 0 / 0.6);
+  --sa-card-bg: #1e293b;
+  --sa-card-text: #f9fafb;
+  --sa-card-muted: #94a3b8;
+  --sa-card-icon-bg: #334155;
+  --sa-card-selected-bg: #064e3b;
+  --sa-card-selected-border: #34d399;
+  --sa-card-selected-icon: #6ee7b7;
+  --sa-footer: #64748b;
+}

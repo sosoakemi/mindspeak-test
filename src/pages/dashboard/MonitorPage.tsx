@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   CartesianGrid,
   Legend,
@@ -9,12 +10,31 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Activity, Headset, Wifi } from 'lucide-react'
+import { Activity, Headset, MessageCircle, Radio, Wifi } from 'lucide-react'
 import { mockPatient } from '../../data/mockDashboard'
 import { useChartTheme } from '../../hooks/useChartTheme'
+import { useLiveSession } from '../../hooks/useLiveSession'
+
+const liveStatusLabel: Record<'idle' | 'connecting' | 'open' | 'closed', string> = {
+  idle: 'Sem sessão',
+  connecting: 'Conectando…',
+  open: 'Ao vivo',
+  closed: 'Reconectando…',
+}
+
+function formatTime(iso: string) {
+  try {
+    return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return '—'
+  }
+}
 
 export function MonitorPage() {
   const chart = useChartTheme()
+  const [searchParams] = useSearchParams()
+  const sessionId = searchParams.get('session')
+  const live = useLiveSession(sessionId, undefined)
   const waves = useMemo(() => {
     return Array.from({ length: 120 }).map((_, i) => {
       const x = i / 8
@@ -46,6 +66,74 @@ export function MonitorPage() {
           </span>
         </div>
       </div>
+
+      {sessionId ? (
+        <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-ms-primary">Sessão ao vivo</h2>
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900 ring-1 ring-emerald-100">
+              <Radio className="h-3.5 w-3.5" aria-hidden />
+              {liveStatusLabel[live.status]}
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-ms-border-subtle bg-ms-subtle p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
+                Qualidade do sinal
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-ms-primary">{live.signalQuality}%</p>
+              {live.paused ? (
+                <p className="mt-1 text-xs font-medium text-amber-600">Sinal ruim — pausado</p>
+              ) : null}
+            </div>
+            <div className="rounded-xl border border-ms-border-subtle bg-ms-subtle p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
+                Palavra em destaque
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-ms-primary">
+                {live.candidateWord ?? '—'}
+              </p>
+              <p className="mt-1 text-xs text-ms-muted">Foco: {Math.round(live.focusLevel)}%</p>
+            </div>
+            <div className="rounded-xl border border-ms-border-subtle bg-ms-subtle p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
+                Última seleção
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-ms-primary">
+                {live.lastSelected?.utterance ?? '—'}
+              </p>
+              {live.lastSelected ? (
+                <p className="mt-1 text-xs text-ms-muted">
+                  {Math.round(live.lastSelected.confidence * 100)}% de confiança
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-5 border-t border-ms-border-subtle pt-4">
+            <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-ms-muted">
+              <MessageCircle className="h-3.5 w-3.5" aria-hidden />O que já foi falado
+            </p>
+            {live.spokenHistory.length === 0 ? (
+              <p className="text-sm text-ms-secondary">Nada falado ainda nesta sessão.</p>
+            ) : (
+              <ul className="space-y-2">
+                {live.spokenHistory.slice(0, 8).map((entry, index) => (
+                  <li
+                    key={`${entry.at}-${index}`}
+                    className="flex items-center justify-between gap-3 rounded-lg bg-ms-subtle-strong px-3 py-2 text-sm"
+                  >
+                    <span className="font-medium text-ms-primary">{entry.text}</span>
+                    <span className="shrink-0 text-xs tabular-nums text-ms-muted">
+                      {formatTime(entry.at)} · {Math.round(entry.confidence * 100)}%
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-3">
