@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Activity,
   Bell,
@@ -11,12 +12,12 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
-import { mockProfessional } from '../../data/mockDashboard'
 import { DashboardAlertsProvider, useDashboardAlerts } from './alerts-context'
 import { Button } from '../../components/shared/Button'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { ThemeToggle } from '../../components/shared/ThemeToggle'
 import { useMobileSidebar } from '../../hooks/useMobileSidebar'
+import { clearAuthSession, getAuthSession } from '../../lib/authSession'
 import {
   msNavActive,
   msNavInactive,
@@ -49,7 +50,28 @@ function UnreadAlertsBadge() {
 
 function DashboardShell() {
   const navFn = useNavigate()
+  const location = useLocation()
   const { open, close, openSidebar } = useMobileSidebar()
+  const session = getAuthSession()
+
+  useEffect(() => {
+    if (!getAuthSession()) {
+      navFn('/acesso', { replace: true })
+    }
+  }, [navFn, location.pathname])
+
+  const signOut = () => {
+    clearAuthSession()
+    navFn('/clinico/login', { replace: true })
+  }
+
+  if (!session) {
+    return (
+      <div className={cn('flex min-h-dvh items-center justify-center', msPage)}>
+        <p className="text-sm text-ms-secondary">Carregando…</p>
+      </div>
+    )
+  }
 
   return (
     <div className={cn('flex min-h-dvh overflow-x-hidden', msPage)}>
@@ -112,7 +134,7 @@ function DashboardShell() {
             variant="ghost"
             fullWidth
             icon={<LogOut className="h-4 w-4" aria-hidden />}
-            onClick={() => navFn('/login')}
+            onClick={signOut}
           >
             Sair
           </Button>
@@ -137,7 +159,7 @@ function DashboardShell() {
             </button>
             <div className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-wide text-ms-muted">Profissional logado</p>
-              <p className="truncate text-sm font-semibold text-ms-primary">{mockProfessional.name}</p>
+              <p className="truncate text-sm font-semibold text-ms-primary">{session.user.fullName}</p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -148,7 +170,7 @@ function DashboardShell() {
               size="md"
               className="hidden sm:inline-flex"
               icon={<LogOut className="h-4 w-4" aria-hidden />}
-              onClick={() => navFn('/login')}
+              onClick={signOut}
             >
               Sair
             </Button>
@@ -159,7 +181,7 @@ function DashboardShell() {
               className="sm:hidden"
               aria-label="Sair"
               icon={<LogOut className="h-4 w-4" aria-hidden />}
-              onClick={() => navFn('/login')}
+              onClick={signOut}
             />
           </div>
         </header>

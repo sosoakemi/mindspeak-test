@@ -1,12 +1,20 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from './layouts/AppShell'
-import { HomePage } from './pages/HomePage'
+import { AccessSelectionPage } from './pages/access/AccessSelectionPage'
+import { SiteScope } from './site/SiteScope'
+import HomePage from './site/pages/HomePage'
+import ProductPage from './site/pages/ProductPage'
+import InstructionsPage from './site/pages/InstructionsPage'
+import TeamPage from './site/pages/TeamPage'
+import ReferencesPage from './site/pages/ReferencesPage'
+import GamePage from './site/pages/GamePage'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { ClinicalLoginPage } from './pages/auth/clinical/ClinicalLoginPage'
+import { ClinicalRegisterPage } from './pages/auth/clinical/ClinicalRegisterPage'
+import { ClinicalForgotPasswordPage } from './pages/auth/clinical/ClinicalForgotPasswordPage'
 import { PatientPage } from './pages/patient/PatientPage'
-import { PatientLoginPage } from './pages/patient/PatientLoginPage'
-import { PatientRegisterPage } from './pages/patient/PatientRegisterPage'
 import { PatientDashboardLayout } from './pages/patient/PatientDashboardLayout'
 import { PatientCommunicationPage } from './pages/patient/dashboard/PatientCommunicationPage'
 import { PatientSignalsPage } from './pages/patient/dashboard/PatientSignalsPage'
@@ -25,16 +33,33 @@ import { PhrasesPage } from './pages/dashboard/PhrasesPage'
 
 export const router = createBrowserRouter([
   {
-    element: <AppShell />,
+    element: <SiteScope />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/login', element: <LoginPage /> },
-      { path: '/cadastro', element: <RegisterPage /> },
-      { path: '/forgot-password', element: <ForgotPasswordPage /> },
+      { path: '/produto', element: <ProductPage /> },
+      { path: '/instrucoes', element: <InstructionsPage /> },
+      { path: '/equipe', element: <TeamPage /> },
+      { path: '/referencias', element: <ReferencesPage /> },
+      { path: '/jogo', element: <GamePage /> },
+    ],
+  },
+  {
+    element: <AppShell />,
+    children: [
+      { path: '/acesso', element: <AccessSelectionPage /> },
+      { path: '/familiar/login', element: <LoginPage /> },
+      { path: '/familiar/cadastro', element: <RegisterPage /> },
+      { path: '/familiar/forgot-password', element: <ForgotPasswordPage /> },
+      { path: '/clinico/login', element: <ClinicalLoginPage /> },
+      { path: '/clinico/cadastro', element: <ClinicalRegisterPage /> },
+      { path: '/clinico/forgot-password', element: <ClinicalForgotPasswordPage /> },
+      { path: '/login', element: <Navigate to="/familiar/login" replace /> },
+      { path: '/cadastro', element: <Navigate to="/familiar/cadastro" replace /> },
+      { path: '/forgot-password', element: <Navigate to="/familiar/forgot-password" replace /> },
       { path: '/patient', element: <Navigate to="/patient/dashboard" replace /> },
       { path: '/patient/demo', element: <PatientPage /> },
-      { path: '/patient/login', element: <PatientLoginPage /> },
-      { path: '/patient/register', element: <PatientRegisterPage /> },
+      { path: '/patient/login', element: <Navigate to="/familiar/login" replace /> },
+      { path: '/patient/register', element: <Navigate to="/familiar/cadastro" replace /> },
       { path: '/patient/communicate', element: <PatientCommunicatePage /> },
       { path: '/patient/bci', element: <Navigate to="/patient/communicate" replace /> },
       {

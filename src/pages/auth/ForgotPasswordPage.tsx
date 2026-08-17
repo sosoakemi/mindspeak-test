@@ -1,11 +1,8 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2, Mail } from 'lucide-react'
-import { cn } from '../../lib/cn'
-import { Button, LinkButton } from '../../components/shared/Button'
-import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
-import { AuthPageShell } from '../../components/layout/AuthPageShell'
-import { msCard, msInputBase, msInputBorder, msInputError, msLabel } from '../../lib/msStyles'
+import { FamilyAuthShell } from '../../components/layout/FamilyAuthShell'
+import { AuthAlert, AuthButton, AuthCard, AuthInput } from '../../components/ui/family-auth'
 
 type Step = 'form' | 'sending' | 'success'
 
@@ -45,87 +42,76 @@ export function ForgotPasswordPage() {
     setError(null)
   }
 
+  if (step === 'success') {
+    return (
+      <FamilyAuthShell maxWidth="md">
+        <AuthCard className="p-6 text-center sm:p-8">
+          <CheckCircle2 className="mx-auto h-14 w-14 text-[var(--fa-link)]" aria-hidden />
+          <h1 className="mt-6 text-2xl font-bold tracking-tight text-[var(--fa-text)]">E-mail enviado!</h1>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--fa-text-muted)]">
+            Verifique sua caixa de entrada em{' '}
+            <span className="font-semibold text-[var(--fa-text)]">{sentTo}</span>. Se não encontrar, verifique a pasta
+            de spam.
+          </p>
+          <AuthAlert variant="info" className="mt-6 text-left">
+            O link de recuperação expira em 24 horas por segurança.
+          </AuthAlert>
+          <AuthButton type="button" className="mt-8" onClick={() => nav('/familiar/login')}>
+            Voltar para o login
+          </AuthButton>
+          <button
+            type="button"
+            onClick={resetFlow}
+            className="mt-4 min-h-11 text-sm font-semibold text-[var(--fa-link)] underline-offset-4 transition-colors hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fa-link)]"
+          >
+            Não recebeu? Enviar novamente
+          </button>
+        </AuthCard>
+      </FamilyAuthShell>
+    )
+  }
+
   return (
-    <AuthPageShell>
-      <div className="mb-10 flex flex-col items-center text-center">
-        <MindSpeakLogo layout="horizontal" size="lg" />
+    <FamilyAuthShell maxWidth="md">
+      <div className="mb-8 sm:mb-10">
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--fa-text)] sm:text-3xl">Recuperar senha</h1>
+        <p className="mt-2 text-sm text-[var(--fa-text-muted)] sm:text-base">
+          Insira seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
+        </p>
       </div>
 
-      <div className={cn(msCard, 'p-6 sm:p-8')}>
-        {step !== 'success' ? (
-          <>
-            <h1 className="text-2xl font-semibold tracking-tight text-ms-primary">Recuperar senha</h1>
-            <p className="mt-2 text-sm leading-relaxed text-ms-secondary">
-              Insira seu e-mail cadastrado e enviaremos um link para redefinir sua senha.
-            </p>
+      <AuthCard as="form" onSubmit={onSubmit} className="p-6 sm:p-8" noValidate>
+        <AuthInput
+          id="fp-email"
+          name="email"
+          type="email"
+          label="E-mail"
+          autoComplete="email"
+          placeholder="nome@exemplo.com"
+          icon={<Mail className="h-4 w-4" aria-hidden />}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value)
+            if (error) setError(null)
+          }}
+          disabled={step === 'sending'}
+          error={error ?? undefined}
+        />
 
-            <form className="mt-8 space-y-5" onSubmit={onSubmit} noValidate>
-              <div>
-                <label htmlFor="fp-email" className={msLabel}>
-                  E-mail
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ms-muted"
-                    aria-hidden
-                  />
-                  <input
-                    id="fp-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value)
-                      if (error) setError(null)
-                    }}
-                    disabled={step === 'sending'}
-                    className={cn(
-                      msInputBase,
-                      'pl-10 pr-3 disabled:opacity-60',
-                      error ? msInputError : msInputBorder,
-                    )}
-                    placeholder="nome@hospital.org"
-                  />
-                </div>
-                {error ? <p className="mt-1.5 text-xs text-red-600">{error}</p> : null}
-              </div>
+        <AuthButton type="submit" isLoading={step === 'sending'} className="mt-8">
+          {step === 'sending' ? 'Enviando…' : 'Enviar link de recuperação'}
+        </AuthButton>
 
-              <Button type="submit" variant="primary" fullWidth isLoading={step === 'sending'}>
-                {step === 'sending' ? 'Enviando…' : 'Enviar link de recuperação'}
-              </Button>
-            </form>
-
-            <div className="mt-6 flex justify-center">
-              <LinkButton
-                to="/login"
-                variant="ghost"
-                size="sm"
-                icon={<ArrowLeft className="h-4 w-4" aria-hidden />}
-              >
-                Voltar para o login
-              </LinkButton>
-            </div>
-          </>
-        ) : (
-          <div className="text-center">
-            <CheckCircle2 className="mx-auto h-16 w-16 text-green-600" aria-hidden />
-            <h1 className="mt-6 text-2xl font-semibold tracking-tight text-ms-primary">E-mail enviado!</h1>
-            <p className="mt-3 text-sm leading-relaxed text-ms-secondary">
-              Verifique sua caixa de entrada em <span className="font-semibold text-ms-primary">{sentTo}</span>. Se
-              não encontrar, verifique a pasta de spam.
-            </p>
-            <Button type="button" variant="primary" fullWidth className="mt-8" onClick={() => nav('/login')}>
-              Voltar para o login
-            </Button>
-            <div className="mt-4 flex justify-center">
-              <Button type="button" variant="ghost" size="sm" onClick={resetFlow}>
-                Não recebeu? Enviar novamente
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </AuthPageShell>
+        <div className="mt-6 flex justify-center">
+          <Link
+            to="/familiar/login"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[var(--fa-text-muted)] transition-colors hover:text-[var(--fa-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fa-link)]"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Voltar para o login
+          </Link>
+        </div>
+      </AuthCard>
+    </FamilyAuthShell>
   )
 }

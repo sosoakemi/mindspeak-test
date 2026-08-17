@@ -16,6 +16,7 @@ import { Button, LinkButton } from '../../components/shared/Button'
 import { PatientHeaderActions } from '../../components/patient/PatientHeaderActions'
 import { PatientSyncButton } from '../../components/patient/PatientSyncButton'
 import { clearPatientSession, getPatientSession } from '../../lib/patientSession'
+import { clearAuthSession } from '../../lib/authSession'
 import { useMobileSidebar } from '../../hooks/useMobileSidebar'
 import {
   msNavActive,
@@ -45,7 +46,7 @@ export function PatientDashboardLayout() {
 
   useEffect(() => {
     if (!getPatientSession()) {
-      nav('/patient/login', { replace: true })
+      nav('/acesso', { replace: true })
     }
   }, [nav, location.pathname])
 
@@ -160,7 +161,8 @@ export function PatientDashboardLayout() {
             icon={<LogOut className="h-4 w-4" aria-hidden />}
             onClick={() => {
               clearPatientSession()
-              nav('/patient/login', { replace: true })
+              clearAuthSession()
+              nav('/acesso', { replace: true })
             }}
           >
             Sair
