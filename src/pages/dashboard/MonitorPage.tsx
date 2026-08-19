@@ -14,6 +14,7 @@ import { Activity, Headset, MessageCircle, Radio, Wifi } from 'lucide-react'
 import { mockPatient } from '../../data/mockDashboard'
 import { useChartTheme } from '../../hooks/useChartTheme'
 import { useLiveSession } from '../../hooks/useLiveSession'
+import { SessionConnect } from '../../components/shared/SessionConnect'
 
 const liveStatusLabel: Record<'idle' | 'connecting' | 'open' | 'closed', string> = {
   idle: 'Sem sessão',
@@ -66,6 +67,14 @@ export function MonitorPage() {
           </span>
         </div>
       </div>
+
+      {!sessionId ? (
+        <SessionConnect
+          redirectTo={(id) => `/dashboard/monitor?session=${encodeURIComponent(id)}`}
+          title="Acompanhar uma sessão ao vivo"
+          description="Informe o identificador da sessão do paciente (ex.: sess-demo-001) para ver o sinal, a palavra em destaque e o que já foi falado em tempo real."
+        />
+      ) : null}
 
       {sessionId ? (
         <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">

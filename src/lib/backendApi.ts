@@ -51,6 +51,53 @@ export type BackendTokenResponse = {
   user: BackendUser
 }
 
+export type BackendPatient = {
+  id: number
+  organization_id: number
+  display_name: string
+  external_ref: string | null
+}
+
+export type BackendDevice = {
+  id: number
+  organization_id: number
+  device_uid: string
+  name: string
+  patient_id: number | null
+}
+
+export type CalibrationLabel = 'foco' | 'repouso'
+
+export type CalibrationCaptureStartResponse = {
+  patient_id: number
+  session_id: string
+  label: CalibrationLabel
+}
+
+export type CalibrationCaptureStopResponse = {
+  patient_id: number
+  session_id: string
+  label: CalibrationLabel
+  window_count: number
+  total_window_count: number
+  artifact_path: string
+}
+
+export type CalibrationStatus = {
+  patient_id: number
+  total_windows: number
+  foco_windows: number
+  repouso_windows: number
+}
+
+export type TrainResponse = {
+  patient_id: number
+  accuracy: number
+  version: number
+  artifact_path: string
+  classifier: string
+}
+
 async function extractErrorMessage(response: Response): Promise<string> {
   try {
     const body = (await response.json()) as { detail?: string }
@@ -125,4 +172,77 @@ export function login(payload: {
   password: string
 }): Promise<BackendTokenResponse> {
   return postJson('/auth/login', payload)
+}
+
+export function assignCaregiver(
+  patientId: number,
+  caregiverUserId: number,
+): Promise<BackendUser> {
+  return postJson(
+    `/patients/${patientId}/caregivers`,
+    { caregiver_user_id: caregiverUserId },
+    true,
+  )
+}
+
+export function createPatient(payload: {
+  display_name: string
+  external_ref?: string
+}): Promise<BackendPatient> {
+  return postJson('/patients', payload, true)
+}
+
+export function listPatients(): Promise<BackendPatient[]> {
+  return getJson('/patients')
+}
+
+export function createDevice(
+  patientId: number,
+  payload: { device_uid: string; name: string },
+): Promise<BackendDevice> {
+  return postJson(`/patients/${patientId}/devices`, payload, true)
+}
+
+export function listDevices(patientId: number): Promise<BackendDevice[]> {
+  return getJson(`/patients/${patientId}/devices`)
+}
+
+export function createSession(payload: {
+  patient_id: number
+  device_id: number
+  external_session_id: string
+}): Promise<BackendSession> {
+  return postJson('/sessions', payload, true)
+}
+
+export function listPatientSessions(
+  patientId: number,
+): Promise<{ items: BackendSession[]; next_cursor: string | null }> {
+  return getJson(`/patients/${patientId}/sessions`)
+}
+
+export function startCalibrationCapture(
+  patientId: number,
+  payload: { session_id: string; label: CalibrationLabel },
+): Promise<CalibrationCaptureStartResponse> {
+  return postJson(`/patients/${patientId}/calibration/capture/start`, payload, true)
+}
+
+export function stopCalibrationCapture(
+  patientId: number,
+  sessionId: string,
+): Promise<CalibrationCaptureStopResponse> {
+  return postJson(
+    `/patients/${patientId}/calibration/capture/stop`,
+    { session_id: sessionId },
+    true,
+  )
+}
+
+export function getCalibrationStatus(patientId: number): Promise<CalibrationStatus> {
+  return getJson(`/patients/${patientId}/calibration/status`)
+}
+
+export function trainPatientModel(patientId: number): Promise<TrainResponse> {
+  return postJson(`/patients/${patientId}/train`, {}, true)
 }

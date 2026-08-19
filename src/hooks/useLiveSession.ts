@@ -133,7 +133,14 @@ export function useLiveSession(
 
     function connect() {
       if (cancelled) return
-      socket = new WebSocket(getStatusWsUrl(sessionId as string, token as string))
+      // relê o token a cada tentativa (não só na 1ª vez) — se ele mudou
+      // (login renovado noutra aba, por exemplo) a reconexão já usa o novo.
+      const currentToken = getAccessToken()
+      if (!currentToken) {
+        setState((prev) => ({ ...prev, status: 'closed' }))
+        return
+      }
+      socket = new WebSocket(getStatusWsUrl(sessionId as string, currentToken))
 
       socket.onopen = () => {
         reconnectDelay = RECONNECT_MIN_MS

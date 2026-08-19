@@ -30,6 +30,7 @@ import { HistoryPage } from './pages/dashboard/HistoryPage'
 import { AlertsPage } from './pages/dashboard/AlertsPage'
 import { SettingsPage } from './pages/dashboard/SettingsPage'
 import { PhrasesPage } from './pages/dashboard/PhrasesPage'
+import { PatientsPage } from './pages/dashboard/PatientsPage'
 
 export const router = createBrowserRouter([
   {
@@ -83,6 +84,7 @@ export const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           { index: true, element: <DashboardOverviewPage /> },
+          { path: 'patients', element: <PatientsPage /> },
           { path: 'monitor', element: <MonitorPage /> },
           { path: 'history', element: <HistoryPage /> },
           { path: 'alerts', element: <AlertsPage /> },

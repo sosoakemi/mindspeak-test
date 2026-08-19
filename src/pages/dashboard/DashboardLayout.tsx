@@ -9,6 +9,7 @@ import {
   Menu,
   MessageSquareText,
   Settings,
+  UserPlus,
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
@@ -31,6 +32,7 @@ import {
 
 const nav = [
   { to: '/dashboard', label: 'Visão Geral', end: true, icon: LayoutDashboard },
+  { to: '/dashboard/patients', label: 'Pacientes', icon: UserPlus },
   { to: '/dashboard/monitor', label: 'Monitoramento', icon: Activity },
   { to: '/dashboard/history', label: 'Histórico', icon: History },
   { to: '/dashboard/phrases', label: 'Frases', icon: MessageSquareText },
@@ -127,7 +129,7 @@ function DashboardShell() {
         </nav>
         <div className="space-y-2 border-t border-ms-border-subtle p-4">
           <Button type="button" variant="primary" fullWidth onClick={() => navFn('/dashboard/monitor')}>
-            Nova sessão
+            Acompanhar sessão
           </Button>
           <Button
             type="button"
