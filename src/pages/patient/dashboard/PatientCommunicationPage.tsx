@@ -1,9 +1,17 @@
-import { Brain, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Brain, RefreshCw, Unplug } from 'lucide-react'
 import { cn } from '../../../lib/cn'
 import { usePatientBci, type SystemPhase } from '../../../hooks/usePatientBci'
+import { useLiveSession } from '../../../hooks/useLiveSession'
 import { Button, LinkButton } from '../../../components/shared/Button'
+import { SessionConnect } from '../../../components/shared/SessionConnect'
 import { getPhraseVisual } from '../patientPhraseIcons'
 import { useTodaySelectionCount } from '../../../hooks/useTodaySelectionCount'
+import {
+  ACTIVE_SESSION_CHANGED_EVENT,
+  clearActiveSessionId,
+  getActiveSessionId,
+} from '../../../lib/activeSession'
 
 const phaseLabel: Record<SystemPhase, string> = {
   aguardando: 'Aguardando',
@@ -12,22 +20,36 @@ const phaseLabel: Record<SystemPhase, string> = {
   confirmado: 'Confirmado',
 }
 
+function useActiveSessionId(): string | null {
+  const [sessionId, setSessionId] = useState(() => getActiveSessionId())
+  useEffect(() => {
+    const sync = () => setSessionId(getActiveSessionId())
+    window.addEventListener(ACTIVE_SESSION_CHANGED_EVENT, sync)
+    return () => window.removeEventListener(ACTIVE_SESSION_CHANGED_EVENT, sync)
+  }, [])
+  return sessionId
+}
+
 export function PatientCommunicationPage() {
-  const {
-    words,
-    attention,
-    threshold,
-    highlightIndex,
-    phase,
-    confirmedIndex,
-    focusedWordLabel,
-    demoActive,
-    startDemo,
-    reset,
-  } = usePatientBci()
+  const activeSessionId = useActiveSessionId()
+  const isLive = Boolean(activeSessionId)
+
+  const demo = usePatientBci()
+  const live = useLiveSession(activeSessionId)
   const selectionsToday = useTodaySelectionCount()
 
-  const displayLast = confirmedIndex != null ? (words[confirmedIndex] ?? '—') : '—'
+  const displayWords = useMemo(
+    () => (isLive ? live.words.map((w) => w.text) : demo.words),
+    [isLive, live.words, demo.words],
+  )
+
+  const highlightIndex = isLive ? live.scanningIndex : demo.highlightIndex
+  const isHighlighting = isLive ? live.status === 'open' && !live.paused : demo.demoActive
+  const attentionValue = isLive ? Math.round(live.focusLevel) : demo.attention
+  const lastSelectedLabel = isLive
+    ? (live.lastSelected?.utterance ?? '—')
+    : (demo.confirmedIndex != null ? (demo.words[demo.confirmedIndex] ?? '—') : '—')
+  const focusedWordLabel = isLive ? (live.candidateWord ?? '—') : demo.focusedWordLabel
 
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-8">
@@ -36,29 +58,49 @@ export function PatientCommunicationPage() {
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ms-secondary">
           Abra o modo foco com a grade de frases e a barra de atenção — ideal para usar com o BCI, sem menus nem distrações.
         </p>
-        <div className="mt-5">
-          <LinkButton
-            to="/patient/communicate"
-            variant="primary"
-            size="lg"
-            fullWidth
-            className="max-w-xl sm:inline-flex sm:min-h-[52px] sm:px-10"
-            icon={<Brain className="h-5 w-5 shrink-0" aria-hidden />}
-          >
-            Iniciar Sessão de Comunicação
-          </LinkButton>
-        </div>
+        {isLive ? (
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <LinkButton
+              to={`/patient/communicate?session=${encodeURIComponent(activeSessionId as string)}`}
+              variant="primary"
+              size="lg"
+              className="max-w-xl sm:inline-flex sm:min-h-[52px] sm:px-10"
+              icon={<Brain className="h-5 w-5 shrink-0" aria-hidden />}
+            >
+              Iniciar Sessão de Comunicação
+            </LinkButton>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              icon={<Unplug className="h-4 w-4" aria-hidden />}
+              onClick={clearActiveSessionId}
+            >
+              Trocar sessão
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-5 max-w-xl">
+            <SessionConnect
+              redirectTo={() => '/patient/dashboard'}
+              title="Conectar à sessão ao vivo"
+              description="Peça o identificador da sessão a quem estiver acompanhando (clínico ou familiar) — sem isso, a tela abaixo mostra só uma demonstração local."
+            />
+          </div>
+        )}
       </section>
 
       <section aria-label="Status da conexão">
-        <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Status da conexão</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">
+          {isLive ? 'Sessão ao vivo' : 'Status da conexão (demonstração)'}
+        </p>
         <div className="mt-2 flex flex-wrap items-end gap-4">
           <h1 className="text-4xl font-semibold tracking-tight text-ms-primary md:text-5xl">
-            {Math.min(100, Math.max(0, attention))}% Neural Sync
+            {Math.min(100, Math.max(0, attentionValue))}% Neural Sync
           </h1>
           <div className="flex h-12 items-end gap-0.5 motion-safe:animate-pulse" aria-hidden>
             {Array.from({ length: 12 }).map((_, i) => {
-              const h = 25 + ((i * 7 + attention) % 55)
+              const h = 25 + ((i * 7 + attentionValue) % 55)
               return (
                 <span
                   key={i}
@@ -69,17 +111,25 @@ export function PatientCommunicationPage() {
             })}
           </div>
         </div>
-        <p className="mt-2 text-sm text-ms-secondary">Aguardando comando neural…</p>
+        <p className="mt-2 text-sm text-ms-secondary">
+          {isLive
+            ? live.paused
+              ? 'Sinal ruim — o sistema está pausado, nenhuma palavra será decidida agora.'
+              : `Qualidade do sinal: ${live.signalQuality}%`
+            : 'Aguardando comando neural…'}
+        </p>
       </section>
 
       <section aria-label="Grade de frases">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:gap-5">
-          {words.map((word, index) => {
+          {displayWords.map((word, index) => {
             const meta = getPhraseVisual(word, 'light')
             const Icon = meta.icon
-            const highlighted = demoActive && index === highlightIndex && phase !== 'confirmado'
-            const confirmed = confirmedIndex === index
-            const locking = highlighted && phase === 'selecionando'
+            const highlighted = isHighlighting && index === highlightIndex
+            const confirmed = isLive
+              ? live.lastSelected?.utterance === word && index === highlightIndex
+              : demo.confirmedIndex === index
+            const locking = !isLive && highlighted && demo.phase === 'selecionando'
 
             return (
               <article
@@ -115,28 +165,32 @@ export function PatientCommunicationPage() {
         <div className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
           <h2 className="text-sm font-semibold text-ms-primary">Nível de atenção</h2>
           <p className="mt-1 text-xs leading-relaxed text-ms-muted">
-            Limiar de confirmação em {threshold}% — mantenha o foco por 1,5s sobre a palavra destacada.
+            {isLive
+              ? 'Nível de foco medido pelo sensor em tempo real.'
+              : `Limiar de confirmação em ${demo.threshold}% — mantenha o foco por 1,5s sobre a palavra destacada.`}
           </p>
           <div
             className="relative mt-5 h-4 overflow-hidden rounded-full bg-ms-subtle-strong"
             role="meter"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={attention}
+            aria-valuenow={attentionValue}
             aria-label="Atenção"
           >
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-[width] duration-150"
-              style={{ width: `${Math.min(100, Math.max(0, attention))}%` }}
+              style={{ width: `${Math.min(100, Math.max(0, attentionValue))}%` }}
             />
-            <div
-              className="pointer-events-none absolute inset-y-0 w-0.5 bg-slate-900/70"
-              style={{ left: `${threshold}%` }}
-            />
+            {!isLive ? (
+              <div
+                className="pointer-events-none absolute inset-y-0 w-0.5 bg-slate-900/70"
+                style={{ left: `${demo.threshold}%` }}
+              />
+            ) : null}
           </div>
           <div className="mt-2 flex justify-between text-xs font-medium text-ms-muted">
             <span>0%</span>
-            <span className="tabular-nums text-ms-primary">{attention}%</span>
+            <span className="tabular-nums text-ms-primary">{attentionValue}%</span>
             <span>100%</span>
           </div>
         </div>
@@ -146,11 +200,13 @@ export function PatientCommunicationPage() {
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
               <dt className="text-ms-muted">Palavra em foco</dt>
-              <dd className="text-right font-semibold text-ms-primary">{demoActive ? focusedWordLabel : '—'}</dd>
+              <dd className="text-right font-semibold text-ms-primary">
+                {isLive || demo.demoActive ? focusedWordLabel : '—'}
+              </dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
               <dt className="text-ms-muted">Última seleção</dt>
-              <dd className="text-right font-semibold text-ms-primary">{displayLast}</dd>
+              <dd className="text-right font-semibold text-ms-primary">{lastSelectedLabel}</dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
               <dt className="text-ms-muted">Seleções hoje</dt>
@@ -158,24 +214,30 @@ export function PatientCommunicationPage() {
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-ms-muted">Qualidade do sinal</dt>
-              <dd className="text-right font-semibold text-ms-primary">—</dd>
+              <dd className="text-right font-semibold text-ms-primary">
+                {isLive ? `${live.signalQuality}%` : '—'}
+              </dd>
             </div>
           </dl>
-          <div className="mt-5 flex flex-wrap gap-2 border-t border-ms-border-subtle pt-4">
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              icon={<RefreshCw className="h-4 w-4" aria-hidden />}
-              onClick={startDemo}
-            >
-              Iniciar demonstração
-            </Button>
-            <Button type="button" variant="secondary" size="sm" onClick={reset}>
-              Resetar
-            </Button>
-          </div>
-          <p className="mt-3 text-xs text-ms-muted">Estado do sistema (demo): {phaseLabel[phase]}</p>
+          {!isLive ? (
+            <>
+              <div className="mt-5 flex flex-wrap gap-2 border-t border-ms-border-subtle pt-4">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  icon={<RefreshCw className="h-4 w-4" aria-hidden />}
+                  onClick={demo.startDemo}
+                >
+                  Iniciar demonstração
+                </Button>
+                <Button type="button" variant="secondary" size="sm" onClick={demo.reset}>
+                  Resetar
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-ms-muted">Estado do sistema (demo): {phaseLabel[demo.phase]}</p>
+            </>
+          ) : null}
         </div>
       </section>
     </div>
