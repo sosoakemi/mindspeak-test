@@ -4,12 +4,15 @@ export type PatientPreferences = {
   attentionThreshold: number
   confirmDwellSec: number
   soundEnabled: boolean
+  /** voiceURI da SpeechSynthesisVoice escolhida, ou null = melhor voz pt-BR disponível */
+  voiceURI: string | null
 }
 
 const DEFAULTS: PatientPreferences = {
   attentionThreshold: 75,
   confirmDwellSec: 1.5,
   soundEnabled: true,
+  voiceURI: null,
 }
 
 export function getPatientPreferences(): PatientPreferences {
@@ -27,6 +30,7 @@ export function getPatientPreferences(): PatientPreferences {
           ? Math.min(4, Math.max(1, parsed.confirmDwellSec))
           : DEFAULTS.confirmDwellSec,
       soundEnabled: typeof parsed.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULTS.soundEnabled,
+      voiceURI: typeof parsed.voiceURI === 'string' ? parsed.voiceURI : DEFAULTS.voiceURI,
     }
   } catch {
     return { ...DEFAULTS }

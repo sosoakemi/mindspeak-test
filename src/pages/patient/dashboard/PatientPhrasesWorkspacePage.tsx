@@ -25,16 +25,13 @@ import {
   setEightPhrases,
 } from '../../../data/patientPhrases'
 import { Button } from '../../../components/shared/Button'
+import { getPatientPreferences } from '../../../lib/patientPreferences'
+import { speakText } from '../../../lib/speech'
 
 type Row = { id: string; text: string }
 
 function speak(text: string) {
-  if (!window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'pt-BR'
-  u.rate = 0.95
-  window.speechSynthesis.speak(u)
+  speakText(text, { voiceURI: getPatientPreferences().voiceURI })
 }
 
 function rowsFromPhrases(phrases: string[], prev?: Row[]): Row[] {
