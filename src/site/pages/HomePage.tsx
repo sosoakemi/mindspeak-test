@@ -1,7 +1,6 @@
 import TeamHeader from '../components/team/TeamHeader'
 import Hero from '../components/Hero'
 import { PrototypeScrollVideo } from '../components/PrototypeScrollVideo'
-import ProductShowcase from '../components/ProductShowcase'
 import Stats from '../components/Stats'
 import About from '../components/About'
 import Features from '../components/Features'
@@ -16,7 +15,6 @@ export default function HomePage() {
       <main>
         <Hero />
         <PrototypeScrollVideo />
-        <ProductShowcase />
         <Stats />
         <About />
         <Features />

@@ -1,4 +1,5 @@
 import { Heart, Network, UserRound } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 const valueCards = [
   {
@@ -135,12 +136,12 @@ export default function About() {
             </p>
 
             {/* Pill-style CTA button */}
-            <a
-              href="#produto"
+            <Link
+              to="/produto"
               className="mt-8 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:border-teal-400 hover:text-teal-600 hover:shadow-md dark:border-slate-600 dark:bg-[#111827] dark:text-slate-200 dark:hover:border-teal-500 dark:hover:text-teal-400"
             >
               Saiba como funciona →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

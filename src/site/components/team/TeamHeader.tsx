@@ -19,7 +19,7 @@ export default function TeamHeader() {
   const isHome = location.pathname === '/'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-[#030712]/95">
+    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-[#020617]/95">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-8"
         aria-label="Navegação principal"
@@ -74,7 +74,7 @@ export default function TeamHeader() {
       </nav>
 
       {open && (
-        <div className="border-t border-slate-100 bg-white px-4 py-4 dark:border-slate-800 dark:bg-[#030712] sm:px-6 lg:hidden">
+        <div className="border-t border-slate-100 bg-white px-4 py-4 dark:border-slate-800 dark:bg-[#020617] sm:px-6 lg:hidden">
           <ul className="flex flex-col gap-2">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.to

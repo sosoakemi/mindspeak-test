@@ -1,10 +1,14 @@
+import { Link } from 'react-router-dom'
+
 export default function Hero() {
   return (
     <section
       id="inicio"
       className="relative overflow-hidden"
       style={{
-        background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1628 0%, #050b14 60%, #020609 100%)',
+        // último stop casado com o fundo escuro do site (#020617) para a
+        // transição para a seção seguinte (vídeo do protótipo) ficar sem costura
+        background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1628 0%, #050b14 60%, #020617 100%)',
         minHeight: '92vh',
         display: 'flex',
         alignItems: 'center',
@@ -101,14 +105,15 @@ export default function Hero() {
             Conheça o Projeto →
           </a>
 
-          {/* Secondary */}
-          <a
-            href="#produto"
+          {/* Secondary — a vitrine de componentes agora vive só em /produto
+              (a seção "O Produto" com imagens placeholder saiu da home) */}
+          <Link
+            to="/produto"
             className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-white/5 active:scale-[0.97]"
             style={{ border: '1px solid rgba(148,163,184,0.35)' }}
           >
             Ver Componentes
-          </a>
+          </Link>
         </div>
       </div>
     </section>

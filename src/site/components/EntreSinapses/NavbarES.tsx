@@ -7,7 +7,7 @@ import SiteThemeToggle from '../SiteThemeToggle'
 const navLinks = [
   { label: 'Projeto', to: '/' },
   { label: 'Instruções', to: '/instrucoes' },
-  { label: 'Produto', to: '/#produto' },
+  { label: 'Produto', to: '/produto' },
   { label: 'Equipe', to: '/equipe' },
   { label: 'Referências', to: '/referencias' },
   { label: 'Jogo', to: '/jogo' },
@@ -18,7 +18,7 @@ export default function NavbarES() {
   const location = useLocation()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-[#030712]/95">
+    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-[#020617]/95">
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8"
         aria-label="Navegação principal"
@@ -75,7 +75,7 @@ export default function NavbarES() {
       </nav>
 
       {open && (
-        <div className="border-t border-slate-100 bg-white px-4 py-4 dark:border-slate-800 dark:bg-[#030712] sm:px-6 lg:hidden">
+        <div className="border-t border-slate-100 bg-white px-4 py-4 dark:border-slate-800 dark:bg-[#020617] sm:px-6 lg:hidden">
           <ul className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <li key={link.to}>

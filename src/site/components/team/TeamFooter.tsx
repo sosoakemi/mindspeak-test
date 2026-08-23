@@ -5,7 +5,7 @@ import { GithubIcon, InstagramIcon, LinkedinIcon } from '../ui/SocialIcons'
 const navigationLinks = [
   { label: 'Projeto', to: '/' },
   { label: 'Instruções', to: '/instrucoes' },
-  { label: 'Produto', to: '/#produto' },
+  { label: 'Produto', to: '/produto' },
   { label: 'Equipe', to: '/equipe' },
   { label: 'Referências', to: '/referencias' },
   { label: 'Jogo', to: '/jogo' },

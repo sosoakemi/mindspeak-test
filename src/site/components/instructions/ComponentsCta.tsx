@@ -10,7 +10,7 @@ export default function ComponentsCta() {
           possível.
         </p>
         <Link
-          to="/#produto"
+          to="/produto"
           className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-teal-500 px-8 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600 active:scale-[0.98]"
         >
           Ver Componentes

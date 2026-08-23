@@ -25,83 +25,59 @@ interface ComponentItem {
   image?: string
 }
 
+// Lista de hardware alinhada com a arquitetura atual (PC lê o TGAM direto por
+// serial; a fala sai no iPad via Web Speech API). Os itens do plano antigo
+// com ESP32/DFPlayer/SD/protoboard/eletrodos descartáveis foram retirados —
+// ver seção 2 do CLAUDE.md.
 const componentsList: ComponentItem[] = [
   {
     id: 'tgam',
     name: 'Sensor TGAM (EEG)',
     price: 120.0,
     category: 'Processamento BCI',
-    image: '/images/hardware-comp1.png',
-  },
-  {
-    id: 'esp32',
-    name: 'ESP32 NodeMCU 38p',
-    price: 31.0,
-    category: 'Microcontrolador',
-    image: '/images/hardware-comp2.png',
-  },
-  {
-    id: 'dfplayer',
-    name: 'DFPlayer Mini',
-    price: 15.0,
-    category: 'Módulo de Áudio',
-    image: '/images/hardware-comp3.png',
+    image: '/images/Sensor%20TGAM%20(NeuroSky).png',
   },
   {
     id: 'speaker',
     name: 'Alto-falante 3W',
     price: 8.0,
     category: 'Saída de Som',
-  },
-  {
-    id: 'microsd',
-    name: 'Cartão MicroSD 8GB',
-    price: 30.0,
-    category: 'Armazenamento',
+    image: '/images/Alto-falante%203W.png',
   },
   {
     id: 'lipo',
     name: 'Bateria LiPo 3.7V',
     price: 32.0,
     category: 'Alimentação',
-  },
-  {
-    id: 'charge',
-    name: 'Módulo TP4056',
-    price: 5.0,
-    category: 'Carregamento',
-  },
-  {
-    id: 'breadboard',
-    name: 'Protoboard 400p',
-    price: 12.0,
-    category: 'Prototipagem',
+    image: '/images/Bateria%20LiPo%203.7V%202000mAh.png',
   },
   {
     id: 'jumpers',
     name: 'Cabos Jumper M/F',
     price: 11.0,
     category: 'Conexões',
+    image: '/images/Cabos%20e%20conectores.png',
   },
   {
     id: 'band',
     name: 'Faixa Elástica Ajustável',
     price: 19.0,
     category: 'Estrutura',
+    image: '/images/headband%20para%20sensor.png',
   },
   {
     id: 'case',
     name: 'Case Impresso 3D',
     price: 22.0,
     category: 'Proteção',
-  },
-  {
-    id: 'electrodes',
-    name: 'Eletrodos Secos (Par)',
-    price: 10.0,
-    category: 'Sensores',
+    image: '/images/Case%20impressa%20em%203D.png',
   },
 ]
+
+// Custo total calculado a partir da lista acima — nunca chumbado, pra não
+// ficar desatualizado se um item for adicionado/removido depois.
+const totalComponentsCost = componentsList.reduce((sum, item) => sum + item.price, 0)
+const formattedTotalCost = totalComponentsCost.toFixed(2).replace('.', ',')
 
 const systemSpecs = [
   {
@@ -240,7 +216,7 @@ export default function ProductPage() {
               </div>
               <div className="text-right">
                 <span className="inline-block rounded-full bg-teal-500/10 px-4.5 py-2 text-sm font-bold text-teal-700">
-                  Total R$ 313,00 <span className="font-normal text-xs text-teal-600">aprox.</span>
+                  Total R$ {formattedTotalCost} <span className="font-normal text-xs text-teal-600">aprox.</span>
                 </span>
               </div>
             </div>
@@ -298,7 +274,7 @@ export default function ProductPage() {
               <div>
                 <div className="flex justify-between text-sm font-semibold text-navy-900 mb-2">
                   <span>MindSpeak (Custo de peças)</span>
-                  <span className="text-teal-600">R$ 313,00</span>
+                  <span className="text-teal-600">R$ {formattedTotalCost}</span>
                 </div>
                 <div className="w-full bg-slate-100 h-6 rounded-full overflow-hidden">
                   <div

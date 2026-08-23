@@ -21,8 +21,13 @@ const SMOOTHING = 0.35
 
 type PinState = 'before' | 'pinned' | 'after'
 
+// A cor final do degradê (#020617) é a mesma do fundo escuro das páginas do
+// site (site-dark.css) — como o vídeo em si não tem canal alfa (não dá pra
+// "recortar" o fundo dele sem also comer o modelo 3D, que também é escuro),
+// a costura fica invisível casando as duas cores em vez de tentar
+// transparência de verdade.
 const BACKDROP = {
-  background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1628 0%, #050b14 60%, #020609 100%)',
+  background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1628 0%, #050b14 60%, #020617 100%)',
 }
 
 /**

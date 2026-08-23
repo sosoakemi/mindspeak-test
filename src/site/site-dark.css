@@ -4,11 +4,20 @@
   color-scheme: dark;
 }
 
-@layer components {
-  /* Page & section backgrounds */
-  .site-scope.dark .bg-white {
-    background-color: #030712;
-  }
+/*
+ * Sem @layer de propósito: Tailwind (v4) empilha suas próprias classes na
+ * layer "utilities", que tem prioridade MAIOR que qualquer @layer nomeada
+ * (ex.: "components") — não importa a especificidade. Isso fazia estas
+ * regras (ex.: `.site-scope.dark .bg-white`) perderem sempre para o
+ * `.bg-white` puro do Tailwind, e o modo escuro "não funcionava" nas
+ * páginas do site. CSS não-camadada (sem @layer) fica acima de toda @layer
+ * nomeada, então as regras abaixo agora realmente vencem.
+ */
+
+/* Page & section backgrounds */
+.site-scope.dark .bg-white {
+  background-color: #020617;
+}
 
   .site-scope.dark .bg-slate-50 {
     background-color: #0f172a;
@@ -36,7 +45,7 @@
 
   /* Header stays slightly translucent over page bg */
   .site-scope.dark header.bg-white\/95 {
-    background-color: rgb(3 7 18 / 0.95);
+    background-color: rgb(2 6 23 / 0.95);
   }
 
   /* Text */
@@ -123,7 +132,7 @@
 
   /* Grid background on team page */
   .site-scope.dark .team-grid-bg {
-    background-color: #030712;
+    background-color: #020617;
     background-image:
       linear-gradient(to right, rgb(30 41 59 / 0.35) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(30 41 59 / 0.35) 1px, transparent 1px);
@@ -171,7 +180,7 @@
 
   /* Entre Sinapses hero gradient */
   .site-scope.dark .site-es-hero {
-    background: linear-gradient(180deg, #030712 0%, #0f172a 100%) !important;
+    background: linear-gradient(180deg, #020617 0%, #0f172a 100%) !important;
   }
 
   .site-scope.dark .site-es-hero-secondary {
@@ -301,4 +310,3 @@
   .site-scope.dark .group-hover\:bg-teal-100:is(:where(.group):hover *) {
     background-color: rgb(20 184 166 / 0.18);
   }
-}
