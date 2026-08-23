@@ -5,6 +5,7 @@ import {
   PHRASES_CHANGED_EVENT,
 } from '../data/patientPhrases'
 import { getPatientPreferences, PATIENT_PREFS_CHANGED_EVENT } from '../lib/patientPreferences'
+import { speakText } from '../lib/speech'
 import { incrementTodaySelectionCount } from '../lib/patientStats'
 
 /** @deprecated use DEFAULT_PATIENT_PHRASES from `data/patientPhrases` */
@@ -21,13 +22,9 @@ function rand(min: number, max: number) {
 }
 
 function speak(text: string) {
-  if (!getPatientPreferences().soundEnabled) return
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'pt-BR'
-  u.rate = 0.95
-  window.speechSynthesis.speak(u)
+  const prefs = getPatientPreferences()
+  if (!prefs.soundEnabled) return
+  speakText(text, { voiceURI: prefs.voiceURI })
 }
 
 export function usePatientBci() {

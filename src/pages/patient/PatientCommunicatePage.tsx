@@ -13,6 +13,7 @@ import { getEightPhrases, PHRASES_CHANGED_EVENT } from '../../data/patientPhrase
 import { getPhraseVisual } from './patientPhraseIcons'
 import { getPatientSession } from '../../lib/patientSession'
 import { getPatientPreferences } from '../../lib/patientPreferences'
+import { isSpeechSupported, listVoices, primeSpeech, speakText } from '../../lib/speech'
 import { incrementTodaySelectionCount } from '../../lib/patientStats'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button } from '../../components/shared/Button'
@@ -32,16 +33,9 @@ function rand(min: number, max: number) {
 }
 
 function speakPhrase(text: string) {
-  if (!getPatientPreferences().soundEnabled) return
-  if (typeof window === 'undefined' || !window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'pt-BR'
-  u.rate = 0.92
-  const voices = window.speechSynthesis.getVoices?.() ?? []
-  const br = voices.find((v) => v.lang?.toLowerCase().startsWith('pt-br') || v.lang === 'pt_BR')
-  if (br) u.voice = br
-  window.speechSynthesis.speak(u)
+  const prefs = getPatientPreferences()
+  if (!prefs.soundEnabled) return
+  speakText(text, { voiceURI: prefs.voiceURI, rate: 0.92 })
 }
 
 function attentionBarClass(v: number) {
@@ -63,6 +57,7 @@ export function PatientCommunicatePage() {
   const [searchParams] = useSearchParams()
   const liveSessionId = searchParams.get('session')
   const isLive = Boolean(liveSessionId)
+  const speechSupported = isSpeechSupported()
 
   const [phrases, setPhrases] = useState(() => getEightPhrases())
   const [scanIndex, setScanIndex] = useState(0)
@@ -224,12 +219,10 @@ export function PatientCommunicatePage() {
 
   /* Prime speech voices (Safari) */
   useEffect(() => {
-    const v = window.speechSynthesis
-    if (!v) return
-    const fn = () => v.getVoices()
-    fn()
-    v.addEventListener('voiceschanged', fn)
-    return () => v.removeEventListener('voiceschanged', fn)
+    if (!speechSupported) return
+    listVoices()
+    window.speechSynthesis.addEventListener('voiceschanged', listVoices)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', listVoices)
   }, [])
 
   const startDemo = () => {
@@ -262,9 +255,7 @@ export function PatientCommunicatePage() {
 
   const startLiveSession = () => {
     // gesto do usuário exigido pelo Safari/iOS pra destravar a Web Speech API.
-    if (window.speechSynthesis) {
-      window.speechSynthesis.speak(new SpeechSynthesisUtterance(''))
-    }
+    primeSpeech()
     setLiveStarted(true)
   }
 
@@ -279,7 +270,7 @@ export function PatientCommunicatePage() {
   return (
     <div className="flex min-h-dvh flex-col bg-slate-900 text-slate-100">
       <header className="flex h-12 max-h-12 shrink-0 items-center justify-between border-b border-slate-800 px-3 sm:px-4">
-        <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
+        <MindSpeakLogo layout="horizontal" size="sm" forceTheme="dark" />
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
             <span className="relative flex h-2 w-2" aria-hidden>
@@ -288,6 +279,14 @@ export function PatientCommunicatePage() {
             </span>
             <span className="hidden sm:inline">{connectionLabel}</span>
           </div>
+          {!speechSupported ? (
+            <span
+              className="hidden rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-300 sm:inline"
+              title="Este navegador não suporta síntese de voz — o texto aparece na tela, mas não será falado."
+            >
+              Sem voz
+            </span>
+          ) : null}
           <Button
             type="button"
             variant="ghost"

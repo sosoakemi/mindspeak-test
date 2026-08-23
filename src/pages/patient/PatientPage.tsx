@@ -281,7 +281,7 @@ export function PatientPage({
                 </div>
                 <div className="flex justify-between gap-4">
                   <dt className="text-ms-muted">Estado do sistema</dt>
-                  <dd className="text-right font-semibold text-emerald-900">{phaseLabel[phase]}</dd>
+                  <dd className="text-right font-semibold text-emerald-900 dark:text-emerald-200">{phaseLabel[phase]}</dd>
                 </div>
               </dl>
               <div className="mt-6 flex flex-wrap gap-3 border-t border-ms-border-subtle pt-5">
@@ -339,7 +339,7 @@ export function PatientPage({
                 </div>
                 <Thermometer className="h-8 w-8 text-emerald-600" aria-hidden />
               </div>
-              <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-emerald-800">
+              <p className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-emerald-800 dark:text-emerald-300">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
                 Temperatura estável
               </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { RotateCcw, Save } from 'lucide-react'
+import { PlayCircle, RotateCcw, Save } from 'lucide-react'
 import { Button } from '../../../components/shared/Button'
 import {
   getPatientPreferences,
@@ -7,15 +7,21 @@ import {
   resetPatientPreferences,
   savePatientPreferences,
 } from '../../../lib/patientPreferences'
+import { isSpeechSupported, listPortugueseVoices, speakText } from '../../../lib/speech'
 import { msCardPad, msInputBase, msInputBorder, msLabel } from '../../../lib/msStyles'
 import { cn } from '../../../lib/cn'
+
+const VOICE_PREVIEW_TEXT = 'Olá, esta é a minha voz.'
 
 export function PatientSettingsPage() {
   const [threshold, setThreshold] = useState(75)
   const [dwell, setDwell] = useState(1.5)
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [voiceURI, setVoiceURI] = useState<string | null>(null)
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const speechSupported = isSpeechSupported()
 
   useEffect(() => {
     const load = () => {
@@ -23,11 +29,21 @@ export function PatientSettingsPage() {
       setThreshold(p.attentionThreshold)
       setDwell(p.confirmDwellSec)
       setSoundEnabled(p.soundEnabled)
+      setVoiceURI(p.voiceURI)
     }
     load()
     window.addEventListener(PATIENT_PREFS_CHANGED_EVENT, load)
     return () => window.removeEventListener(PATIENT_PREFS_CHANGED_EVENT, load)
   }, [])
+
+  useEffect(() => {
+    if (!speechSupported) return
+    const loadVoices = () => setVoices(listPortugueseVoices())
+    loadVoices()
+    // algumas engines (Chrome) só populam a lista de vozes de forma async
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
+  }, [speechSupported])
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -37,6 +53,7 @@ export function PatientSettingsPage() {
         attentionThreshold: threshold,
         confirmDwellSec: dwell,
         soundEnabled,
+        voiceURI,
       })
       setSaved(true)
       window.setTimeout(() => setSaved(false), 2500)
@@ -51,6 +68,7 @@ export function PatientSettingsPage() {
     setThreshold(p.attentionThreshold)
     setDwell(p.confirmDwellSec)
     setSoundEnabled(p.soundEnabled)
+    setVoiceURI(p.voiceURI)
     setSaved(false)
     setError(null)
   }
@@ -119,6 +137,50 @@ export function PatientSettingsPage() {
             <p className="mt-1 text-xs text-ms-muted">Usa síntese de voz do navegador quando uma palavra é selecionada.</p>
           </div>
         </div>
+
+        {!speechSupported ? (
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">
+            Este navegador não suporta síntese de voz (Web Speech API). O texto ainda aparece na tela,
+            mas não será falado em voz alta — use Safari (iPad/iPhone) ou Chrome para ter áudio.
+          </p>
+        ) : (
+          <div>
+            <label htmlFor="patient-voice" className={msLabel}>
+              Voz
+            </label>
+            <p className="mb-3 text-xs text-ms-muted">Escolha a voz usada para falar as frases confirmadas.</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <select
+                id="patient-voice"
+                value={voiceURI ?? ''}
+                onChange={(e) => setVoiceURI(e.target.value || null)}
+                className={cn(msInputBase, msInputBorder, 'sm:flex-1')}
+                disabled={voices.length === 0}
+              >
+                <option value="">Automática (melhor voz em português)</option>
+                {voices.map((v) => (
+                  <option key={v.voiceURI} value={v.voiceURI}>
+                    {v.name} ({v.lang})
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                variant="secondary"
+                icon={<PlayCircle className="h-4 w-4" aria-hidden />}
+                onClick={() => speakText(VOICE_PREVIEW_TEXT, { voiceURI })}
+                disabled={voices.length === 0}
+              >
+                Ouvir prévia
+              </Button>
+            </div>
+            {voices.length === 0 ? (
+              <p className="mt-2 text-xs text-ms-muted">
+                Nenhuma voz carregada ainda — aguarde um instante ou toque na tela.
+              </p>
+            ) : null}
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Button type="submit" variant="primary" icon={<Save className="h-4 w-4" aria-hidden />}>

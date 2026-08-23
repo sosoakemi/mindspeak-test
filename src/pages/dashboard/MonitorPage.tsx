@@ -51,13 +51,13 @@ export function MonitorPage() {
     <div className="min-w-0 space-y-6 sm:space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Monitoramento</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-emerald-100">Monitoramento</h1>
           <p className="mt-1 text-sm text-ms-secondary">
             Paciente {mockPatient.name} · {mockPatient.bed}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-900 ring-1 ring-emerald-100">
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-900 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-100 dark:ring-emerald-800/60">
             <Wifi className="h-4 w-4" aria-hidden />
             Sincronizado
           </span>
@@ -80,7 +80,7 @@ export function MonitorPage() {
         <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-ms-primary">Sessão ao vivo</h2>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900 ring-1 ring-emerald-100">
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-100 dark:ring-emerald-800/60">
               <Radio className="h-3.5 w-3.5" aria-hidden />
               {liveStatusLabel[live.status]}
             </span>
@@ -147,7 +147,7 @@ export function MonitorPage() {
       <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-ms-primary">Interface neural</h2>
-          <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800">
+          <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
             <Activity className="h-4 w-4" aria-hidden />
             98,4% neural sync
           </span>

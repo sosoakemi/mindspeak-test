@@ -1,6 +1,6 @@
 // Footer for Entre Sinapses page — light, white theme matching Figma design
-import { Brain } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { MindSpeakLogo } from '../../../components/brand/MindSpeakLogo'
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -72,13 +72,8 @@ export default function FooterES() {
       <div className="mx-auto max-w-7xl grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
         {/* Brand col */}
         <div className="lg:col-span-2">
-          <Link to="/" className="flex items-center gap-2.5 mb-4">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
-              <Brain className="h-5 w-5" strokeWidth={1.75} />
-            </span>
-            <span className="font-display text-lg font-semibold text-navy-900">
-              MindSpeak
-            </span>
+          <Link to="/" className="mb-4 flex items-center">
+            <MindSpeakLogo layout="horizontal" size="sm" />
           </Link>
           <p className="text-sm leading-relaxed text-slate-500 max-w-xs">
             Transformando pensamentos em comunicação. Uma jornada pelo universo

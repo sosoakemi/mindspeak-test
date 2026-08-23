@@ -1,5 +1,5 @@
-import { Brain } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { MindSpeakLogo } from '../../../components/brand/MindSpeakLogo'
 import { GithubIcon, InstagramIcon, LinkedinIcon } from '../ui/SocialIcons'
 
 const navigationLinks = [
@@ -28,13 +28,8 @@ export default function TeamFooter() {
     <footer className="border-t border-slate-100 bg-white px-6 py-16 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Link to="/" className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
-              <Brain className="h-5 w-5" strokeWidth={1.75} />
-            </span>
-            <span className="font-display text-lg font-semibold text-navy-900">
-              MindSpeak
-            </span>
+          <Link to="/" className="flex items-center">
+            <MindSpeakLogo layout="horizontal" size="sm" />
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-slate-600">
             Sistema de comunicação assistiva de baixo custo usando Interface
