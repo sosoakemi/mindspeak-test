@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button, LinkButton } from '../../components/shared/Button'
 import { PatientHeaderActions } from '../../components/patient/PatientHeaderActions'
 import { PatientSyncButton } from '../../components/patient/PatientSyncButton'
@@ -28,8 +29,6 @@ import {
   msSidebarOpen,
   msSurface,
 } from '../../lib/msStyles'
-
-const LOGO_SRC = '/logos/logoCt-2b7c3200-61f0-4a60-96a1-a47d5808bb1f.png'
 
 const navItems = [
   { to: '/patient/dashboard', label: 'Comunicação', icon: MessageSquare, match: (p: string) => p === '/patient/dashboard' || p.endsWith('/comunicacao') },
@@ -78,14 +77,7 @@ export function PatientDashboardLayout() {
       >
         <div className="flex items-start justify-between border-b border-ms-border-subtle p-4">
           <div className="min-w-0 flex-1">
-            <img
-              src={LOGO_SRC}
-              alt="MindSpeak"
-              className="h-9 w-full max-w-[200px] object-contain object-left dark:brightness-110"
-              width={200}
-              height={36}
-              decoding="async"
-            />
+            <MindSpeakLogo layout="horizontal" size="sm" className="max-w-[200px] object-left" />
             <div className="mt-3">
               <p className="truncate text-sm font-semibold text-ms-primary">{patientName}</p>
               <p className="text-xs text-ms-muted">ID: {patientId}</p>

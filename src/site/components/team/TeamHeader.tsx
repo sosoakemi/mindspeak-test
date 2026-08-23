@@ -1,6 +1,7 @@
-import { Brain, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { MindSpeakLogo } from '../../../components/brand/MindSpeakLogo'
 import SiteThemeToggle from '../SiteThemeToggle'
 
 const navLinks = [
@@ -23,13 +24,8 @@ export default function TeamHeader() {
         className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-8"
         aria-label="Navegação principal"
       >
-        <Link to="/" className="flex min-w-0 items-center gap-2.5 justify-self-start lg:justify-self-start">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400">
-            <Brain className="h-5 w-5" strokeWidth={1.75} />
-          </span>
-          <span className="truncate font-display text-lg font-semibold tracking-tight text-navy-900 dark:text-gray-50">
-            MindSpeak
-          </span>
+        <Link to="/" className="flex min-w-0 shrink-0 items-center justify-self-start lg:justify-self-start">
+          <MindSpeakLogo layout="horizontal" size="sm" />
         </Link>
 
         <ul className="hidden items-center gap-1 lg:flex lg:justify-self-center">

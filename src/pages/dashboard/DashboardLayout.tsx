@@ -95,7 +95,7 @@ function DashboardShell() {
       >
         <div className="flex items-center justify-between border-b border-ms-border-subtle p-4 lg:p-5">
           <div className="min-w-0 flex-1">
-            <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
+            <MindSpeakLogo layout="horizontal" size="sm" />
             <p className="mt-2 text-[11px] text-ms-muted">Interface clínica</p>
           </div>
           <button

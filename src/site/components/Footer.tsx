@@ -1,4 +1,4 @@
-import { Brain } from 'lucide-react'
+import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 
 /* ── Filled social icons ─────────────────────────────────────────────── */
 
@@ -60,13 +60,8 @@ export default function Footer() {
 
           {/* Col 1 — Brand */}
           <div>
-            <a href="/#inicio" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
-                <Brain className="h-5 w-5" strokeWidth={1.75} />
-              </span>
-              <span className="font-display text-lg font-semibold text-slate-900">
-                MindSpeak
-              </span>
+            <a href="/#inicio" className="flex items-center">
+              <MindSpeakLogo layout="horizontal" size="sm" />
             </a>
 
             <p className="mt-4 text-sm leading-relaxed text-slate-500">
