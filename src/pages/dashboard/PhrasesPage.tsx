@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   DndContext,
   KeyboardSensor,
@@ -21,29 +21,22 @@ import { cn } from '../../lib/cn'
 import { initialPhrases, type PhraseRow } from '../../data/mockPhrases'
 import type { AlertSeverity } from '../../data/mockDashboard'
 import { Button } from '../../components/shared/Button'
+import { isSpeechSupported, listPortugueseVoices, speakText } from '../../lib/speech'
 
-const voices = [
-  { id: 'pt-BR-neural', label: 'Português (Brasil) · Neural' },
-  { id: 'pt-BR-standard', label: 'Português (Brasil) · Standard' },
-  { id: 'pt-PT', label: 'Português (Portugal)' },
-]
-
-function speak(text: string) {
-  if (!window.speechSynthesis) return
-  window.speechSynthesis.cancel()
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = 'pt-BR'
-  window.speechSynthesis.speak(u)
+function speak(text: string, voiceURI: string | null) {
+  speakText(text, { voiceURI })
 }
 
 function SortablePhraseRow({
   row,
   onChange,
   onRemove,
+  voiceURI,
 }: {
   row: PhraseRow
   onChange: (id: string, patch: Partial<PhraseRow>) => void
   onRemove: (id: string) => void
+  voiceURI: string | null
 }) {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({
@@ -111,7 +104,7 @@ function SortablePhraseRow({
             variant="secondary"
             size="sm"
             icon={<Volume2 className="h-4 w-4" aria-hidden />}
-            onClick={() => speak(row.text)}
+            onClick={() => speak(row.text, voiceURI)}
           >
             Ouvir
           </Button>
@@ -132,7 +125,17 @@ function SortablePhraseRow({
 
 export function PhrasesPage() {
   const [rows, setRows] = useState<PhraseRow[]>(initialPhrases)
-  const [voice, setVoice] = useState(voices[0]!.id)
+  const [voiceURI, setVoiceURI] = useState<string | null>(null)
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  const speechSupported = isSpeechSupported()
+
+  useEffect(() => {
+    if (!speechSupported) return
+    const loadVoices = () => setVoices(listPortugueseVoices())
+    loadVoices()
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
+  }, [speechSupported])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -197,16 +200,23 @@ export function PhrasesPage() {
               </label>
               <select
                 id="voice"
-                value={voice}
-                onChange={(e) => setVoice(e.target.value)}
-                className="mt-2 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2"
+                value={voiceURI ?? ''}
+                onChange={(e) => setVoiceURI(e.target.value || null)}
+                disabled={!speechSupported || voices.length === 0}
+                className="mt-2 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2 disabled:opacity-60"
               >
+                <option value="">Automática (melhor voz em português)</option>
                 {voices.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.label}
+                  <option key={v.voiceURI} value={v.voiceURI}>
+                    {v.name} ({v.lang})
                   </option>
                 ))}
               </select>
+              {!speechSupported ? (
+                <p className="mt-1 text-[11px] text-amber-700">
+                  Este navegador não suporta síntese de voz — "Ouvir" não vai funcionar aqui.
+                </p>
+              ) : null}
             </div>
             <div>
               <label htmlFor="audio" className="text-xs font-semibold uppercase tracking-wide text-ms-muted">
@@ -227,7 +237,13 @@ export function PhrasesPage() {
             <SortableContext items={rows.map((r) => r.id)} strategy={verticalListSortingStrategy}>
               <ul className="space-y-3">
                 {rows.map((row) => (
-                  <SortablePhraseRow key={row.id} row={row} onChange={patchPhrase} onRemove={removePhrase} />
+                  <SortablePhraseRow
+                    key={row.id}
+                    row={row}
+                    onChange={patchPhrase}
+                    onRemove={removePhrase}
+                    voiceURI={voiceURI}
+                  />
                 ))}
               </ul>
             </SortableContext>
