@@ -178,7 +178,7 @@ export function PhrasesPage() {
   return (
     <div className="min-w-0 space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Editar palavras e frases</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-emerald-100">Editar palavras e frases</h1>
         <p className="mt-1 text-sm text-ms-secondary">
           Organize a grade, níveis de alerta e voz · arraste o ícone à esquerda para reordenar.
         </p>
@@ -227,7 +227,7 @@ export function PhrasesPage() {
                 name="audio"
                 type="file"
                 accept="audio/*"
-                className="mt-2 block w-full text-sm text-ms-secondary file:mr-3 file:rounded-lg file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-900 hover:file:bg-green-100"
+                className="mt-2 block w-full text-sm text-ms-secondary file:mr-3 file:rounded-lg file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-900 hover:file:bg-green-100 dark:file:bg-emerald-950/40 dark:file:text-emerald-100 dark:hover:file:bg-emerald-950/60"
               />
               <p className="mt-1 text-[11px] text-ms-muted">Upload ou gravação serão integrados ao backend.</p>
             </div>

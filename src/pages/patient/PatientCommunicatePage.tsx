@@ -270,7 +270,7 @@ export function PatientCommunicatePage() {
   return (
     <div className="flex min-h-dvh flex-col bg-slate-900 text-slate-100">
       <header className="flex h-12 max-h-12 shrink-0 items-center justify-between border-b border-slate-800 px-3 sm:px-4">
-        <MindSpeakLogo layout="horizontal" size="sm" className="justify-start" />
+        <MindSpeakLogo layout="horizontal" size="sm" forceTheme="dark" />
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
             <span className="relative flex h-2 w-2" aria-hidden>

@@ -1,32 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
-
-const STORAGE_KEY = 'mindspeak-site-theme'
+import { useTheme as useAppTheme } from '../../theme/useTheme'
 
 export type SiteTheme = 'light' | 'dark'
 
-function getPreferredTheme(): SiteTheme {
-  if (typeof window === 'undefined') return 'light'
-
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored === 'light' || stored === 'dark') return stored
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
+/**
+ * Antes disto, o site institucional tinha seu PRÓPRIO estado de tema
+ * (chave de localStorage separada, `mindspeak-site-theme`) — trocar o tema
+ * numa página pública não refletia no app (login/dashboard/paciente) e
+ * vice-versa. Agora só delega pro ThemeProvider da raiz (src/theme/), que
+ * já envolve o app inteiro em main.tsx: uma única fonte de verdade, um
+ * único toggle, uma única chave persistida (`mindspeak-theme`).
+ */
 export function useThemeState() {
-  const [theme, setThemeState] = useState<SiteTheme>(() => getPreferredTheme())
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, theme)
-  }, [theme])
-
-  const setTheme = useCallback((next: SiteTheme) => {
-    setThemeState(next)
-  }, [])
-
-  const toggleTheme = useCallback(() => {
-    setThemeState((current) => (current === 'dark' ? 'light' : 'dark'))
-  }, [])
-
+  const { theme, setTheme, toggleTheme } = useAppTheme()
   return { theme, isDark: theme === 'dark', setTheme, toggleTheme }
 }

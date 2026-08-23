@@ -97,7 +97,7 @@ export function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950">Configurações</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-emerald-100">Configurações</h1>
         <p className="mt-1 text-sm text-ms-secondary">
           Vínculo de cuidador é real (fala com o backend). Os parâmetros de protocolo abaixo ainda
           são um mock estático.

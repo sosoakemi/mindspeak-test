@@ -68,7 +68,7 @@ export function DashboardOverviewPage() {
               <p
                 className={
                   mockPatient.sensorConnected
-                    ? 'mt-1 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800'
+                    ? 'mt-1 inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 dark:text-emerald-300'
                     : 'mt-1 text-sm font-semibold text-red-700'
                 }
               >
@@ -108,7 +108,7 @@ export function DashboardOverviewPage() {
             </div>
             <div className={msStatRow}>
               <dt className="text-sm text-ms-secondary">Precisão</dt>
-              <dd className="text-lg font-semibold tabular-nums text-emerald-800">
+              <dd className="text-lg font-semibold tabular-nums text-emerald-800 dark:text-emerald-300">
                 {mockDayStats.accuracyPct}%
               </dd>
             </div>

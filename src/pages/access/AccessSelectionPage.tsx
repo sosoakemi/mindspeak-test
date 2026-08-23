@@ -32,7 +32,7 @@ export function AccessSelectionPage() {
     >
       <header className="relative z-10 flex items-center justify-between gap-4 px-4 py-6 sm:px-6 sm:py-8">
         <div className="w-24" aria-hidden />
-        <MindSpeakLogo layout="horizontal" size="md" className="justify-center" />
+        <MindSpeakLogo layout="horizontal" size="md" />
         <div className="flex w-24 shrink-0 items-center justify-end gap-2">
           <ThemeToggle size="compact" />
           <button

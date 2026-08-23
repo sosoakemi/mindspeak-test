@@ -2,6 +2,7 @@ import hardwareDiagram from '../assets/hardware-diagram.png'
 import headsetPlaceholder from '../assets/headset-placeholder.png'
 import TeamHeader from '../components/team/TeamHeader'
 import Footer from '../components/Footer'
+import { TiltImage } from '../components/TiltImage'
 import {
   Activity,
   Battery,
@@ -461,10 +462,10 @@ export default function ProductPage() {
                     />
                     ─────────────────────────────────────────────────────────
                   */}
-                  <img
+                  <TiltImage
                     src={headsetPlaceholder}
                     alt="Placeholder: manequim 3D com capacete BCI MindSpeak — substituir por vídeo"
-                    className="w-full h-full object-cover"
+                    className="h-full w-full"
                   />
                 </div>
               </div>
