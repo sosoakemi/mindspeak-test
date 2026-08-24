@@ -79,7 +79,7 @@ Escopo `[data-family-auth]`:
 
 ### Marca (`src/components/brand/MindSpeakLogo.tsx`)
 
-Logo via `/favicon.svg`; wordmark via `wordmarkClassName`.
+Logo via `/logos/logosite.png`; wordmark via `wordmarkClassName`.
 
 ## Padrão de implementação Figma
 
@@ -95,7 +95,7 @@ Logo via `/favicon.svg`; wordmark via `wordmarkClassName`.
 
 ## Assets
 
-- `public/logos/`, `public/favicon.svg`
+- `public/logos/`
 - Ilustração auth: componente `FamilyAuthHero` (CSS + Lucide, sem imagem externa)
 
 ## Ícones

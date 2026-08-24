@@ -1,7 +1,9 @@
 import { cn } from '../../lib/cn'
 import { useTheme } from '../../theme/useTheme'
 
-const MARK_SRC = '/favicon.svg'
+// favicon.svg saiu do projeto (o favicon da aba agora é logos/logosite.png,
+// que também serve pro ícone isolado aqui).
+const MARK_SRC = '/logos/logosite.png'
 
 // Logo com ícone + "MindSpeak" já compostos na imagem — usada no
 // header/rodapé de toda página (pública ou do sistema). `lg.modonoturno`
