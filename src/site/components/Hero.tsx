@@ -15,6 +15,21 @@ export default function Hero() {
         justifyContent: 'center',
       }}
     >
+      {/* ── Fundo do modo escuro (cérebro translúcido) ──────────────────
+          Fica atrás do degradê/constelação, bem sutil — só dá profundidade,
+          não compete com o texto por cima. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          backgroundImage: "url('/images/img.homeNoturno.jpg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.22,
+          mixBlendMode: 'screen',
+        }}
+      />
+
       {/* ── Constellation background ─────────────────────────────────── */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"

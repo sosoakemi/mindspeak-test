@@ -1,46 +1,41 @@
 // Characters section: "Conheça os Personagens"
-import { Trophy, Heart, GraduationCap } from 'lucide-react'
+// Arquivos vivem em public/images (fora do grafo de módulos do Vite) — por
+// isso são referenciados por caminho de URL, não import.
+const ikennyImg = '/images/ikenny.png'
+const sukyeImg = '/images/Sukye%20-%20img.png'
+const zetaImg = '/images/Zeta.png'
 
 type Character = {
   name: string
   role: string
   description: string
-  stats: Array<{ icon: React.ElementType; label: string; color: string }>
+  image: string
   bg: string
 }
 
 const characters: Character[] = [
   {
-    name: 'Aria',
-    role: 'Neurocientista',
+    name: 'Ikenny',
+    role: 'Mentor Cientista',
     description:
-      'Uma jovem prodigiosa que descobriu o poder de se comunicar através das sinapses cerebrais. Sua curiosidade e determinação a levam a explorar os mistérios da mente.',
-    stats: [
-      { icon: GraduationCap, label: 'Inteligência 95', color: 'text-teal-500' },
-      { icon: Heart, label: 'Empatia 88', color: 'text-rose-500' },
-    ],
+      'Ikenny é o mentor do Instituto Sinapses, guiando os jovens cientistas em suas pesquisas. Sua experiência e sabedoria são vitais para a equipe.',
+    image: ikennyImg,
     bg: '#f0fdf4',
   },
   {
-    name: 'Tobias',
-    role: 'Hacker Neural',
+    name: 'Sukye',
+    role: 'Paciente Virtual',
     description:
-      'Autodidata e rebelde, Tobias dominou a arte de hackear interfaces neurais. Suas habilidades técnicas são fundamentais para desvendar a conspiração do Instituto.',
-    stats: [
-      { icon: Trophy, label: 'Técnica 97', color: 'text-amber-500' },
-      { icon: GraduationCap, label: 'Lógica 91', color: 'text-teal-500' },
-    ],
+      'Sukye é uma paciente virtual criada para testar novas terapias. Sua complexidade emocional desafia os pesquisadores a encontrar soluções inovadoras.',
+    image: sukyeImg,
     bg: '#fef9f0',
   },
   {
-    name: 'Zoya',
-    role: 'Pesquisadora',
+    name: 'Zeta',
+    role: 'IA Assistente',
     description:
-      'Veterana do Instituto Sinapses, Zoya conhece segredos que podem mudar tudo. Sua lealdade é questionável, mas seu conhecimento é inestimável.',
-    stats: [
-      { icon: Heart, label: 'Sabedoria 99', color: 'text-purple-500' },
-      { icon: Trophy, label: 'Influência 85', color: 'text-amber-500' },
-    ],
+      'Um robozinho fofo que traduz seus sinais cerebrais em palavras na tela.',
+    image: zetaImg,
     bg: '#f5f0ff',
   },
 ]
@@ -55,7 +50,7 @@ export default function CharactersES() {
             Conheça os Personagens
           </h2>
           <p className="mt-3 text-sm text-slate-500">
-            Cada personagem traz habilidades únicas para a jornada sináptica.
+           Cada um tem uma história e precisa da sua ajuda
           </p>
         </div>
 
@@ -66,15 +61,17 @@ export default function CharactersES() {
               key={char.name}
               className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              {/* Colored top badge */}
+              {/* Retrato do personagem (pixel art) */}
               <div
-                className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
+                className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
                 style={{ background: char.bg }}
               >
-                {/* Character avatar placeholder using lucide-react icon */}
-                <GraduationCap
-                  className="h-7 w-7 text-teal-500"
-                  strokeWidth={1.75}
+                <img
+                  src={char.image}
+                  alt={char.name}
+                  className="h-16 w-16 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                  loading="lazy"
                 />
               </div>
 
@@ -88,22 +85,6 @@ export default function CharactersES() {
               <p className="mt-3 text-sm leading-relaxed text-slate-500">
                 {char.description}
               </p>
-
-              {/* Stats row */}
-              <div className="mt-5 flex flex-wrap gap-3">
-                {char.stats.map((stat) => {
-                  const Icon = stat.icon
-                  return (
-                    <span
-                      key={stat.label}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600"
-                    >
-                      <Icon className={`h-3.5 w-3.5 ${stat.color}`} strokeWidth={2} />
-                      {stat.label}
-                    </span>
-                  )
-                })}
-              </div>
             </article>
           ))}
         </div>

@@ -5,6 +5,9 @@ type TiltImageProps = {
   src: string
   alt: string
   className?: string
+  /** 'cover' (padrão, preenche recortando) ou 'contain' (mostra a imagem
+   * inteira sem cortar — melhor pra diagramas/fotos de produto). */
+  fit?: 'cover' | 'contain'
 }
 
 const MAX_TILT_DEG = 10
@@ -17,7 +20,7 @@ const RESET_STYLE: CSSProperties = {
  * hover — só ativa com mouse (em touch simplesmente não dispara mousemove,
  * a imagem fica estática, o que é o comportamento correto lá).
  */
-export function TiltImage({ src, alt, className }: TiltImageProps) {
+export function TiltImage({ src, alt, className, fit = 'cover' }: TiltImageProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [style, setStyle] = useState<CSSProperties>(RESET_STYLE)
 
@@ -42,7 +45,12 @@ export function TiltImage({ src, alt, className }: TiltImageProps) {
       className={cn('transition-transform duration-200 ease-out will-change-transform', className)}
       style={style}
     >
-      <img src={src} alt={alt} className="h-full w-full object-cover" draggable={false} />
+      <img
+        src={src}
+        alt={alt}
+        className={cn('h-full w-full', fit === 'contain' ? 'object-contain' : 'object-cover')}
+        draggable={false}
+      />
     </div>
   )
 }

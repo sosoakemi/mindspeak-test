@@ -190,11 +190,13 @@ export default function ProductPage() {
 
             <div className="mt-12">
               <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
-                <img
+                {/* TiltImage: segue o cursor com leve rotação 3D — dá pra
+                    "girar" o diagrama em vez de olhar uma imagem estática */}
+                <TiltImage
                   src={hardwareDiagram}
                   alt="Diagrama explodido do interior do hardware MindSpeak: TGAM Sensor, ESP32, DFPlayer e Bateria LiPo"
-                  className="w-full max-w-[900px] h-auto mx-auto object-contain"
-                  loading="lazy"
+                  fit="contain"
+                  className="mx-auto h-auto max-w-[900px] w-full"
                 />
               </div>
             </div>
@@ -221,7 +223,8 @@ export default function ProductPage() {
               </div>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {/* 6 componentes, 3 por linha (2 linhas) a partir do tablet */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {componentsList.map((item) => (
                 <div
                   key={item.id}

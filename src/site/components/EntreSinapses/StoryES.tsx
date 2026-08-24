@@ -23,7 +23,7 @@ const chapterContent: Record<string, Chapter> = {
     title: 'O Despertar',
     episode: 'Capítulo 1',
     description:
-      'Aria acorda em um mundo onde os pensamentos se tornam realidade. Uma jovem neurocientista descobre que pode controlar sistemas digitais com a mente — mas essa habilidade tem um custo. Ao explorar o Instituto Sinapses, ela encontra outros com poderes similares e começa a entender a conspiração que envolve a tecnologia BCI.',
+      'A história se passa em uma cidade comum, nos dias de hoje. Não tem magia, não tem fantasia. É uma história sobre duas pessoas que se amam mas não conseguem se entender.',
     imageBg: '#8B5A2B',
   },
   livro2: {
@@ -31,7 +31,7 @@ const chapterContent: Record<string, Chapter> = {
     title: 'A Conexão',
     episode: 'Capítulo 2',
     description:
-      'Com novos aliados ao lado, Aria adentra as profundezas do servidor neural. O laboratório guarda segredos que podem mudar para sempre como os humanos se comunicam com as máquinas. Mas quem está do outro lado da interface?',
+      'Com novos aliados ao lado, Ikenny adentra as profundezas do servidor neural. O laboratório guarda segredos que podem mudar para sempre como os humanos se comunicam com as máquinas. Mas quem está do outro lado da interface?',
     imageBg: '#1a5f7a',
   },
   parte1: {
@@ -111,7 +111,10 @@ export default function StoryES() {
       id="historia"
       className="site-es-story relative overflow-hidden px-6 py-20 lg:px-8 lg:py-28"
       style={{
-        background: 'linear-gradient(160deg, #b2dfdb 0%, #80cbc4 30%, #4db6ac 60%, #80cbc4 100%)',
+        // degradê teal (translúcido) sobre a arte pixel-art do jogo — mantém
+        // a identidade de cor da seção e ainda deixa a cena por trás visível
+        background:
+          "linear-gradient(160deg, rgba(178,223,219,0.78) 0%, rgba(128,203,196,0.6) 30%, rgba(77,182,172,0.6) 60%, rgba(128,203,196,0.78) 100%), url('/images/background.cameClaro.png') center / cover no-repeat",
       }}
     >
       {/* Noise overlay for texture */}
