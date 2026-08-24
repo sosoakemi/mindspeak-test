@@ -22,7 +22,7 @@ interface ComponentItem {
   name: string
   price: number
   category: string
-  image?: string
+  image: string
 }
 
 // Lista de hardware alinhada com a arquitetura atual (PC lê o TGAM direto por
@@ -231,23 +231,14 @@ export default function ProductPage() {
                   className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02]"
                 >
                   <div className="flex h-36 w-full items-center justify-center rounded-xl bg-slate-50 overflow-hidden mb-4 p-4">
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-contain"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-slate-400">
-                        <Cpu className="h-10 w-10 text-slate-300 stroke-[1.5]" />
-                        <span className="mt-2 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                          {item.category}
-                        </span>
-                      </div>
-                    )}
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-full w-full object-contain"
+                    />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mb-2">
-                    {item.image ? 'Componente Disponível' : 'Asset pendente'}
+                    Componente Disponível
                   </span>
                   <h3 className="text-sm font-semibold text-navy-900 text-center truncate w-full">
                     {item.name}

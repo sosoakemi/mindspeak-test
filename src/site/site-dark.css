@@ -183,11 +183,10 @@
     background: linear-gradient(180deg, #020617 0%, #0f172a 100%) !important;
   }
 
-  /* Entre Sinapses "A História do..." — versão escura da arte pixel-art */
+  /* Entre Sinapses "A História do..." — só a arte pixel-art (modo escuro),
+     sem degradê por cima, que conflitava com a imagem */
   .site-scope.dark .site-es-story {
-    background:
-      linear-gradient(160deg, rgba(15,118,110,0.78) 0%, rgba(17,94,89,0.68) 30%, rgba(19,78,74,0.68) 60%, rgba(17,94,89,0.78) 100%),
-      url('/images/background.game.png') center / cover no-repeat !important;
+    background: url('/images/background.game.png') center / cover no-repeat !important;
   }
 
   .site-scope.dark .site-es-hero-secondary {

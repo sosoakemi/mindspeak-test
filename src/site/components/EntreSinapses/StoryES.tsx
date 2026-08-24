@@ -111,10 +111,9 @@ export default function StoryES() {
       id="historia"
       className="site-es-story relative overflow-hidden px-6 py-20 lg:px-8 lg:py-28"
       style={{
-        // degradê teal (translúcido) sobre a arte pixel-art do jogo — mantém
-        // a identidade de cor da seção e ainda deixa a cena por trás visível
-        background:
-          "linear-gradient(160deg, rgba(178,223,219,0.78) 0%, rgba(128,203,196,0.6) 30%, rgba(77,182,172,0.6) 60%, rgba(128,203,196,0.78) 100%), url('/images/background.cameClaro.png') center / cover no-repeat",
+        // só a arte pixel-art (modo claro) — sem degradê por cima, que
+        // conflitava com a imagem
+        background: "url('/images/background.cameClaro.png') center / cover no-repeat",
       }}
     >
       {/* Noise overlay for texture */}

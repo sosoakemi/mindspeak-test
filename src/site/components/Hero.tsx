@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useSiteTheme } from '../context/SiteThemeContext'
 
 export default function Hero() {
+  const { isDark } = useSiteTheme()
+
   return (
     <section
       id="inicio"
@@ -16,19 +19,22 @@ export default function Hero() {
       }}
     >
       {/* ── Fundo do modo escuro (cérebro translúcido) ──────────────────
-          Fica atrás do degradê/constelação, bem sutil — só dá profundidade,
-          não compete com o texto por cima. */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        aria-hidden="true"
-        style={{
-          backgroundImage: "url('/images/img.homeNoturno.jpg')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.22,
-          mixBlendMode: 'screen',
-        }}
-      />
+          Só no tema escuro — no claro ela conflitava com o fundo que deve
+          ficar só no modo claro. Fica atrás do degradê/constelação, bem
+          sutil — só dá profundidade, não compete com o texto por cima. */}
+      {isDark && (
+        <div
+          className="pointer-events-none absolute inset-0"
+          aria-hidden="true"
+          style={{
+            backgroundImage: "url('/images/img.homeNoturno.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.22,
+            mixBlendMode: 'screen',
+          }}
+        />
+      )}
 
       {/* ── Constellation background ─────────────────────────────────── */}
       <svg

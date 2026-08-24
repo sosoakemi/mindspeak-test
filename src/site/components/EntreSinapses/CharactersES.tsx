@@ -1,16 +1,20 @@
 // Characters section: "Conheça os Personagens"
+import { Bot } from 'lucide-react'
+
 // Arquivos vivem em public/images (fora do grafo de módulos do Vite) — por
 // isso são referenciados por caminho de URL, não import.
 const ikennyImg = '/images/ikenny.png'
 const sukyeImg = '/images/Sukye%20-%20img.png'
-const zetaImg = '/images/Zeta.png'
 
 type Character = {
   name: string
   role: string
   description: string
-  image: string
   bg: string
+  // Ikenny/Sukye usam retrato pixel art; Zeta usa um ícone (é uma IA, não
+  // tem um retrato pixel art próprio ainda) — só um dos dois é passado.
+  image?: string
+  icon?: React.ElementType
 }
 
 const characters: Character[] = [
@@ -35,7 +39,7 @@ const characters: Character[] = [
     role: 'IA Assistente',
     description:
       'Um robozinho fofo que traduz seus sinais cerebrais em palavras na tela.',
-    image: zetaImg,
+    icon: Bot,
     bg: '#f5f0ff',
   },
 ]
@@ -61,18 +65,22 @@ export default function CharactersES() {
               key={char.name}
               className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
-              {/* Retrato do personagem (pixel art) */}
+              {/* Retrato do personagem — pixel art (Ikenny/Sukye) ou ícone (Zeta) */}
               <div
                 className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
                 style={{ background: char.bg }}
               >
-                <img
-                  src={char.image}
-                  alt={char.name}
-                  className="h-16 w-16 object-contain"
-                  style={{ imageRendering: 'pixelated' }}
-                  loading="lazy"
-                />
+                {char.image ? (
+                  <img
+                    src={char.image}
+                    alt={char.name}
+                    className="h-16 w-16 object-contain"
+                    style={{ imageRendering: 'pixelated' }}
+                    loading="lazy"
+                  />
+                ) : char.icon ? (
+                  <char.icon className="h-9 w-9 text-purple-500" strokeWidth={1.75} />
+                ) : null}
               </div>
 
               <h3 className="font-display text-lg font-black text-navy-900">
