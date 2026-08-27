@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import gameImage from '../assets/hero.png'
+
+const gameImage = '/images/game.img.home.png'
 
 const cards = [
   { label: 'NÍVEIS', value: '4 Capítulos' },

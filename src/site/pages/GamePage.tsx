@@ -1,4 +1,4 @@
-import NavbarES from '../components/EntreSinapses/NavbarES'
+import TeamHeader from '../components/team/TeamHeader'
 import HeroES from '../components/EntreSinapses/HeroES'
 import StatsES from '../components/EntreSinapses/StatsES'
 import StoryES from '../components/EntreSinapses/StoryES'
@@ -10,7 +10,7 @@ import FooterES from '../components/EntreSinapses/FooterES'
 export default function GamePage() {
   return (
     <>
-      <NavbarES />
+      <TeamHeader />
       <HeroES />
       <StatsES />
       <StoryES />

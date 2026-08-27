@@ -5,8 +5,8 @@ import { ArrowRight } from 'lucide-react'
 const chapters = [
   { id: 'livro1', label: 'Livro 1' },
   { id: 'livro2', label: 'Livro 2' },
-  { id: 'parte1', label: 'Parte 1' },
-  { id: 'capitulo1', label: 'Capítulo 1' },
+  { id: 'parte1', label: 'Livro 3' },
+  { id: 'capitulo1', label: 'Livro 4' },
 ]
 
 type Chapter = {
@@ -14,7 +14,7 @@ type Chapter = {
   title: string
   episode: string
   description: string
-  imageBg: string
+  image: string
 }
 
 const chapterContent: Record<string, Chapter> = {
@@ -24,7 +24,7 @@ const chapterContent: Record<string, Chapter> = {
     episode: 'Capítulo 1',
     description:
       'A história se passa em uma cidade comum, nos dias de hoje. Não tem magia, não tem fantasia. É uma história sobre duas pessoas que se amam mas não conseguem se entender.',
-    imageBg: '#8B5A2B',
+    image: '/images/historia1.games.png',
   },
   livro2: {
     id: 'livro2',
@@ -32,15 +32,15 @@ const chapterContent: Record<string, Chapter> = {
     episode: 'Capítulo 2',
     description:
       'Com novos aliados ao lado, Ikenny adentra as profundezas do servidor neural. O laboratório guarda segredos que podem mudar para sempre como os humanos se comunicam com as máquinas. Mas quem está do outro lado da interface?',
-    imageBg: '#1a5f7a',
+    image: '/images/livro2.jpeg',
   },
   parte1: {
     id: 'parte1',
     title: 'O Laboratório',
-    episode: 'Parte 1',
+    episode: 'Livro 3',
     description:
       'Os corredores do Instituto Sinapses escondem experimentos proibidos. Aria precisa decifrar os padrões cerebrais de sujeitos desaparecidos antes que o projeto seja encerrado permanentemente.',
-    imageBg: '#2d6a4f',
+    image: '/images/livro3.jpeg',
   },
   capitulo1: {
     id: 'capitulo1',
@@ -48,56 +48,14 @@ const chapterContent: Record<string, Chapter> = {
     episode: 'Introdução',
     description:
       'Tudo começa com um simples encefalograma. Um pico anômalo nos sinais cerebrais de Aria revela que a mente humana esconde muito mais do que a ciência imagina.',
-    imageBg: '#4a1942',
+    image: '/images/livro4.jpeg',
   },
 }
 
-function StoryIllustration({ bgColor }: { bgColor: string }) {
+function StoryIllustration({ image, alt }: { image: string; alt: string }) {
   return (
-    <div
-      className="relative w-full h-full min-h-[200px] lg:min-h-0 rounded-xl overflow-hidden"
-      style={{ background: bgColor }}
-    >
-      {/* Decorative illustration: silhouette + particles */}
-      <svg
-        viewBox="0 0 320 240"
-        className="absolute inset-0 w-full h-full"
-        aria-hidden="true"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        {/* Sky gradient overlay */}
-        <defs>
-          <radialGradient id="skyGlow" cx="50%" cy="30%" r="60%">
-            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="groundGrad" cx="50%" cy="100%" r="60%">
-            <stop offset="0%" stopColor="rgba(0,0,0,0.4)" stopOpacity="1" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <rect width="320" height="240" fill={bgColor} />
-        <ellipse cx="160" cy="80" rx="80" ry="60" fill="url(#skyGlow)" />
-        {/* Fireflies / particles */}
-        {[
-          [60, 80], [100, 50], [200, 70], [250, 100], [80, 130],
-          [170, 40], [230, 60], [140, 110], [290, 90], [40, 160],
-        ].map(([cx, cy], i) => (
-          <circle key={i} cx={cx} cy={cy} r="2" fill="#fde68a" opacity={0.6 + (i % 3) * 0.15} />
-        ))}
-        {/* Ground */}
-        <ellipse cx="160" cy="210" rx="200" ry="40" fill="rgba(0,0,0,0.35)" />
-        {/* Trees silhouette */}
-        <rect x="20" y="160" width="8" height="60" rx="4" fill="rgba(0,0,0,0.6)" />
-        <ellipse cx="24" cy="155" rx="18" ry="22" fill="rgba(0,0,0,0.5)" />
-        <rect x="270" y="150" width="10" height="70" rx="5" fill="rgba(0,0,0,0.6)" />
-        <ellipse cx="275" cy="145" rx="22" ry="28" fill="rgba(0,0,0,0.5)" />
-        {/* Person silhouette */}
-        <ellipse cx="160" cy="160" rx="12" ry="14" fill="rgba(0,0,0,0.75)" />
-        <circle cx="160" cy="145" r="7" fill="rgba(0,0,0,0.75)" />
-        {/* Ground glow */}
-        <ellipse cx="160" cy="235" rx="120" ry="20" fill="url(#groundGrad)" />
-      </svg>
+    <div className="relative w-full h-full min-h-[200px] lg:min-h-0 overflow-hidden rounded-xl">
+      <img src={image} alt={alt} className="h-full w-full object-cover" />
     </div>
   )
 }
@@ -153,7 +111,7 @@ export default function StoryES() {
           <div className="grid lg:grid-cols-2">
             {/* Left: Illustration */}
             <div className="h-56 lg:h-auto">
-              <StoryIllustration bgColor={current.imageBg} />
+              <StoryIllustration image={current.image} alt={current.title} />
             </div>
 
             {/* Right: Content */}
