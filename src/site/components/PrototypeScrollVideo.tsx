@@ -5,6 +5,12 @@ import { cn } from '../../lib/cn'
 // com /images/helmet-side.png (removida do disco fora desta sessão).
 import fallbackImage from '../assets/headset-placeholder.png'
 
+// ⚠️ Se reexportar este vídeo: precisa ser "all-intra" (todo frame é
+// keyframe — no ffmpeg: `-g 1 -bf 0`). Sem isso, cada `video.currentTime =`
+// do scroll obriga o navegador a decodificar de trás pra frente até o
+// keyframe mais próximo — com poucos keyframes (ex.: 1 pro vídeo inteiro),
+// isso trava visivelmente o scrub. All-intra deixa o arquivo maior, mas
+// cada busca é instantânea (essencial pra um vídeo controlado por scroll).
 const VIDEO_SRC = '/video/3dvideo.home.mp4'
 // imagem do protótipo já montado — usada como pôster (antes do vídeo carregar)
 // e como fallback total se o vídeo não puder ser reproduzido.
@@ -21,13 +27,18 @@ const SMOOTHING = 0.35
 
 type PinState = 'before' | 'pinned' | 'after'
 
-// A cor final do degradê (#020617) é a mesma do fundo escuro das páginas do
-// site (site-dark.css) — como o vídeo em si não tem canal alfa (não dá pra
-// "recortar" o fundo dele sem also comer o modelo 3D, que também é escuro),
-// a costura fica invisível casando as duas cores em vez de tentar
-// transparência de verdade.
+// O vídeo original (render 3D) vinha com fundo branco/preto de estúdio, não
+// transparente — <video> não suporta canal alfa de forma confiável entre
+// navegadores, então em vez disso o fundo foi removido do arquivo (fora
+// desta sessão): máscara por "flood fill" a partir das bordas identifica só
+// o fundo realmente conectado à borda do quadro (preserva partes claras
+// legítimas do modelo, como a tira da headband, que têm cor parecida com o
+// fundo mas não tocam a borda) e recompõe cada frame sobre #060D17 antes de
+// reexportar o mp4. #060D17 é o tom central do degradê abaixo — a cor final
+// do degradê (#020617) é a mesma do fundo escuro das páginas do site
+// (site-dark.css), então a costura com o resto da página fica invisível.
 const BACKDROP = {
-  background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #0a1628 0%, #050b14 60%, #020617 100%)',
+  background: 'radial-gradient(ellipse 80% 70% at 50% 40%, #060D17 0%, #050b14 60%, #020617 100%)',
 }
 
 /**
