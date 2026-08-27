@@ -1,5 +1,5 @@
 import TeamHeader from '../components/team/TeamHeader'
-import TeamFooter from '../components/team/TeamFooter'
+import Footer from '../components/Footer'
 import ReferencesHero from '../components/references/ReferencesHero'
 import ReferenceCard from '../components/references/ReferenceCard'
 import ReferencesCta from '../components/references/ReferencesCta'
@@ -31,7 +31,7 @@ export default function ReferencesPage() {
       </main>
 
       {/* Light-themed Footer */}
-      <TeamFooter />
+      <Footer />
     </div>
   )
 }

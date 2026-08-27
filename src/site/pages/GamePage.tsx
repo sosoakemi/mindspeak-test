@@ -5,7 +5,7 @@ import StoryES from '../components/EntreSinapses/StoryES'
 import CharactersES from '../components/EntreSinapses/CharactersES'
 import VideoES from '../components/EntreSinapses/VideoES'
 import CTAES from '../components/EntreSinapses/CTAES'
-import FooterES from '../components/EntreSinapses/FooterES'
+import Footer from '../components/Footer'
 
 export default function GamePage() {
   return (
@@ -17,7 +17,7 @@ export default function GamePage() {
       <CharactersES />
       <VideoES />
       <CTAES />
-      <FooterES />
+      <Footer />
     </>
   )
 }
