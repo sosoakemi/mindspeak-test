@@ -30,7 +30,7 @@ export default function TeamCard({ member }: TeamCardProps) {
         {member.role}
       </p>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex justify-center gap-2">
         {socialItems.map(({ key, href, icon: Icon, label }) =>
           href ? (
             <a
