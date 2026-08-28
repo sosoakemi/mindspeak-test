@@ -266,6 +266,16 @@ export function PatientCommunicatePage() {
   const highlightedIndex = isLive ? live.scanningIndex : scanIndex
   const isHighlighting = isLive ? liveStarted && live.status === 'open' && !live.paused : demoRunning && !scanPaused
   const connectionLabel = isLive ? liveStatusLabel[live.status] : 'Conectado'
+  // Sem isso, o ponto de status ficava verde/"conectado" mesmo com o
+  // WebSocket caído (reconectando) — só o texto ao lado mudava, o que passa
+  // despercebido a quem olha rápido pra tela numa sessão real.
+  const connectionDotClass =
+    !isLive || live.status === 'open'
+      ? 'bg-emerald-500'
+      : live.status === 'connecting'
+        ? 'bg-amber-400'
+        : 'bg-red-500'
+  const connectionDotPulses = !isLive || live.status === 'open'
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-900 text-slate-100">
@@ -274,8 +284,15 @@ export function PatientCommunicatePage() {
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
             <span className="relative flex h-2 w-2" aria-hidden>
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60 motion-reduce:animate-none motion-reduce:opacity-0" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              {connectionDotPulses ? (
+                <span
+                  className={cn(
+                    'absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:animate-none motion-reduce:opacity-0',
+                    connectionDotClass,
+                  )}
+                />
+              ) : null}
+              <span className={cn('relative inline-flex h-2 w-2 rounded-full', connectionDotClass)} />
             </span>
             <span className="hidden sm:inline">{connectionLabel}</span>
           </div>
