@@ -174,15 +174,8 @@ export function login(payload: {
   return postJson('/auth/login', payload)
 }
 
-export function assignCaregiver(
-  patientId: number,
-  caregiverUserId: number,
-): Promise<BackendUser> {
-  return postJson(
-    `/patients/${patientId}/caregivers`,
-    { caregiver_user_id: caregiverUserId },
-    true,
-  )
+export function assignCaregiver(patientId: number, caregiverEmail: string): Promise<BackendUser> {
+  return postJson(`/patients/${patientId}/caregivers`, { caregiver_email: caregiverEmail }, true)
 }
 
 export function createPatient(payload: {

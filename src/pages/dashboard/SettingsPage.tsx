@@ -5,25 +5,25 @@ import { assignCaregiver, BackendApiError } from '../../lib/backendApi'
 
 function AssignCaregiverCard() {
   const [patientId, setPatientId] = useState('')
-  const [caregiverUserId, setCaregiverUserId] = useState('')
+  const [caregiverEmail, setCaregiverEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const patientIdNum = Number(patientId)
-    const caregiverIdNum = Number(caregiverUserId)
-    if (!patientIdNum || !caregiverIdNum) {
-      setMessage({ kind: 'error', text: 'Informe os dois IDs (números).' })
+    const email = caregiverEmail.trim()
+    if (!patientIdNum || !email) {
+      setMessage({ kind: 'error', text: 'Informe o ID do paciente e o e-mail do cuidador.' })
       return
     }
     setIsLoading(true)
     setMessage(null)
     try {
-      const caregiver = await assignCaregiver(patientIdNum, caregiverIdNum)
+      const caregiver = await assignCaregiver(patientIdNum, email)
       setMessage({ kind: 'ok', text: `${caregiver.full_name} vinculado(a) ao paciente #${patientIdNum}.` })
       setPatientId('')
-      setCaregiverUserId('')
+      setCaregiverEmail('')
     } catch (err) {
       const text =
         err instanceof BackendApiError
@@ -43,9 +43,9 @@ function AssignCaregiverCard() {
       <div>
         <h2 className="text-sm font-semibold text-ms-primary">Vincular cuidador a um paciente</h2>
         <p className="mt-1 text-xs text-ms-muted">
-          Concede acesso ao histórico do paciente para um familiar/cuidador já cadastrado. Só
-          funciona pra pacientes da sua organização. Ainda não há busca por nome — use os IDs
-          numéricos por enquanto.
+          Concede acesso ao histórico do paciente para um familiar/cuidador que já se cadastrou em
+          "Portal Familiar". Só funciona pra pacientes da sua organização — peça o e-mail que a
+          pessoa usou no cadastro.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -63,15 +63,15 @@ function AssignCaregiverCard() {
           />
         </div>
         <div>
-          <label htmlFor="caregiverUserId" className="block text-sm font-medium text-ms-primary">
-            ID do cuidador
+          <label htmlFor="caregiverEmail" className="block text-sm font-medium text-ms-primary">
+            E-mail do cuidador
           </label>
           <input
-            id="caregiverUserId"
-            type="number"
-            min={1}
-            value={caregiverUserId}
-            onChange={(e) => setCaregiverUserId(e.target.value)}
+            id="caregiverEmail"
+            type="email"
+            value={caregiverEmail}
+            onChange={(e) => setCaregiverEmail(e.target.value)}
+            placeholder="familiar@exemplo.com"
             className="mt-2 w-full rounded-xl border border-ms-border bg-ms-subtle px-3 py-2 text-sm outline-none ring-green-600/20 focus:bg-ms-surface focus:ring-2"
           />
         </div>
