@@ -71,11 +71,30 @@ function PatientListPanel({
   const [externalRef, setExternalRef] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  // true depois que o usuário já viu o aviso de duplicado e clicou de novo
+  // em "Cadastrar" mesmo assim — evita bloquear pra sempre um paciente que
+  // por coincidência tem o mesmo nome de outro já cadastrado.
+  const [duplicateConfirmed, setDuplicateConfirmed] = useState(false)
+
+  const trimmedName = displayName.trim()
+  const isDuplicateName =
+    trimmedName.length > 0 &&
+    patients.some((p) => p.display_name.trim().toLowerCase() === trimmedName.toLowerCase())
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!displayName.trim()) {
+    if (!trimmedName) {
       setFeedback({ kind: 'error', text: 'Informe o nome do paciente.' })
+      return
+    }
+    if (isDuplicateName && !duplicateConfirmed) {
+      // 1º clique com nome repetido só avisa — não cadastra ainda. Clicar
+      // de novo (com o mesmo nome) confirma e cadastra mesmo assim.
+      setDuplicateConfirmed(true)
+      setFeedback({
+        kind: 'error',
+        text: `Já existe um paciente chamado "${trimmedName}" nesta organização. Clique em "Cadastrar paciente" de novo para confirmar mesmo assim.`,
+      })
       return
     }
     setIsCreating(true)
@@ -88,6 +107,7 @@ function PatientListPanel({
       onCreated(patient)
       setDisplayName('')
       setExternalRef('')
+      setDuplicateConfirmed(false)
       setFeedback({ kind: 'ok', text: `${patient.display_name} cadastrado(a).` })
     } catch (err) {
       setFeedback({ kind: 'error', text: apiErrorText(err, 'Não foi possível cadastrar agora.') })
@@ -111,10 +131,19 @@ function PatientListPanel({
           <input
             id="patient-name"
             value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            onChange={(e) => {
+              setDisplayName(e.target.value)
+              setDuplicateConfirmed(false)
+            }}
             className={cn(msInputBase, 'border border-ms-border px-3 py-2')}
             placeholder="Nome do paciente"
+            aria-describedby={isDuplicateName ? 'patient-name-duplicate-hint' : undefined}
           />
+          {isDuplicateName ? (
+            <p id="patient-name-duplicate-hint" className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              Já existe um paciente com esse nome nesta organização.
+            </p>
+          ) : null}
         </div>
         <div>
           <label htmlFor="patient-ref" className={msLabel}>

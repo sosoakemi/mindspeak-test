@@ -13,7 +13,7 @@ import { getEightPhrases, PHRASES_CHANGED_EVENT } from '../../data/patientPhrase
 import { getPhraseVisual } from './patientPhraseIcons'
 import { getPatientSession } from '../../lib/patientSession'
 import { getPatientPreferences } from '../../lib/patientPreferences'
-import { isSpeechSupported, listVoices, primeSpeech, speakText } from '../../lib/speech'
+import { isSpeechSupported, listVoices, primeSpeech, speakTextAI } from '../../lib/speech'
 import { incrementTodaySelectionCount } from '../../lib/patientStats'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button } from '../../components/shared/Button'
@@ -35,7 +35,7 @@ function rand(min: number, max: number) {
 function speakPhrase(text: string) {
   const prefs = getPatientPreferences()
   if (!prefs.soundEnabled) return
-  speakText(text, { voiceURI: prefs.voiceURI, rate: 0.92 })
+  void speakTextAI(text, { voiceURI: prefs.voiceURI, rate: 0.92 })
 }
 
 function attentionBarClass(v: number) {
@@ -326,6 +326,10 @@ export function PatientCommunicatePage() {
           {displayWords.map((word, index) => {
             const highlighted = isHighlighting && index === highlightedIndex
             const flash = flashCardIndex === index
+            // Sinal na zona cinzenta (ver DecisionEngineConfig.uncertain_margin) —
+            // destaca em âmbar em vez de verde: o motor não confirmou nem
+            // descontou essa leitura, então não é foco "de verdade" ainda.
+            const uncertainHighlight = highlighted && isLive && live.uncertain
             const { icon: Icon, wrap } = getPhraseVisual(word, 'dark')
             return (
               <article
@@ -335,7 +339,10 @@ export function PatientCommunicatePage() {
                   'flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-2xl border-2 px-2 py-4 text-center transition duration-300 motion-reduce:transition-none sm:min-h-[140px]',
                   'bg-gray-800 border-slate-700/80',
                   highlighted &&
+                    !uncertainHighlight &&
                     'border-emerald-400 bg-gray-700 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40',
+                  uncertainHighlight &&
+                    'border-amber-400 bg-gray-700 shadow-lg shadow-amber-500/30 ring-1 ring-amber-400/40',
                   flash && 'border-emerald-300 bg-emerald-600/30 shadow-lg shadow-emerald-400/50',
                 )}
                 aria-current={highlighted ? 'step' : undefined}
@@ -344,6 +351,11 @@ export function PatientCommunicatePage() {
                   <Icon className="h-6 w-6" aria-hidden />
                 </div>
                 <p className="text-balance text-lg font-bold leading-tight text-white sm:text-2xl md:text-3xl">{word}</p>
+                {uncertainHighlight ? (
+                  <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
+                    Sinal incerto
+                  </span>
+                ) : null}
               </article>
             )
           })}
@@ -379,6 +391,7 @@ export function PatientCommunicatePage() {
             <p className="text-center text-xs text-ms-muted">
               Qualidade do sinal: {live.signalQuality}%
               {live.paused ? ' · sinal ruim, aguardando' : ''}
+              {!live.paused && live.uncertain ? ' · foco incerto, mantenha o olhar' : ''}
             </p>
           ) : null}
         </section>

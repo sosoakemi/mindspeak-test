@@ -239,3 +239,36 @@ export function getCalibrationStatus(patientId: number): Promise<CalibrationStat
 export function trainPatientModel(patientId: number): Promise<TrainResponse> {
   return postJson(`/patients/${patientId}/train`, {}, true)
 }
+
+// --- voz por IA (ElevenLabs) ------------------------------------------------
+
+export type AiVoiceName = 'feminina' | 'masculina'
+
+export type AiVoice = {
+  name: AiVoiceName
+  label: string
+}
+
+/** Vozes por IA disponíveis. Vem VAZIO quando a ElevenLabs não está
+ * configurada no backend — nesse caso o app só oferece as vozes locais. */
+export function listAiVoices(): Promise<AiVoice[]> {
+  return getJson('/tts/voices')
+}
+
+/** Pede o áudio (MP3) da frase ao backend, que chama a ElevenLabs. Devolve
+ * o blob pra quem chamou tocar. Lança BackendApiError se falhar — o
+ * chamador (speakTextAI) trata isso caindo pra voz local. */
+export async function synthesizeAiSpeech(
+  text: string,
+  voice: AiVoiceName,
+): Promise<Blob> {
+  const response = await fetch(`${getApiBaseUrl()}/tts/speak`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify({ text, voice }),
+  })
+  if (!response.ok) {
+    throw new BackendApiError(response.status, await extractErrorMessage(response))
+  }
+  return response.blob()
+}

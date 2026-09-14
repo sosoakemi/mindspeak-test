@@ -9,11 +9,9 @@ import {
   Brain,
   CheckCircle2,
   Clock,
-  Cpu,
   Settings,
+  Usb,
   Volume2,
-  Wifi,
-  Zap,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -81,34 +79,24 @@ const formattedTotalCost = totalComponentsCost.toFixed(2).replace('.', ',')
 
 const systemSpecs = [
   {
-    icon: Cpu,
-    title: 'Microcontrolador',
-    value: 'ESP32 NodeMCU 38 pinos',
-  },
-  {
-    icon: Zap,
-    title: 'Frequência de CPU',
-    value: '240MHz Dual-Core',
-  },
-  {
-    icon: Wifi,
-    title: 'Conectividade',
-    value: 'Bluetooth Classic & Wi-Fi',
+    icon: Usb,
+    title: 'Conexão',
+    value: 'Cabo serial USB-TTL, direto no PC',
   },
   {
     icon: Volume2,
     title: 'Saída de Áudio',
-    value: 'DFPlayer Mini + Alto-falante',
+    value: 'Web Speech API (voz no iPad)',
   },
   {
     icon: Brain,
     title: 'Sensor Neural',
-    value: 'TGAM (NeuroSky OEM)',
+    value: 'TGAM (NeuroSky OEM), 1 canal',
   },
   {
     icon: Battery,
     title: 'Alimentação',
-    value: 'Bateria LiPo 3.7V 1800mAh',
+    value: 'Bateria LiPo 3.7V 2000mAh',
   },
   {
     icon: Clock,
@@ -143,7 +131,7 @@ export default function ProductPage() {
 
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
               Criado com o mínimo de barreiras físicas e com o custo de fabricação
-              abaixo de R$ 350 reais, tornando a tecnologia de Interface
+              de aproximadamente R$ {formattedTotalCost}, tornando a tecnologia de Interface
               Cérebro-Computador (BCI) viável e ao alcance de todos.
             </p>
 
@@ -151,7 +139,7 @@ export default function ProductPage() {
             <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-4 divide-y divide-slate-100 rounded-2xl border border-slate-100 bg-white py-6 shadow-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  R$ 800
+                  R$ {formattedTotalCost}
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
                   Preço Final
@@ -159,18 +147,18 @@ export default function ProductPage() {
               </div>
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  12
+                  1
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Canais EEG
+                  Canal EEG (Sensor TGAM)
                 </p>
               </div>
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  98%
+                  Por paciente
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Taxa de Acerto
+                  Acurácia calculada via validação cruzada
                 </p>
               </div>
             </div>
@@ -194,7 +182,7 @@ export default function ProductPage() {
                     "girar" o diagrama em vez de olhar uma imagem estática */}
                 <TiltImage
                   src={hardwareDiagram}
-                  alt="Diagrama explodido do interior do hardware MindSpeak: TGAM Sensor, ESP32, DFPlayer e Bateria LiPo"
+                  alt="Diagrama dos componentes físicos do MindSpeak: sensor TGAM, faixa elástica e bateria LiPo"
                   fit="contain"
                   className="mx-auto h-auto max-w-[900px] w-full"
                 />
@@ -375,9 +363,9 @@ export default function ProductPage() {
 
                 <ul className="mt-8 space-y-3.5">
                   {[
-                    'Sensor EEG NeuroSky TGAM para captura de atenção',
-                    'ESP32 com processamento em tempo real',
-                    'DFPlayer Mini para reprodução de áudio',
+                    'Sensor EEG NeuroSky TGAM (1 canal) para captura de atenção',
+                    'PC lê o sensor direto pela serial — sem microcontrolador',
+                    'Fala via Web Speech API no iPad',
                     'Case 3D leve e ergonômico',
                     'Recarregável via USB',
                   ].map((bullet, i) => (

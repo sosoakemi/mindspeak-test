@@ -28,6 +28,10 @@ export type LiveSessionState = {
   candidateWord: string | null
   confidence: number
   paused: boolean
+  /** Sinal na zona cinzenta perto do limiar calibrado — nem foco nem
+   * repouso confiável o bastante. Backend não decide nada nesta janela;
+   * a tela deve sinalizar isso em vez de tratar como foco normal. */
+  uncertain: boolean
   lastSelected: LastSelected | null
   /** mais recente primeiro */
   spokenHistory: SpokenEntry[]
@@ -41,6 +45,7 @@ type LiveStatusMessage = {
   candidate_word: string | null
   confidence: number
   paused: boolean
+  uncertain: boolean
   last_selected: { word_id: string; utterance: string; confidence: number } | null
 }
 
@@ -62,6 +67,7 @@ const INITIAL_STATE: LiveSessionState = {
   candidateWord: null,
   confidence: 0,
   paused: false,
+  uncertain: false,
   lastSelected: null,
   spokenHistory: [],
 }
@@ -164,6 +170,7 @@ export function useLiveSession(
             candidateWord: message.candidate_word,
             confidence: message.confidence,
             paused: message.paused,
+            uncertain: message.uncertain,
             lastSelected: message.last_selected
               ? {
                   wordId: message.last_selected.word_id,
