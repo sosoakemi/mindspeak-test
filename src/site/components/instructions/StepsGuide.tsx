@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
+import { Reveal } from '../Reveal'
 
 type Step = {
   id: number
@@ -132,16 +133,16 @@ export default function StepsGuide() {
   }
 
   return (
-    <section className="bg-slate-50 px-6 py-16 lg:px-8 lg:py-24">
+    <section id="passos" className="bg-slate-50 px-6 py-16 lg:px-8 lg:py-24">
       <div className="mx-auto max-w-7xl">
-        <div className="text-center">
+        <Reveal className="text-center">
           <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
             Siga cada etapa com atenção
           </h2>
           <p className="mt-3 text-base text-slate-600">
             Cinco passos simples para começar a usar o MindSpeak.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(280px,340px)_1fr] lg:gap-10">
           <nav aria-label="Passos do manual" className="flex flex-col gap-3">
@@ -260,25 +261,26 @@ export default function StepsGuide() {
           {steps.map((step, index) => {
             const StepIcon = step.icon
             return (
-              <button
-                key={step.id}
-                type="button"
-                onClick={() => setActiveStep(index)}
-                className={`flex flex-col items-center gap-2 rounded-xl border bg-white px-3 py-4 transition-all ${
-                  index === activeStep
-                    ? 'border-teal-500/30 shadow-sm'
-                    : 'border-slate-100 hover:border-slate-200'
-                }`}
-              >
-                <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${step.iconBg} ${step.iconColor}`}
+              <Reveal key={step.id} delay={index * 60}>
+                <button
+                  type="button"
+                  onClick={() => setActiveStep(index)}
+                  className={`flex w-full flex-col items-center gap-2 rounded-xl border bg-white px-3 py-4 transition-all ${
+                    index === activeStep
+                      ? 'border-teal-500/30 shadow-sm'
+                      : 'border-slate-100 hover:border-slate-200'
+                  }`}
                 >
-                  <StepIcon className="h-5 w-5" strokeWidth={1.75} />
-                </span>
-                <span className="text-xs font-medium text-slate-700">
-                  {step.shortLabel}
-                </span>
-              </button>
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl ${step.iconBg} ${step.iconColor}`}
+                  >
+                    <StepIcon className="h-5 w-5" strokeWidth={1.75} />
+                  </span>
+                  <span className="text-xs font-medium text-slate-700">
+                    {step.shortLabel}
+                  </span>
+                </button>
+              </Reveal>
             )
           })}
         </div>

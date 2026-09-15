@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Reveal } from './Reveal'
 
 const gameImage = '/images/game.img.home.png'
 
@@ -15,15 +16,15 @@ export default function GameSection() {
     <section id="entresinapses" className="bg-white px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div className="flex items-center justify-center">
+          <Reveal className="flex items-center justify-center">
             <img
               src={gameImage}
               alt="EntreSinapses — O Jogo — pixel art de perfil azul com cérebro iluminado e ilhas flutuantes"
-              className="aspect-[4/3] w-full max-w-[593px] rounded-3xl object-cover"
+              className="aspect-[4/3] w-full max-w-[593px] rounded-3xl object-cover shadow-lg"
             />
-          </div>
+          </Reveal>
 
-          <div>
+          <Reveal delay={150}>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-teal-500">
               EXPERIÊNCIA INTERATIVA
             </p>
@@ -63,7 +64,7 @@ export default function GameSection() {
               Conheça a História
               <ArrowRight size={16} />
             </Link>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

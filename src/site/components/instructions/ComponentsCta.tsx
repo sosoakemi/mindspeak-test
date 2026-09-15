@@ -1,10 +1,11 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Reveal } from '../Reveal'
 
 export default function ComponentsCta() {
   return (
     <section className="bg-slate-50 px-6 py-16 text-center lg:px-8 lg:py-20">
-      <div className="mx-auto max-w-2xl">
+      <Reveal className="mx-auto max-w-2xl">
         <p className="text-base leading-relaxed text-slate-600 sm:text-lg">
           Agora que você sabe como usar, conheça os componentes que tornam isso
           possível.
@@ -16,7 +17,7 @@ export default function ComponentsCta() {
           Ver Componentes
           <ArrowRight className="h-4 w-4" />
         </Link>
-      </div>
+      </Reveal>
     </section>
   )
 }

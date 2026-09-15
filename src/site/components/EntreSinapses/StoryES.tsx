@@ -1,6 +1,6 @@
 // Story section: "A História do Entre Sinapses"
 import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { Reveal } from '../Reveal'
 
 const chapters = [
   { id: 'livro1', label: 'Livro 1' },
@@ -76,7 +76,7 @@ export default function StoryES() {
     >
       <div className="relative mx-auto max-w-6xl">
         {/* Section header */}
-        <div className="text-center mb-10">
+        <Reveal className="text-center mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-900/70 mb-2">
             História
           </p>
@@ -86,7 +86,7 @@ export default function StoryES() {
           <div className="mt-4 flex justify-center">
             <div className="h-px w-24 bg-teal-700/30" />
           </div>
-        </div>
+        </Reveal>
 
         {/* Chapter tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -107,7 +107,7 @@ export default function StoryES() {
         </div>
 
         {/* Story card */}
-        <div className="site-es-story-card mx-auto max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
+        <Reveal delay={100} className="site-es-story-card mx-auto max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
           <div className="grid lg:grid-cols-2">
             {/* Left: Illustration */}
             <div className="h-56 lg:h-auto">
@@ -136,19 +136,9 @@ export default function StoryES() {
                   {current.description}
                 </p>
               </div>
-
-              <div className="mt-6">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-500"
-                >
-                  Ler mais
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

@@ -1,5 +1,7 @@
 /* ─── Testimonials — "O impacto que esperamos" ───────────────────────────── */
 
+import { Reveal } from './Reveal'
+
 type Testimonial = {
   initials: string
   initialsColor: string
@@ -41,7 +43,7 @@ export default function Testimonials() {
       <div className="mx-auto max-w-7xl">
 
         {/* Header — left-aligned */}
-        <div className="mb-12">
+        <Reveal className="mb-12">
           <span className="mb-4 block text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">
             Depoimentos
           </span>
@@ -49,33 +51,36 @@ export default function Testimonials() {
             <span className="text-navy-900">O impacto que </span>
             <span className="text-teal-500">esperamos</span>
           </h2>
-        </div>
+          <p className="mt-3 max-w-xl text-sm text-slate-500">
+            Perfis ilustrativos — representam o tipo de impacto que projetamos
+            alcançar com o MindSpeak, ainda em fase de protótipo acadêmico.
+          </p>
+        </Reveal>
 
         {/* Cards row */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {testimonials.map(({ initials, initialsColor, name, role, quote }) => (
-            <article
-              key={name}
-              className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
-              {/* Avatar + name/role */}
-              <div className="flex items-center gap-3">
-                <span
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold ${initialsColor}`}
-                >
-                  {initials}
-                </span>
-                <div className="leading-tight">
-                  <p className="text-sm font-bold text-navy-900">{name}</p>
-                  <p className="text-xs text-slate-500">{role}</p>
+          {testimonials.map(({ initials, initialsColor, name, role, quote }, i) => (
+            <Reveal key={name} delay={i * 90}>
+              <article className="flex h-full flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                {/* Avatar + name/role */}
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold ${initialsColor}`}
+                  >
+                    {initials}
+                  </span>
+                  <div className="leading-tight">
+                    <p className="text-sm font-bold text-navy-900">{name}</p>
+                    <p className="text-xs text-slate-500">{role}</p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Quote */}
-              <p className="text-sm italic leading-relaxed text-slate-400">
-                {quote}
-              </p>
-            </article>
+                {/* Quote */}
+                <p className="text-sm italic leading-relaxed text-slate-400">
+                  {quote}
+                </p>
+              </article>
+            </Reveal>
           ))}
         </div>
 

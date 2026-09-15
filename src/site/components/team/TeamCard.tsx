@@ -13,12 +13,12 @@ export default function TeamCard({ member }: TeamCardProps) {
   ] as const
 
   return (
-    <article className="flex flex-col rounded-xl bg-navy-900 p-4">
+    <article className="flex flex-col rounded-xl bg-navy-900 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-teal-500/10">
       <div className="overflow-hidden rounded-lg">
         <img
           src={member.image}
           alt={`Foto de ${member.name}`}
-          className="aspect-square w-full object-cover object-top"
+          className="aspect-square w-full object-cover object-top transition-transform duration-500 hover:scale-105"
         />
       </div>
 

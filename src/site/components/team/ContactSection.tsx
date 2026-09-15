@@ -1,18 +1,19 @@
 import ContactForm from './ContactForm'
+import { Reveal } from '../Reveal'
 
 export default function ContactSection() {
   return (
     <section className="bg-white px-6 py-20 lg:px-8 lg:py-24">
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
-        <div className="overflow-hidden rounded-2xl">
+        <Reveal className="overflow-hidden rounded-2xl">
           <img
             src="/images/team/video-em-breve.png"
             alt="Vídeo da equipe em breve — o conteúdo será adicionado em breve"
             className="h-full w-full object-cover"
           />
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal delay={120}>
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-teal-600">
             Contato
           </span>
@@ -30,7 +31,7 @@ export default function ContactSection() {
           <div className="mt-8">
             <ContactForm />
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   )

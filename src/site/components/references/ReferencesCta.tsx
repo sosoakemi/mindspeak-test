@@ -1,10 +1,11 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Reveal } from '../Reveal'
 
 export default function ReferencesCta() {
   return (
     <section className="bg-slate-50 py-16 sm:py-20">
-      <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
+      <Reveal className="mx-auto max-w-4xl px-6 text-center lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight text-navy-900 sm:text-3xl">
           Quer saber mais?
         </h2>
@@ -23,7 +24,7 @@ export default function ReferencesCta() {
             <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
           </Link>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

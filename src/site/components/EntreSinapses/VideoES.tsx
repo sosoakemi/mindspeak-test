@@ -1,6 +1,7 @@
 // Video section: "Veja em ação"
 import { Play } from 'lucide-react'
 import { useState } from 'react'
+import { Reveal } from '../Reveal'
 
 export default function VideoES() {
   const [playing, setPlaying] = useState(false)
@@ -9,17 +10,17 @@ export default function VideoES() {
     <section id="videos" className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-4xl">
         {/* Section header */}
-        <div className="text-center mb-10">
+        <Reveal className="text-center mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-500 mb-2">
             Gameplay
           </p>
           <h2 className="font-display text-3xl font-black tracking-tight text-navy-900 sm:text-4xl">
             Veja em ação
           </h2>
-        </div>
+        </Reveal>
 
         {/* Video player */}
-        <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-video bg-navy-900 group">
+        <Reveal delay={100} className="relative overflow-hidden rounded-2xl shadow-2xl aspect-video bg-navy-900 group">
           {/* Thumbnail / placeholder */}
           <div
             className="absolute inset-0"
@@ -74,7 +75,8 @@ export default function VideoES() {
             </div>
           </div>
 
-          {/* Play button */}
+          {/* Play button — como ainda não há gameplay gravado, o clique revela
+              um aviso "em breve" em vez de não fazer nada visível */}
           {!playing && (
             <button
               type="button"
@@ -87,7 +89,19 @@ export default function VideoES() {
               </span>
             </button>
           )}
-        </div>
+
+          {playing && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-navy-900/80 text-center backdrop-blur-sm">
+              <p className="font-display text-lg font-semibold text-teal-400">
+                Gameplay em breve
+              </p>
+              <p className="max-w-xs text-sm text-slate-300">
+                Estamos gravando as primeiras fases do EntreSinapses. Volte em
+                breve para assistir.
+              </p>
+            </div>
+          )}
+        </Reveal>
       </div>
     </section>
   )
