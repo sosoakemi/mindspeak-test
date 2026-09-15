@@ -130,6 +130,11 @@ export function PatientCommunicationPage() {
               ? live.lastSelected?.utterance === word && index === highlightIndex
               : demo.confirmedIndex === index
             const locking = !isLive && highlighted && demo.phase === 'selecionando'
+            // Sinal na zona cinzenta perto do limiar calibrado — ver
+            // DecisionEngineConfig.uncertain_margin no backend. Destaca em
+            // âmbar em vez de verde: o motor não confirmou nem descontou
+            // essa leitura ainda.
+            const uncertainHighlight = highlighted && !confirmed && isLive && live.uncertain
 
             return (
               <article
@@ -140,7 +145,10 @@ export function PatientCommunicationPage() {
                   confirmed && 'border-emerald-500 bg-emerald-50/80 shadow-emerald-900/10 ring-emerald-200',
                   !confirmed &&
                     highlighted &&
+                    !uncertainHighlight &&
                     'border-emerald-400 shadow-[0_0_0_1px_rgb(16_185_129_0.45),0_8px_28px_rgb(16_185_129_0.18)] ring-emerald-100',
+                  uncertainHighlight &&
+                    'border-amber-400 shadow-[0_0_0_1px_rgb(217_119_6_0.45),0_8px_28px_rgb(217_119_6_0.18)] ring-amber-100',
                   !confirmed && !highlighted && 'border-ms-border',
                   locking && 'animate-ms-pulse-glow',
                 )}
@@ -155,6 +163,11 @@ export function PatientCommunicationPage() {
                   <Icon className="h-7 w-7" aria-hidden />
                 </div>
                 <p className="text-base font-bold leading-snug tracking-tight text-ms-primary sm:text-lg">{word}</p>
+                {uncertainHighlight ? (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">
+                    Sinal incerto
+                  </span>
+                ) : null}
               </article>
             )
           })}

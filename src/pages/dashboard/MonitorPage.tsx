@@ -102,7 +102,14 @@ export function MonitorPage() {
               <p className="mt-2 text-2xl font-semibold text-ms-primary">
                 {live.candidateWord ?? '—'}
               </p>
-              <p className="mt-1 text-xs text-ms-muted">Foco: {Math.round(live.focusLevel)}%</p>
+              <p className="mt-1 text-xs text-ms-muted">
+                Foco: {Math.round(live.focusLevel)}%
+                {live.uncertain ? (
+                  <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">
+                    sinal incerto
+                  </span>
+                ) : null}
+              </p>
             </div>
             <div className="rounded-xl border border-ms-border-subtle bg-ms-subtle p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-ms-muted">

@@ -51,7 +51,7 @@ const systemSpecs = [
   {
     icon: Battery,
     title: 'Alimentação',
-    value: 'USB, via adaptador CP2102/CH340',
+    value: 'Bateria LiPo 3.7V 2000mAh',
   },
   {
     icon: Clock,
@@ -105,7 +105,7 @@ export default function ProductPage() {
                   1
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Canal EEG
+                  Canal EEG (Sensor TGAM)
                 </p>
               </div>
               <div className="text-center">
@@ -313,11 +313,12 @@ export default function ProductPage() {
 
                 <ul className="mt-8 space-y-3.5">
                   {[
-                    'Sensor EEG NeuroSky TGAM para captura de atenção',
-                    'Leitura direta pelo PC via porta serial (pyserial)',
+                    'Sensor EEG NeuroSky TGAM (1 canal) para captura de atenção',
+                    'PC lê o sensor direto pela serial — sem microcontrolador',
                     'Motor de decisão com IA calibrada por paciente',
-                    'Fala em tempo real no iPad, em português',
-                    'Sem hardware adicional — só sensor, PC e iPad',
+                    'Fala em tempo real no iPad, via Web Speech API',
+                    'Case 3D leve e ergonômico',
+                    'Bateria recarregável via USB',
                   ].map((bullet, i) => (
                     <li
                       key={i}

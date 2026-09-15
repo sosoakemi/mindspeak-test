@@ -5,7 +5,7 @@ import {
   PHRASES_CHANGED_EVENT,
 } from '../data/patientPhrases'
 import { getPatientPreferences, PATIENT_PREFS_CHANGED_EVENT } from '../lib/patientPreferences'
-import { speakText } from '../lib/speech'
+import { speakTextAI } from '../lib/speech'
 import { incrementTodaySelectionCount } from '../lib/patientStats'
 
 /** @deprecated use DEFAULT_PATIENT_PHRASES from `data/patientPhrases` */
@@ -24,7 +24,9 @@ function rand(min: number, max: number) {
 function speak(text: string) {
   const prefs = getPatientPreferences()
   if (!prefs.soundEnabled) return
-  speakText(text, { voiceURI: prefs.voiceURI })
+  // speakTextAI nunca rejeita (cai pra voz local se a IA falhar), então o
+  // void aqui é seguro — ninguém precisa esperar a fala terminar.
+  void speakTextAI(text, { voiceURI: prefs.voiceURI })
 }
 
 export function usePatientBci() {

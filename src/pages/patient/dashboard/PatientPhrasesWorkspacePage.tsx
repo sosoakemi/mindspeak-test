@@ -26,12 +26,12 @@ import {
 } from '../../../data/patientPhrases'
 import { Button } from '../../../components/shared/Button'
 import { getPatientPreferences } from '../../../lib/patientPreferences'
-import { speakText } from '../../../lib/speech'
+import { speakTextAI } from '../../../lib/speech'
 
 type Row = { id: string; text: string }
 
 function speak(text: string) {
-  speakText(text, { voiceURI: getPatientPreferences().voiceURI })
+  void speakTextAI(text, { voiceURI: getPatientPreferences().voiceURI })
 }
 
 function rowsFromPhrases(phrases: string[], prev?: Row[]): Row[] {

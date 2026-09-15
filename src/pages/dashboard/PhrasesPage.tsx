@@ -21,10 +21,10 @@ import { cn } from '../../lib/cn'
 import { initialPhrases, type PhraseRow } from '../../data/mockPhrases'
 import type { AlertSeverity } from '../../data/mockDashboard'
 import { Button } from '../../components/shared/Button'
-import { isSpeechSupported, listPortugueseVoices, speakText } from '../../lib/speech'
+import { isSpeechSupported, listPortugueseVoices, speakTextAI } from '../../lib/speech'
 
 function speak(text: string, voiceURI: string | null) {
-  speakText(text, { voiceURI })
+  void speakTextAI(text, { voiceURI })
 }
 
 function SortablePhraseRow({
