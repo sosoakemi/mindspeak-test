@@ -34,9 +34,9 @@ export default function HeroES() {
             </h1>
 
             <p className="mt-5 max-w-xl mx-auto lg:mx-0 text-base leading-relaxed text-slate-500 sm:text-lg">
-              Uma jornada pelos mistérios do cérebro humano. Explore neurônios,
-              descubra conexões e venha futuros da mente. Aprenda enquanto
-              se aventura nesse universo fascinante.
+             Uma aventura onde sua mente é o controle. Aprenda sobre Interface
+             Cérebro-Computador jogando e ajude personagens a encontrarem 
+             a voz que perderam.
             </p>
 
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">

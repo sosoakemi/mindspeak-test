@@ -17,8 +17,8 @@ export default function CTAES() {
           Pronto para a aventura?
         </h2>
         <p className="mt-4 text-base leading-relaxed text-slate-500">
-          Embarque nessa jornada fascinante pelas sinapses do cérebro humano.
-          Aprenda, explore e conquiste novos horizontes da mente.
+          Entre no mundo do Entre Sinapses e descubra como a mente
+          humana pode controlar a tecnologia..
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
