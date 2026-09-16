@@ -163,15 +163,15 @@ export default function ProductPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {componentsList.map((item, i) => (
                 <Reveal key={item.id} delay={i * 60}>
-                  <div className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                  <div className="group flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-900/5">
                     <div className="flex h-36 w-full items-center justify-center rounded-xl bg-slate-50 overflow-hidden mb-4 p-4">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="h-full w-full object-contain"
+                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mb-2 transition-colors duration-300 group-hover:bg-teal-500 group-hover:text-white">
                       Componente Disponível
                     </span>
                     <h3 className="text-sm font-semibold text-navy-900 text-center truncate w-full">
@@ -275,8 +275,8 @@ export default function ProductPage() {
                 const Icon = spec.icon
                 return (
                   <Reveal key={spec.title} delay={i * 50}>
-                    <div className="flex gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
+                    <div className="group flex gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-md">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600 transition-colors duration-300 group-hover:bg-teal-500 group-hover:text-white">
                         <Icon className="h-5 w-5" />
                       </span>
                       <div>

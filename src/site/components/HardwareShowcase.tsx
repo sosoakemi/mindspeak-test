@@ -24,7 +24,7 @@ export default function HardwareShowcase() {
         <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
           {componentsList.map((item, i) => (
             <Reveal key={item.id} delay={i * 70}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/60 transition-colors hover:border-teal-500/30 hover:bg-teal-50/30">
+              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-xl hover:shadow-teal-500/30">
                 <div className="flex aspect-square items-center justify-center bg-white p-4">
                   <img
                     src={item.image}

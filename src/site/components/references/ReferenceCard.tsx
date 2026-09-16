@@ -7,9 +7,9 @@ interface ReferenceCardProps {
 
 export default function ReferenceCard({ reference }: ReferenceCardProps) {
   return (
-    <article className="flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+    <article className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-900/5">
       <div className="flex-grow">
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600">
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 transition-colors duration-300 group-hover:bg-teal-500 group-hover:text-white">
           <FileText className="h-5 w-5" strokeWidth={1.75} />
         </span>
         
@@ -36,7 +36,10 @@ export default function ReferenceCard({ reference }: ReferenceCardProps) {
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-600 transition-colors hover:text-teal-500"
         >
           Acessar
-          <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+          <ArrowUpRight
+            className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            strokeWidth={2}
+          />
         </a>
       </div>
     </article>
