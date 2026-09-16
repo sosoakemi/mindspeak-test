@@ -1,9 +1,10 @@
 import TeamHeader from '../components/team/TeamHeader'
-import TeamFooter from '../components/team/TeamFooter'
+import Footer from '../components/Footer'
 import ReferencesHero from '../components/references/ReferencesHero'
 import ReferenceCard from '../components/references/ReferenceCard'
 import ReferencesCta from '../components/references/ReferencesCta'
 import { referencesData } from '../data/references'
+import { Reveal } from '../components/Reveal'
 
 export default function ReferencesPage() {
   return (
@@ -19,8 +20,10 @@ export default function ReferencesPage() {
         <section className="border-y border-slate-100 bg-slate-50 px-6 py-16 lg:px-8 lg:py-20">
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {referencesData.map((ref) => (
-                <ReferenceCard key={ref.id} reference={ref} />
+              {referencesData.map((ref, i) => (
+                <Reveal key={ref.id} delay={(i % 3) * 90}>
+                  <ReferenceCard reference={ref} />
+                </Reveal>
               ))}
             </div>
           </div>
@@ -31,7 +34,7 @@ export default function ReferencesPage() {
       </main>
 
       {/* Light-themed Footer */}
-      <TeamFooter />
+      <Footer />
     </div>
   )
 }

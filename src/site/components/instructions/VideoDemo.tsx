@@ -1,9 +1,10 @@
 import { Play } from 'lucide-react'
+import { Reveal } from '../Reveal'
 
 export default function VideoDemo() {
   return (
     <section id="video-demo" className="bg-white px-6 py-16 lg:px-8 lg:py-24">
-      <div className="mx-auto max-w-4xl">
+      <Reveal className="mx-auto max-w-4xl">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-500">
           Demonstração
         </p>
@@ -28,7 +29,7 @@ export default function VideoDemo() {
             </p>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

@@ -13,7 +13,7 @@ const FAQ = [
   },
   {
     q: 'O que fazer se o sensor não conectar?',
-    a: 'Verifique se o Bluetooth está ligado, aproxime o sensor do receptor e use “Sincronizar” na barra lateral. Se persistir, peça ajuda ao seu profissional.',
+    a: 'Confira se o cabo USB do sensor está bem conectado ao computador e se o adaptador está com a luz acesa. O profissional responsável pode verificar a porta serial no backend. Se persistir, peça ajuda ao seu profissional.',
   },
   {
     q: 'Como melhorar a precisão?',
@@ -130,12 +130,8 @@ export function PatientSupportPage() {
           <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
             <dt className="text-ms-muted">Conexão</dt>
             <dd className="text-right font-medium text-ms-primary">
-              {sensorConnected ? 'Bluetooth · conectado' : 'Bluetooth · desconectado'}
+              {sensorConnected ? 'Serial USB · conectado' : 'Serial USB · desconectado'}
             </dd>
-          </div>
-          <div className="flex justify-between gap-4 border-b border-ms-border-subtle pb-3">
-            <dt className="text-ms-muted">Versão do firmware</dt>
-            <dd className="text-right font-medium text-ms-primary">1.0.0</dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ms-muted">Último sync</dt>

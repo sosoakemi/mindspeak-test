@@ -1,8 +1,9 @@
-import hardwareDiagram from '../assets/hardware-diagram.png'
 import headsetPlaceholder from '../assets/headset-placeholder.png'
 import TeamHeader from '../components/team/TeamHeader'
 import Footer from '../components/Footer'
 import { TiltImage } from '../components/TiltImage'
+import { ArchitectureDiagram } from '../components/ArchitectureDiagram'
+import { Reveal } from '../components/Reveal'
 import {
   Activity,
   Battery,
@@ -16,109 +17,51 @@ import {
   Zap,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { componentsList, totalComponentsCost, formattedTotalCost } from '../data/hardware'
 
-interface ComponentItem {
-  id: string
-  name: string
-  price: number
-  category: string
-  image: string
-}
-
-// Lista de hardware alinhada com a arquitetura atual (PC lê o TGAM direto por
-// serial; a fala sai no iPad via Web Speech API). Os itens do plano antigo
-// com ESP32/DFPlayer/SD/protoboard/eletrodos descartáveis foram retirados —
-// ver seção 2 do CLAUDE.md.
-const componentsList: ComponentItem[] = [
-  {
-    id: 'tgam',
-    name: 'Sensor TGAM (EEG)',
-    price: 120.0,
-    category: 'Processamento BCI',
-    image: '/images/Sensor%20TGAM%20(NeuroSky).png',
-  },
-  {
-    id: 'speaker',
-    name: 'Alto-falante 3W',
-    price: 8.0,
-    category: 'Saída de Som',
-    image: '/images/Alto-falante%203W.png',
-  },
-  {
-    id: 'lipo',
-    name: 'Bateria LiPo 3.7V',
-    price: 32.0,
-    category: 'Alimentação',
-    image: '/images/Bateria%20LiPo%203.7V%202000mAh.png',
-  },
-  {
-    id: 'jumpers',
-    name: 'Cabos Jumper M/F',
-    price: 11.0,
-    category: 'Conexões',
-    image: '/images/Cabos%20e%20conectores.png',
-  },
-  {
-    id: 'band',
-    name: 'Faixa Elástica Ajustável',
-    price: 19.0,
-    category: 'Estrutura',
-    image: '/images/headband%20para%20sensor.png',
-  },
-  {
-    id: 'case',
-    name: 'Case Impresso 3D',
-    price: 22.0,
-    category: 'Proteção',
-    image: '/images/Case%20impressa%20em%203D.png',
-  },
-]
-
-// Custo total calculado a partir da lista acima — nunca chumbado, pra não
-// ficar desatualizado se um item for adicionado/removido depois.
-const totalComponentsCost = componentsList.reduce((sum, item) => sum + item.price, 0)
-const formattedTotalCost = totalComponentsCost.toFixed(2).replace('.', ',')
-
+// Specs alinhadas com a arquitetura atual: o PC lê o TGAM direto pela porta
+// serial (pyserial) e processa tudo em Python; a fala sai no iPad via Web
+// Speech API. Sem ESP32/DFPlayer/Bluetooth — ver seção 2 do CLAUDE.md.
 const systemSpecs = [
   {
     icon: Cpu,
-    title: 'Microcontrolador',
-    value: 'ESP32 NodeMCU 38 pinos',
+    title: 'Processamento',
+    value: 'PC / servidor — FastAPI + DSP + IA',
   },
   {
     icon: Zap,
-    title: 'Frequência de CPU',
-    value: '240MHz Dual-Core',
+    title: 'Protocolo do sensor',
+    value: 'ThinkGear Serial (57600 / 9600 bps)',
   },
   {
     icon: Wifi,
     title: 'Conectividade',
-    value: 'Bluetooth Classic & Wi-Fi',
+    value: 'Wi-Fi (WebSocket PC ↔ iPad)',
   },
   {
     icon: Volume2,
-    title: 'Saída de Áudio',
-    value: 'DFPlayer Mini + Alto-falante',
+    title: 'Saída de voz',
+    value: 'Web Speech API no iPad (pt-BR)',
   },
   {
     icon: Brain,
     title: 'Sensor Neural',
-    value: 'TGAM (NeuroSky OEM)',
+    value: 'TGAM (NeuroSky OEM), 1 canal',
   },
   {
     icon: Battery,
     title: 'Alimentação',
-    value: 'Bateria LiPo 3.7V 1800mAh',
+    value: 'Bateria LiPo 3.7V 2000mAh',
   },
   {
     icon: Clock,
-    title: 'Autonomia',
-    value: 'Até 12 horas contínuas',
+    title: 'Latência',
+    value: 'Seleção e fala em tempo real',
   },
   {
     icon: Activity,
-    title: 'Processamento',
-    value: 'Tempo real de ondas neurais',
+    title: 'IA',
+    value: 'Modelo por paciente, via calibração',
   },
 ]
 
@@ -142,8 +85,8 @@ export default function ProductPage() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-              Criado com o mínimo de barreiras físicas e com o custo de fabricação
-              abaixo de R$ 350 reais, tornando a tecnologia de Interface
+              Criado com o mínimo de barreiras físicas e com custo de peças de
+              cerca de R$ {formattedTotalCost}, tornando a tecnologia de Interface
               Cérebro-Computador (BCI) viável e ao alcance de todos.
             </p>
 
@@ -151,26 +94,26 @@ export default function ProductPage() {
             <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-4 divide-y divide-slate-100 rounded-2xl border border-slate-100 bg-white py-6 shadow-sm sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  R$ 800
+                  R$ {formattedTotalCost}
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Preço Final
+                  Custo de Peças
                 </p>
               </div>
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  12
+                  1
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Canais EEG
+                  Canal EEG (Sensor TGAM)
                 </p>
               </div>
               <div className="text-center">
                 <p className="font-display text-2xl font-bold text-navy-900 sm:text-3xl">
-                  98%
+                  Tempo Real
                 </p>
                 <p className="mt-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                  Taxa de Acerto
+                  Seleção e Fala
                 </p>
               </div>
             </div>
@@ -180,33 +123,26 @@ export default function ProductPage() {
         {/* 2. Por dentro do MindSpeak */}
         <section className="border-t border-slate-100 bg-slate-50 px-6 py-20 lg:px-8">
           <div className="mx-auto max-w-5xl text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
-              Por dentro do <span className="text-teal-600">MindSpeak</span>
-            </h2>
-            <p className="mt-4 text-base text-slate-600 max-w-xl mx-auto">
-              Saiba quais são as principais placas e componentes eletrônicos
-              utilizados na nossa solução de BCI de baixo custo.
-            </p>
+            <Reveal>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+                Por dentro do <span className="text-teal-600">MindSpeak</span>
+              </h2>
+              <p className="mt-4 text-base text-slate-600 max-w-xl mx-auto">
+                Do sensor ao som: veja o caminho que o sinal cerebral percorre
+                até virar uma palavra falada.
+              </p>
+            </Reveal>
 
-            <div className="mt-12">
-              <div className="w-full rounded-3xl bg-white p-8 shadow-sm">
-                {/* TiltImage: segue o cursor com leve rotação 3D — dá pra
-                    "girar" o diagrama em vez de olhar uma imagem estática */}
-                <TiltImage
-                  src={hardwareDiagram}
-                  alt="Diagrama explodido do interior do hardware MindSpeak: TGAM Sensor, ESP32, DFPlayer e Bateria LiPo"
-                  fit="contain"
-                  className="mx-auto h-auto max-w-[900px] w-full"
-                />
-              </div>
-            </div>
+            <Reveal delay={120} className="mt-12">
+              <ArchitectureDiagram />
+            </Reveal>
           </div>
         </section>
 
         {/* 3. Grid de Componentes */}
         <section className="bg-white px-6 py-20 lg:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="flex flex-col gap-4 border-b border-slate-100 pb-6 mb-10 sm:flex-row sm:items-end sm:justify-between">
+            <Reveal className="flex flex-col gap-4 border-b border-slate-100 pb-6 mb-10 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900">
                   Componentes
@@ -221,32 +157,31 @@ export default function ProductPage() {
                   Total R$ {formattedTotalCost} <span className="font-normal text-xs text-teal-600">aprox.</span>
                 </span>
               </div>
-            </div>
+            </Reveal>
 
             {/* 6 componentes, 3 por linha (2 linhas) a partir do tablet */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {componentsList.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02]"
-                >
-                  <div className="flex h-36 w-full items-center justify-center rounded-xl bg-slate-50 overflow-hidden mb-4 p-4">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="h-full w-full object-contain"
-                    />
+              {componentsList.map((item, i) => (
+                <Reveal key={item.id} delay={i * 60}>
+                  <div className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                    <div className="flex h-36 w-full items-center justify-center rounded-xl bg-slate-50 overflow-hidden mb-4 p-4">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mb-2">
+                      Componente Disponível
+                    </span>
+                    <h3 className="text-sm font-semibold text-navy-900 text-center truncate w-full">
+                      {item.name}
+                    </h3>
+                    <p className="mt-1 text-sm font-bold text-teal-600">
+                      R$ {item.price.toFixed(2)}
+                    </p>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full mb-2">
-                    Componente Disponível
-                  </span>
-                  <h3 className="text-sm font-semibold text-navy-900 text-center truncate w-full">
-                    {item.name}
-                  </h3>
-                  <p className="mt-1 text-sm font-bold text-teal-600">
-                    R$ {item.price.toFixed(2)}
-                  </p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -255,15 +190,17 @@ export default function ProductPage() {
         {/* 4. Comparativo de Custo */}
         <section className="bg-slate-50 px-6 py-20 lg:px-8 border-y border-slate-100">
           <div className="mx-auto max-w-4xl text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900">
-              Comparativo de Custo
-            </h2>
-            <p className="mt-4 text-base text-slate-600">
-              Veja a diferença expressiva de custo de fabricação do MindSpeak em
-              relação às alternativas do mercado.
-            </p>
+            <Reveal>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900">
+                Comparativo de Custo
+              </h2>
+              <p className="mt-4 text-base text-slate-600">
+                Veja a diferença expressiva de custo de fabricação do MindSpeak em
+                relação às alternativas do mercado.
+              </p>
+            </Reveal>
 
-            <div className="mt-12 rounded-3xl bg-white p-6 md:p-8 shadow-sm border border-slate-100 text-left space-y-6">
+            <Reveal delay={120} className="mt-12 rounded-3xl bg-white p-6 md:p-8 shadow-sm border border-slate-100 text-left space-y-6">
               {/* MindSpeak Bar */}
               <div>
                 <div className="flex justify-between text-sm font-semibold text-navy-900 mb-2">
@@ -273,7 +210,7 @@ export default function ProductPage() {
                 <div className="w-full bg-slate-100 h-6 rounded-full overflow-hidden">
                   <div
                     className="bg-teal-500 h-full rounded-full transition-all duration-500"
-                    style={{ width: '4%' }}
+                    style={{ width: `${Math.max(2, (totalComponentsCost / 20000) * 100)}%` }}
                   />
                 </div>
               </div>
@@ -311,46 +248,47 @@ export default function ProductPage() {
                 <CheckCircle2 className="h-5 w-5 text-teal-600 shrink-0" />
                 <span>
                   O MindSpeak é cerca de{' '}
-                  <strong className="text-teal-700">96% mais barato</strong> que os
-                  dispositivos importados e alternativos comerciais.
+                  <strong className="text-teal-700">
+                    {Math.round((1 - totalComponentsCost / 20000) * 100)}% mais barato
+                  </strong>{' '}
+                  que os dispositivos importados e alternativos comerciais.
                 </span>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* 5. Especificações do Sistema */}
         <section className="bg-white px-6 py-20 lg:px-8">
           <div className="mx-auto max-w-6xl">
-            <div className="text-center max-w-2xl mx-auto mb-16">
+            <Reveal className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900">
                 Especificações do Sistema
               </h2>
               <p className="mt-4 text-base text-slate-600">
                 Detalhes de funcionamento físico e de hardware do nosso protótipo
               </p>
-            </div>
+            </Reveal>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {systemSpecs.map((spec, i) => {
                 const Icon = spec.icon
                 return (
-                  <div
-                    key={i}
-                    className="flex gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                        {spec.title}
-                      </h4>
-                      <p className="mt-1 text-sm font-semibold text-navy-900">
-                        {spec.value}
-                      </p>
+                  <Reveal key={spec.title} delay={i * 50}>
+                    <div className="flex gap-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600">
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                          {spec.title}
+                        </h4>
+                        <p className="mt-1 text-sm font-semibold text-navy-900">
+                          {spec.value}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </Reveal>
                 )
               })}
             </div>
@@ -361,25 +299,26 @@ export default function ProductPage() {
         <section className="border-t border-slate-100 bg-slate-50 px-6 py-20 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-              <div>
+              <Reveal>
                 <h2 className="font-display text-4xl font-extrabold tracking-tight text-navy-900 leading-tight">
                   O resultado de <br className="hidden sm:inline" />
                   <span className="text-teal-500">5 estudantes</span>
                 </h2>
                 <p className="mt-6 text-base leading-relaxed text-slate-600">
-                  Todo o sistema cabe em um case impresso em 3D e pode ser
-                  carregado no corpo do paciente ou posicionado ao lado da cama.
-                  A bateria LiPo de 2000mAh permite uso contínuo por até 8
-                  horas, e o módulo TP4056 possibilita recarga via USB.
+                  Só o sensor TGAM fica na cabeça do paciente, leve e sem fios
+                  soltos — ligado por USB a um PC próximo, que faz todo o
+                  processamento de sinal e a decisão da palavra. A voz sai no
+                  iPad, ao alcance de quem acompanha a sessão.
                 </p>
 
                 <ul className="mt-8 space-y-3.5">
                   {[
-                    'Sensor EEG NeuroSky TGAM para captura de atenção',
-                    'ESP32 com processamento em tempo real',
-                    'DFPlayer Mini para reprodução de áudio',
+                    'Sensor EEG NeuroSky TGAM (1 canal) para captura de atenção',
+                    'PC lê o sensor direto pela serial — sem microcontrolador',
+                    'Motor de decisão com IA calibrada por paciente',
+                    'Fala em tempo real no iPad, via Web Speech API',
                     'Case 3D leve e ergonômico',
-                    'Recarregável via USB',
+                    'Bateria recarregável via USB',
                   ].map((bullet, i) => (
                     <li
                       key={i}
@@ -399,10 +338,10 @@ export default function ProductPage() {
                     Ver Instruções →
                   </Link>
                 </div>
-              </div>
+              </Reveal>
 
               {/* Right column: video player container — 662 × 662 px */}
-              <div className="flex items-center justify-center">
+              <Reveal delay={150} className="flex items-center justify-center">
                 <div className="w-full max-w-[662px] aspect-square rounded-3xl overflow-hidden shadow-lg">
                   {/*
                     ── SUBSTITUIR QUANDO O VÍDEO ESTIVER PRONTO ──────────────
@@ -438,7 +377,7 @@ export default function ProductPage() {
                     className="h-full w-full"
                   />
                 </div>
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>

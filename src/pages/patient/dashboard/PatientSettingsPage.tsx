@@ -7,7 +7,13 @@ import {
   resetPatientPreferences,
   savePatientPreferences,
 } from '../../../lib/patientPreferences'
-import { isSpeechSupported, listPortugueseVoices, speakText } from '../../../lib/speech'
+import {
+  isSpeechSupported,
+  listPortugueseVoices,
+  speakTextAI,
+  toAiVoiceURI,
+} from '../../../lib/speech'
+import { listAiVoices, type AiVoice } from '../../../lib/backendApi'
 import { msCardPad, msInputBase, msInputBorder, msLabel } from '../../../lib/msStyles'
 import { cn } from '../../../lib/cn'
 
@@ -19,6 +25,9 @@ export function PatientSettingsPage() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [voiceURI, setVoiceURI] = useState<string | null>(null)
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  // vozes humanas por IA (ElevenLabs) — lista vazia quando o backend não
+  // tem a chave configurada, aí a seção nem aparece.
+  const [aiVoices, setAiVoices] = useState<AiVoice[]>([])
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const speechSupported = isSpeechSupported()
@@ -44,6 +53,21 @@ export function PatientSettingsPage() {
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
     return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
   }, [speechSupported])
+
+  useEffect(() => {
+    let cancelled = false
+    listAiVoices()
+      .then((result) => {
+        if (!cancelled) setAiVoices(result)
+      })
+      .catch(() => {
+        // backend fora do ar / sem chave: segue só com as vozes locais.
+        if (!cancelled) setAiVoices([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -155,26 +179,43 @@ export function PatientSettingsPage() {
                 value={voiceURI ?? ''}
                 onChange={(e) => setVoiceURI(e.target.value || null)}
                 className={cn(msInputBase, msInputBorder, 'sm:flex-1')}
-                disabled={voices.length === 0}
+                disabled={voices.length === 0 && aiVoices.length === 0}
               >
                 <option value="">Automática (melhor voz em português)</option>
-                {voices.map((v) => (
-                  <option key={v.voiceURI} value={v.voiceURI}>
-                    {v.name} ({v.lang})
-                  </option>
-                ))}
+                {aiVoices.length > 0 ? (
+                  <optgroup label="Vozes humanas (IA)">
+                    {aiVoices.map((v) => (
+                      <option key={v.name} value={toAiVoiceURI(v.name)}>
+                        {v.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                ) : null}
+                <optgroup label="Vozes do dispositivo">
+                  {voices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} ({v.lang})
+                    </option>
+                  ))}
+                </optgroup>
               </select>
               <Button
                 type="button"
                 variant="secondary"
                 icon={<PlayCircle className="h-4 w-4" aria-hidden />}
-                onClick={() => speakText(VOICE_PREVIEW_TEXT, { voiceURI })}
-                disabled={voices.length === 0}
+                onClick={() => void speakTextAI(VOICE_PREVIEW_TEXT, { voiceURI })}
+                disabled={voices.length === 0 && aiVoices.length === 0}
               >
                 Ouvir prévia
               </Button>
             </div>
-            {voices.length === 0 ? (
+            {aiVoices.length > 0 ? (
+              <p className="mt-2 text-xs text-ms-muted">
+                As vozes humanas (IA) precisam de internet. Se a conexão falhar, o sistema usa
+                automaticamente uma voz do próprio dispositivo — nunca fica sem falar.
+              </p>
+            ) : null}
+            {voices.length === 0 && aiVoices.length === 0 ? (
               <p className="mt-2 text-xs text-ms-muted">
                 Nenhuma voz carregada ainda — aguarde um instante ou toque na tela.
               </p>

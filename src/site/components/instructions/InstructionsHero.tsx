@@ -1,9 +1,10 @@
-import { Download, Play } from 'lucide-react'
+import { Play } from 'lucide-react'
+import { Reveal } from '../Reveal'
 
 export default function InstructionsHero() {
   return (
     <section className="bg-white px-6 py-16 text-center lg:px-8 lg:py-24">
-      <div className="mx-auto max-w-3xl">
+      <Reveal className="mx-auto max-w-3xl">
         <span className="inline-block rounded-full bg-teal-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-teal-600">
           Manual de utilização
         </span>
@@ -20,11 +21,10 @@ export default function InstructionsHero() {
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
-            href="#"
+            href="#passos"
             className="inline-flex min-w-[160px] items-center justify-center gap-2 rounded-lg bg-navy-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-800 active:scale-[0.98]"
           >
-            <Download className="h-4 w-4" />
-            Baixar PDF
+            Ver o Passo a Passo
           </a>
           <a
             href="#video-demo"
@@ -34,7 +34,7 @@ export default function InstructionsHero() {
             Ver Vídeo
           </a>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

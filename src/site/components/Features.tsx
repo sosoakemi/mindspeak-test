@@ -1,4 +1,5 @@
 import { Cpu, Eye, SlidersVertical } from 'lucide-react'
+import { formattedTotalCost } from '../data/hardware'
 
 /* ─── Watermark SVGs (rendered as background decoration) ──────────────────── */
 
@@ -69,8 +70,8 @@ function AudioWatermark() {
 const cards = [
   {
     icon: Eye,
-    title: 'R$ 800',
-    description: 'R$ 800,00 — mais barato que alternativas comerciais de BCI',
+    title: `R$ ${formattedTotalCost}`,
+    description: `Custo de peças de R$ ${formattedTotalCost} — muito abaixo de alternativas comerciais de BCI`,
     watermark: <BrainWatermark />,
   },
   {

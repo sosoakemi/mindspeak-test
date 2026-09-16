@@ -1,5 +1,6 @@
 // Characters section: "Conheça os Personagens"
 import { Bot } from 'lucide-react'
+import { Reveal } from '../Reveal'
 
 // Arquivos vivem em public/images (fora do grafo de módulos do Vite) — por
 // isso são referenciados por caminho de URL, não import.
@@ -46,54 +47,53 @@ const characters: Character[] = [
 
 export default function CharactersES() {
   return (
-    <section className="bg-white px-6 py-20 lg:px-8 lg:py-28">
+    <section id="personagens" className="bg-white px-6 py-20 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
-        <div className="text-center mb-12">
+        <Reveal className="text-center mb-12">
           <h2 className="font-display text-3xl font-black tracking-tight text-navy-900 sm:text-4xl">
             Conheça os Personagens
           </h2>
           <p className="mt-3 text-sm text-slate-500">
            Cada um tem uma história e precisa da sua ajuda
           </p>
-        </div>
+        </Reveal>
 
         {/* Character cards */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {characters.map((char) => (
-            <article
-              key={char.name}
-              className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
-            >
-              {/* Retrato do personagem — pixel art (Ikenny/Sukye) ou ícone (Zeta) */}
-              <div
-                className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
-                style={{ background: char.bg }}
-              >
-                {char.image ? (
-                  <img
-                    src={char.image}
-                    alt={char.name}
-                    className="h-16 w-16 object-contain"
-                    style={{ imageRendering: 'pixelated' }}
-                    loading="lazy"
-                  />
-                ) : char.icon ? (
-                  <char.icon className="h-9 w-9 text-purple-500" strokeWidth={1.75} />
-                ) : null}
-              </div>
+          {characters.map((char, i) => (
+            <Reveal key={char.name} delay={i * 100}>
+              <article className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                {/* Retrato do personagem — pixel art (Ikenny/Sukye) ou ícone (Zeta) */}
+                <div
+                  className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
+                  style={{ background: char.bg }}
+                >
+                  {char.image ? (
+                    <img
+                      src={char.image}
+                      alt={char.name}
+                      className="h-16 w-16 object-contain"
+                      style={{ imageRendering: 'pixelated' }}
+                      loading="lazy"
+                    />
+                  ) : char.icon ? (
+                    <char.icon className="h-9 w-9 text-purple-500" strokeWidth={1.75} />
+                  ) : null}
+                </div>
 
-              <h3 className="font-display text-lg font-black text-navy-900">
-                {char.name}
-              </h3>
-              <p className="text-xs font-semibold uppercase tracking-wide text-teal-500 mt-0.5">
-                {char.role}
-              </p>
+                <h3 className="font-display text-lg font-black text-navy-900">
+                  {char.name}
+                </h3>
+                <p className="text-xs font-semibold uppercase tracking-wide text-teal-500 mt-0.5">
+                  {char.role}
+                </p>
 
-              <p className="mt-3 text-sm leading-relaxed text-slate-500">
-                {char.description}
-              </p>
-            </article>
+                <p className="mt-3 text-sm leading-relaxed text-slate-500">
+                  {char.description}
+                </p>
+              </article>
+            </Reveal>
           ))}
         </div>
       </div>

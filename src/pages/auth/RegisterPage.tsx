@@ -244,7 +244,8 @@ export function RegisterPage() {
           <div>
             <p className="text-sm font-bold text-[var(--fa-text)]">Protocolo de segurança ativo</p>
             <p className="mt-1 text-xs leading-relaxed text-[var(--fa-text-muted)] sm:text-sm">
-              Seus dados são criptografados de ponta a ponta seguindo normas médicas globais.
+              Sua senha é protegida por hash e seus dados ficam isolados com segurança por
+              organização.
             </p>
           </div>
         </div>

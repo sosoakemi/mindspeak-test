@@ -1,5 +1,5 @@
 import ContactSection from '../components/team/ContactSection'
-import TeamFooter from '../components/team/TeamFooter'
+import Footer from '../components/Footer'
 import TeamHeader from '../components/team/TeamHeader'
 import TeamHeroSection from '../components/team/TeamHeroSection'
 
@@ -9,7 +9,7 @@ export default function TeamPage() {
       <TeamHeader />
       <TeamHeroSection />
       <ContactSection />
-      <TeamFooter />
+      <Footer />
     </>
   )
 }

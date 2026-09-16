@@ -3,7 +3,7 @@ import InstructionsHero from '../components/instructions/InstructionsHero'
 import StepsGuide from '../components/instructions/StepsGuide'
 import VideoDemo from '../components/instructions/VideoDemo'
 import ComponentsCta from '../components/instructions/ComponentsCta'
-import InstructionsFooter from '../components/instructions/InstructionsFooter'
+import Footer from '../components/Footer'
 
 export default function InstructionsPage() {
   return (
@@ -13,7 +13,7 @@ export default function InstructionsPage() {
       <StepsGuide />
       <VideoDemo />
       <ComponentsCta />
-      <InstructionsFooter />
+      <Footer />
     </>
   )
 }

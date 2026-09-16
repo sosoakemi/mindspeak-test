@@ -1,5 +1,6 @@
 import { Heart, Network, UserRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Reveal } from './Reveal'
 
 const valueCards = [
   {
@@ -26,7 +27,7 @@ export default function About() {
         <div className="grid items-center gap-12 overflow-visible lg:grid-cols-2 lg:gap-20">
 
           {/* ── Left column: text + cards ── */}
-          <div className="flex flex-col items-start">
+          <Reveal className="flex flex-col items-start">
             {/* Overline */}
             <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">
               Nosso Objetivo
@@ -73,10 +74,10 @@ export default function About() {
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
 
           {/* ── Right column: image + floating badge ── */}
-          <div className="relative">
+          <Reveal delay={150} className="relative">
             <img
               src="/images/family.png"
               alt="Avô e neta compartilhando um momento de conexão e afeto"
@@ -92,22 +93,22 @@ export default function About() {
                 de brasileiros vivem com alguma condição que limita a fala ou movimento.
               </p>
             </div>
-          </div>
+          </Reveal>
         </div>
 
         <div className="mt-24 grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Image column — left, full room visible */}
-          <div className="order-2 lg:order-1 w-full max-w-[468px] shrink-0 lg:h-[580px]">
+          <Reveal className="order-2 lg:order-1 w-full max-w-[468px] shrink-0 lg:h-[580px]">
             <img
               src="/images/patient.png"
               alt="Paciente utilizando o capacete MindSpeak em ambiente hospitalar"
               className="h-full w-full rounded-2xl object-cover shadow-lg"
               loading="lazy"
             />
-          </div>
+          </Reveal>
 
           {/* Text column — right */}
-          <div className="order-1 lg:order-2 flex flex-col items-start">
+          <Reveal delay={150} className="order-1 lg:order-2 flex flex-col items-start">
             {/* Overline tag */}
             <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
               Público-Alvo
@@ -142,7 +143,7 @@ export default function About() {
             >
               Saiba como funciona →
             </Link>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

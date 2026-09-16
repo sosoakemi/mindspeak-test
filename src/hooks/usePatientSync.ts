@@ -1,7 +1,53 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getPatientSession, patchPatientSession, PATIENT_SESSION_CHANGED_EVENT } from '../lib/patientSession'
+import { getActiveSessionId } from '../lib/activeSession'
+import { getAccessToken } from '../lib/authSession'
+import { getStatusWsUrl } from '../lib/backendConfig'
 
 export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error'
+
+// Tempo máximo esperando o handshake do WebSocket antes de desistir e
+// reportar "não conectou" — sem isso um backend fora do ar deixaria o botão
+// girando pra sempre.
+const CONNECT_TIMEOUT_MS = 6000
+
+/** Tenta abrir de verdade o /ws/status/{sessionId} (o mesmo endpoint que a
+ * tela de comunicação ao vivo usa) só pra confirmar que o backend está no
+ * ar e aceita a conexão — fecha o socket assim que sabe o resultado, não
+ * fica "ouvindo" nada. Não é sinônimo de "sensor conectado": só confirma
+ * que a sessão existe e o backend está alcançável a partir daqui. */
+function checkStatusSocket(sessionId: string, token: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    let settled = false
+    let socket: WebSocket
+    try {
+      socket = new WebSocket(getStatusWsUrl(sessionId, token))
+    } catch {
+      resolve(false)
+      return
+    }
+
+    const finish = (ok: boolean) => {
+      if (settled) return
+      settled = true
+      window.clearTimeout(timer)
+      socket.onopen = null
+      socket.onerror = null
+      socket.onclose = null
+      try {
+        socket.close()
+      } catch {
+        // já fechado — sem problema
+      }
+      resolve(ok)
+    }
+
+    const timer = window.setTimeout(() => finish(false), CONNECT_TIMEOUT_MS)
+    socket.onopen = () => finish(true)
+    socket.onerror = () => finish(false)
+    socket.onclose = () => finish(false)
+  })
+}
 
 export function usePatientSync() {
   const [status, setStatus] = useState<SyncStatus>('idle')
@@ -30,15 +76,34 @@ export function usePatientSync() {
     }
     if (status === 'syncing') return
 
+    const sessionId = getActiveSessionId()
+    if (!sessionId) {
+      setStatus('error')
+      setErrorMessage(
+        'Nenhuma sessão ao vivo conectada ainda — informe o id da sessão na tela de Comunicação.',
+      )
+      patchPatientSession({ sensorConnected: false })
+      return
+    }
+
+    const token = getAccessToken()
+    if (!token) {
+      setStatus('error')
+      setErrorMessage('Sua sessão de login expirou. Faça login novamente.')
+      patchPatientSession({ sensorConnected: false })
+      return
+    }
+
     setStatus('syncing')
     setErrorMessage(null)
 
-    await new Promise((r) => window.setTimeout(r, 1400))
+    const connected = await checkStatusSocket(sessionId, token)
 
-    const fail = Math.random() < 0.08
-    if (fail) {
+    if (!connected) {
       setStatus('error')
-      setErrorMessage('Não foi possível conectar ao sensor. Verifique o Bluetooth e tente novamente.')
+      setErrorMessage(
+        'Não foi possível conectar ao backend para esta sessão. Verifique se o servidor está no ar e se a sessão ainda existe.',
+      )
       patchPatientSession({ sensorConnected: false })
       return
     }

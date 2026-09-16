@@ -1,5 +1,6 @@
 // CTA section: "Pronto para a aventura?"
 import { Gamepad2 } from 'lucide-react'
+import { Reveal } from '../Reveal'
 
 export default function CTAES() {
   return (
@@ -7,7 +8,7 @@ export default function CTAES() {
       id="aventura"
       className="bg-white px-6 py-20 lg:px-8 lg:py-28"
     >
-      <div className="mx-auto max-w-2xl text-center">
+      <Reveal className="mx-auto max-w-2xl text-center">
         {/* Icon */}
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50">
           <Gamepad2 className="h-8 w-8 text-teal-500" strokeWidth={1.75} />
@@ -21,21 +22,24 @@ export default function CTAES() {
           humana pode controlar a tecnologia..
         </p>
 
+        {/* O jogo ainda não está publicado — os botões levam pro conteúdo que
+            já existe na própria página (história, personagens), em vez de
+            prometer um "jogar" que ainda não existe */}
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
             href="#historia"
             className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal-600 hover:shadow-teal-200 hover:shadow-md active:scale-[0.98]"
           >
-            Jogar Gratuitamente
+            Ler a História
           </a>
           <a
             href="#personagens"
             className="inline-flex min-w-[180px] items-center justify-center rounded-full border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 transition-all hover:border-teal-400 hover:text-teal-600 active:scale-[0.98] dark:border-slate-600 dark:bg-[#111827] dark:text-slate-200 dark:hover:border-teal-500 dark:hover:text-teal-400"
           >
-            Saiba mais
+            Conhecer os Personagens
           </a>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }
