@@ -68,8 +68,17 @@ export default function TeamHeader() {
         className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-4 lg:px-8"
         aria-label="Navegação principal"
       >
-        <Link to="/" className="flex min-w-0 shrink-0 items-center justify-self-start lg:justify-self-start">
-          <MindSpeakLogo layout="horizontal" size="sm" />
+        <Link to="/" className="flex min-w-0 shrink items-center justify-self-start lg:shrink-0 lg:justify-self-start">
+          {/* lg.header.rd.png é bem mais "largo" (462×44) que a versão
+              escura (190×44) — a 32px de altura (size="sm") isso passa de
+              300px de largura e, com shrink-0 no <img> base, empurrava o
+              botão de menu pra fora da viewport em telas estreitas. Cap de
+              largura só até o breakpoint lg, onde sobra espaço de sobra. */}
+          <MindSpeakLogo
+            layout="horizontal"
+            size="sm"
+            className="max-w-[140px] shrink sm:max-w-[200px] lg:max-w-none lg:shrink-0"
+          />
         </Link>
 
         <ul className="hidden items-center gap-1 lg:flex lg:justify-self-center">
