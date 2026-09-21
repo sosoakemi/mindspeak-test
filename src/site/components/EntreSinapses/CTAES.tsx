@@ -1,6 +1,7 @@
 // CTA section: "Pronto para a aventura?"
 import { Gamepad2 } from 'lucide-react'
 import { Reveal } from '../Reveal'
+import { GAME_URL } from '../../data/gameLink'
 
 export default function CTAES() {
   return (
@@ -22,21 +23,22 @@ export default function CTAES() {
           humana pode controlar a tecnologia..
         </p>
 
-        {/* O jogo ainda não está publicado — os botões levam pro conteúdo que
-            já existe na própria página (história, personagens), em vez de
-            prometer um "jogar" que ainda não existe */}
+        {/* Jogo publicado no GD.games — "Jogar Agora" sai do site; o
+            segundo botão continua levando pra história aqui na página. */}
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
-            href="#historia"
+            href={GAME_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex min-w-[180px] items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal-600 hover:shadow-teal-200 hover:shadow-md active:scale-[0.98]"
           >
-            Ler a História
+            Jogar Agora
           </a>
           <a
-            href="#personagens"
+            href="#historia"
             className="inline-flex min-w-[180px] items-center justify-center rounded-full border border-slate-300 bg-white px-7 py-3.5 text-sm font-semibold text-slate-700 transition-all hover:border-teal-400 hover:text-teal-600 active:scale-[0.98] dark:border-slate-600 dark:bg-[#111827] dark:text-slate-200 dark:hover:border-teal-500 dark:hover:text-teal-400"
           >
-            Conhecer os Personagens
+            Ler a História
           </a>
         </div>
       </Reveal>

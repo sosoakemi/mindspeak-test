@@ -1,10 +1,24 @@
 // Video section: "Veja em ação"
 import { Play } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Reveal } from '../Reveal'
+
+const videoSrc = '/video/video-entresinapses.mp4'
+// mesma ilustração do Hero — evita a tela preta que o <video> mostra antes
+// do primeiro frame carregar.
+const videoPoster = '/images/game.img.home.png'
 
 export default function VideoES() {
   const [playing, setPlaying] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const play = () => {
+    setPlaying(true)
+    // autoplay programático só funciona depois de um gesto do usuário em
+    // vários navegadores (Safari/iOS inclusive) — por isso não usa a prop
+    // autoPlay direto no <video>, chama play() aqui dentro do clique.
+    videoRef.current?.play()
+  }
 
   return (
     <section id="videos" className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
@@ -21,85 +35,26 @@ export default function VideoES() {
 
         {/* Video player */}
         <Reveal delay={100} className="relative overflow-hidden rounded-2xl shadow-2xl aspect-video bg-navy-900 group">
-          {/* Thumbnail / placeholder */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(135deg, #0a192f 0%, #163a5f 50%, #0d9488 100%)',
-            }}
-          >
-            {/* Decorative synapse illustration */}
-            <svg
-              className="absolute inset-0 w-full h-full opacity-20"
-              viewBox="0 0 800 450"
-              aria-hidden="true"
-            >
-              {[
-                [100, 100], [700, 80], [400, 200], [200, 300], [600, 320],
-                [350, 400], [500, 150], [150, 250],
-              ].map(([cx, cy], i) => (
-                <g key={i}>
-                  <circle cx={cx} cy={cy} r="4" fill="#2dd4bf" opacity="0.8" />
-                  {i > 0 && (
-                    <line
-                      x1={cx}
-                      y1={cy}
-                      x2={i % 2 === 0 ? 400 : cx - 80}
-                      y2={i % 2 === 0 ? 200 : cy + 60}
-                      stroke="#2dd4bf"
-                      strokeWidth="1"
-                      opacity="0.3"
-                      strokeDasharray="6 4"
-                    />
-                  )}
-                </g>
-              ))}
-            </svg>
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            poster={videoPoster}
+            controls={playing}
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          />
 
-            {/* Scene labels */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6 px-6">
-              {['Fase 1', 'Fase 2', 'O Despertar'].map((label) => (
-                <span
-                  key={label}
-                  className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-
-            {/* Top right badge */}
-            <div className="absolute top-4 right-4 rounded-full bg-teal-500 px-3 py-1 text-xs font-bold text-white">
-              Preview
-            </div>
-          </div>
-
-          {/* Play button — como ainda não há gameplay gravado, o clique revela
-              um aviso "em breve" em vez de não fazer nada visível */}
           {!playing && (
             <button
               type="button"
-              onClick={() => setPlaying(true)}
-              aria-label="Reproduzir vídeo"
-              className="absolute inset-0 flex items-center justify-center group/btn"
+              onClick={play}
+              aria-label="Reproduzir vídeo do EntreSinapses"
+              className="absolute inset-0 flex items-center justify-center bg-navy-900/30 transition-colors group/btn hover:bg-navy-900/40"
             >
               <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30 transition-all duration-300 group-hover/btn:scale-110 group-hover/btn:bg-white/30">
                 <Play className="h-7 w-7 text-white fill-white ml-1" />
               </span>
             </button>
-          )}
-
-          {playing && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-navy-900/80 text-center backdrop-blur-sm">
-              <p className="font-display text-lg font-semibold text-teal-400">
-                Gameplay em breve
-              </p>
-              <p className="max-w-xs text-sm text-slate-300">
-                Estamos gravando as primeiras fases do EntreSinapses. Volte em
-                breve para assistir.
-              </p>
-            </div>
           )}
         </Reveal>
       </div>

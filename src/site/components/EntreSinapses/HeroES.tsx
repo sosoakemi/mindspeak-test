@@ -1,3 +1,5 @@
+import { GAME_URL } from '../../data/gameLink'
+
 const fundoSection1 = '/images/fundo.section1.games.png'
 const gameHeroImage = '/images/game.img.home.png'
 
@@ -28,20 +30,22 @@ export default function HeroES() {
             Aprenda enquanto se aventura nesse universo fascinante.
           </p>
 
-          {/* O jogo ainda não está publicado — os botões levam pro conteúdo já
-              disponível nesta página, sem prometer um "jogar" inexistente */}
+          {/* O jogo já está publicado no GD.games — "Jogar Agora" sai do
+              site; o resto da navegação continua pro conteúdo interno. */}
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
             <a
-              href="#historia"
+              href={GAME_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex min-w-[160px] items-center justify-center rounded-full bg-teal-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-teal-600 hover:shadow-teal-200 hover:shadow-md active:scale-[0.98]"
             >
-              Conhecer a História
+              Jogar Agora
             </a>
             <a
-              href="#personagens"
+              href="#historia"
               className="site-es-hero-secondary inline-flex min-w-[160px] items-center justify-center rounded-full border border-slate-300 bg-white/70 px-7 py-3.5 text-sm font-semibold text-slate-700 transition-all hover:border-teal-400 hover:text-teal-600 active:scale-[0.98]"
             >
-              Ver Personagens
+              Conhecer a História
             </a>
           </div>
         </div>

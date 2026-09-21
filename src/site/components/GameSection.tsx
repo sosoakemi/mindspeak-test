@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Reveal } from './Reveal'
+import { GAME_URL } from '../data/gameLink'
 
 const gameImage = '/images/game.img.home.png'
 
@@ -57,13 +58,23 @@ export default function GameSection() {
               ))}
             </div>
 
-            <Link
-              to="/jogo"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy-900 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-navy-800 active:scale-[0.97] dark:bg-teal-600 dark:hover:bg-teal-500"
-            >
-              Conheça a História
-              <ArrowRight size={16} />
-            </Link>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href={GAME_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-teal-500 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-teal-600 active:scale-[0.97]"
+              >
+                Jogar Agora
+                <ArrowRight size={16} />
+              </a>
+              <Link
+                to="/jogo"
+                className="inline-flex items-center gap-2 rounded-full bg-navy-900 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-navy-800 active:scale-[0.97] dark:bg-white/10 dark:hover:bg-white/20"
+              >
+                Conheça a História
+              </Link>
+            </div>
           </Reveal>
         </div>
       </div>
