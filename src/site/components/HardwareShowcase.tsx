@@ -5,17 +5,17 @@ import { Reveal } from './Reveal'
 
 export default function HardwareShowcase() {
   return (
-    <section className="bg-white px-6 py-20 lg:px-8 lg:py-28">
+    <section className="bg-white px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#020617]">
       <div className="mx-auto max-w-7xl">
         <Reveal className="flex flex-col items-center text-center">
           <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">
             Hardware Real
           </span>
           <h2 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-            <span className="text-navy-900">Peça por peça, do jeito que </span>
+            <span className="text-navy-900 dark:text-white">Peça por peça, do jeito que </span>
             <span className="text-teal-500">montamos</span>
           </h2>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-500">
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-500 dark:text-slate-300">
             Sem specs fabricadas: são os componentes que compõem o protótipo físico, com o preço
             que pagamos por cada um.
           </p>
@@ -24,8 +24,8 @@ export default function HardwareShowcase() {
         <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
           {componentsList.map((item, i) => (
             <Reveal key={item.id} delay={i * 70}>
-              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-xl hover:shadow-teal-500/30">
-                <div className="flex aspect-square items-center justify-center bg-white p-4">
+              <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-slate-50/60 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-xl hover:shadow-teal-500/30 dark:border-slate-800 dark:bg-[#111827] dark:hover:border-teal-500/50 dark:hover:bg-[#111827]">
+                <div className="flex aspect-square items-center justify-center bg-white p-4 dark:bg-slate-100">
                   <img
                     src={item.image}
                     alt={item.name}
@@ -34,11 +34,11 @@ export default function HardwareShowcase() {
                   />
                 </div>
                 <div className="flex flex-1 flex-col gap-1 px-3 pb-4 pt-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500">
                     {item.category}
                   </p>
-                  <p className="text-xs font-semibold leading-snug text-navy-900">{item.name}</p>
-                  <p className="mt-auto text-sm font-bold text-teal-600">
+                  <p className="text-xs font-semibold leading-snug text-navy-900 dark:text-white">{item.name}</p>
+                  <p className="mt-auto text-sm font-bold text-teal-600 dark:text-teal-400">
                     R$ {item.price.toFixed(2).replace('.', ',')}
                   </p>
                 </div>

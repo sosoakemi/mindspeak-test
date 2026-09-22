@@ -14,7 +14,7 @@ const cards = [
 
 export default function GameSection() {
   return (
-    <section id="entresinapses" className="bg-white px-6 py-20 lg:px-8 lg:py-28">
+    <section id="entresinapses" className="bg-white px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#020617]">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <Reveal className="flex items-center justify-center">
@@ -31,12 +31,12 @@ export default function GameSection() {
             </p>
 
             <h2 className="text-[clamp(2rem,4vw,2.75rem)] font-extrabold leading-[1.1]">
-              <span className="site-game-title-dark text-slate-900">EntreSinapses</span>
+              <span className="site-game-title-dark text-slate-900 dark:text-white">EntreSinapses</span>
               <br />
               <span className="text-teal-500">O Jogo</span>
             </h2>
 
-            <p className="site-game-desc mt-4 max-w-[480px] text-[15px] leading-[1.7] text-slate-600">
+            <p className="site-game-desc mt-4 max-w-[480px] text-[15px] leading-[1.7] text-slate-600 dark:text-slate-300">
               Uma aventura onde você controla um mundo inteiro usando apenas o
               poder da sua mente. Aprenda sobre interfaces cérebro-computador de
               forma divertida e imersiva.
@@ -46,12 +46,12 @@ export default function GameSection() {
               {cards.map((card) => (
                 <div
                   key={card.label}
-                  className="site-game-card rounded-xl border border-slate-200 bg-white p-[14px_18px] shadow-sm"
+                  className="site-game-card rounded-xl border border-slate-200 bg-white p-[14px_18px] shadow-sm dark:border-slate-800 dark:bg-[#111827]"
                 >
-                  <p className="site-game-card-label mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  <p className="site-game-card-label mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
                     {card.label}
                   </p>
-                  <p className="site-game-card-value m-0 text-[15px] font-bold text-slate-900">
+                  <p className="site-game-card-value m-0 text-[15px] font-bold text-slate-900 dark:text-white">
                     {card.value}
                   </p>
                 </div>

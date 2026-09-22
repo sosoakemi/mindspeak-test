@@ -150,6 +150,13 @@ export function getSessionSelections(
   return getJson(`/sessions/${sessionId}/selections`)
 }
 
+// Atalho de operador/teste: avança a varredura na hora, sem esperar o
+// timer. Não substitui a decisão do motor — o paciente continua sendo
+// selecionado pelo sinal do sensor; isto só pula o destaque adiante.
+export function skipToNextWord(sessionId: number): Promise<{ status: string }> {
+  return postJson(`/sessions/${sessionId}/skip`, {}, true)
+}
+
 export function registerCaregiver(payload: {
   full_name: string
   email: string

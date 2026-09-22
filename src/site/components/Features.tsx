@@ -92,7 +92,7 @@ const cards = [
 
 export default function Features() {
   return (
-    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
+    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#0a1628]">
       <div className="mx-auto max-w-3xl">
 
         {/* Centered header */}
@@ -101,10 +101,10 @@ export default function Features() {
             Diferenciais
           </span>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            <span className="text-navy-900">Por que é </span>
+            <span className="text-navy-900 dark:text-white">Por que é </span>
             <span className="text-teal-500">diferente?</span>
           </h2>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-500">
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-500 dark:text-slate-300">
             Uma solução projetada por estudantes para resolver um problema real com
             tecnologia acessível.
           </p>
@@ -115,23 +115,23 @@ export default function Features() {
           {cards.map(({ icon: Icon, title, description, watermark }) => (
             <article
               key={title}
-              className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm transition-shadow duration-300 hover:shadow-md"
+              className="relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm transition-shadow duration-300 hover:shadow-md dark:bg-[#111827]"
             >
               {/* Watermark illustration */}
               {watermark}
 
               {/* Icon badge */}
-              <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600">
+              <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 dark:bg-teal-500/10 dark:text-teal-300">
                 <Icon className="h-5 w-5" strokeWidth={1.75} />
               </span>
 
               {/* Title */}
-              <h3 className="relative z-10 mt-5 font-display text-2xl font-bold text-navy-900">
+              <h3 className="relative z-10 mt-5 font-display text-2xl font-bold text-navy-900 dark:text-white">
                 {title}
               </h3>
 
               {/* Description */}
-              <p className="relative z-10 mt-2 text-sm leading-relaxed text-slate-600">
+              <p className="relative z-10 mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                 {description}
               </p>
             </article>

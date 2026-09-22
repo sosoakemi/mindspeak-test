@@ -39,7 +39,7 @@ const testimonials: Testimonial[] = [
 
 export default function Testimonials() {
   return (
-    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
+    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#0a1628]">
       <div className="mx-auto max-w-7xl">
 
         {/* Header — left-aligned */}
@@ -48,10 +48,10 @@ export default function Testimonials() {
             Depoimentos
           </span>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            <span className="text-navy-900">O impacto que </span>
+            <span className="text-navy-900 dark:text-white">O impacto que </span>
             <span className="text-teal-500">esperamos</span>
           </h2>
-          <p className="mt-3 max-w-xl text-sm text-slate-500">
+          <p className="mt-3 max-w-xl text-sm text-slate-500 dark:text-slate-400">
             Perfis ilustrativos — representam o tipo de impacto que projetamos
             alcançar com o MindSpeak, ainda em fase de protótipo acadêmico.
           </p>
@@ -61,22 +61,22 @@ export default function Testimonials() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {testimonials.map(({ initials, initialsColor, name, role, quote }, i) => (
             <Reveal key={name} delay={i * 90}>
-              <article className="flex h-full flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+              <article className="flex h-full flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-[#111827]">
                 {/* Avatar + name/role */}
                 <div className="flex items-center gap-3">
                   <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold ${initialsColor}`}
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold dark:bg-slate-800 ${initialsColor}`}
                   >
                     {initials}
                   </span>
                   <div className="leading-tight">
-                    <p className="text-sm font-bold text-navy-900">{name}</p>
-                    <p className="text-xs text-slate-500">{role}</p>
+                    <p className="text-sm font-bold text-navy-900 dark:text-white">{name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{role}</p>
                   </div>
                 </div>
 
                 {/* Quote */}
-                <p className="text-sm italic leading-relaxed text-slate-400">
+                <p className="text-sm italic leading-relaxed text-slate-400 dark:text-slate-400">
                   {quote}
                 </p>
               </article>

@@ -22,7 +22,7 @@ const valueCards = [
 
 export default function About() {
   return (
-    <section id="missao" className="bg-white px-6 py-20 lg:px-8 lg:py-28">
+    <section id="missao" className="bg-white px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#020617]">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 overflow-visible lg:grid-cols-2 lg:gap-20">
 
@@ -34,12 +34,12 @@ export default function About() {
             </span>
 
             {/* Title */}
-            <h2 className="font-display text-3xl font-bold leading-tight tracking-tight text-navy-900 sm:text-4xl">
+            <h2 className="font-display text-3xl font-bold leading-tight tracking-tight text-navy-900 sm:text-4xl dark:text-white">
               Dar voz a quem o mundo esqueceu de ouvir
             </h2>
 
             {/* Paragraph 1 */}
-            <p className="mt-6 text-base leading-relaxed text-slate-600">
+            <p className="mt-6 text-base leading-relaxed text-slate-600 dark:text-slate-300">
               MindSpeak nasceu de uma constatação simples e dolorosa: milhões de
               pessoas ao redor do mundo vivem em silêncio não por escolha, mas
               por limitações motoras que as impedem de falar, digitar ou
@@ -47,7 +47,7 @@ export default function About() {
             </p>
 
             {/* Paragraph 2 */}
-            <p className="mt-4 text-base leading-relaxed text-slate-600">
+            <p className="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300">
               Nossa missão é eliminar essa barreira usando inteligência artificial
               e interfaces cérebro-computador de baixo custo. Queremos devolver
               autonomia, dignidade e a possibilidade de expressar pensamentos,
@@ -110,18 +110,18 @@ export default function About() {
           {/* Text column — right */}
           <Reveal delay={150} className="order-1 lg:order-2 flex flex-col items-start">
             {/* Overline tag */}
-            <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
               Público-Alvo
             </span>
 
             {/* Two-tone title */}
             <h2 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-              <span className="text-navy-900">Tecnologia que </span>
+              <span className="text-navy-900 dark:text-white">Tecnologia que </span>
               <span className="text-teal-500">devolve a voz</span>
             </h2>
 
             {/* Paragraph 1 */}
-            <p className="mt-6 text-base leading-relaxed text-slate-600">
+            <p className="mt-6 text-base leading-relaxed text-slate-600 dark:text-slate-300">
               O MindSpeak foi desenvolvido para auxiliar pessoas que enfrentam
               dificuldades de comunicação devido a condições como Esclerose
               Lateral Amiotrófica (ELA), Acidente Vascular Cerebral (AVC),
@@ -129,7 +129,7 @@ export default function About() {
             </p>
 
             {/* Paragraph 2 */}
-            <p className="mt-4 text-base leading-relaxed text-slate-600">
+            <p className="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300">
               Usando um sensor EEG acessível na testa, o dispositivo captura
               sinais cerebrais e converte níveis de atenção em frases
               pré-programadas que são faladas em voz alta — permitindo

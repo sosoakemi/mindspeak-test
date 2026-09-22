@@ -162,10 +162,18 @@ export default function Hero() {
             />
           </div>
 
+          {/* Pedestal de luz sob o card — mesmo recurso visual do anel
+              luminoso sob o cérebro na referência, aqui em teal da marca */}
+          <div
+            className="pointer-events-none absolute -bottom-10 left-1/2 h-10 w-[72%] -translate-x-1/2 rounded-[50%] blur-xl"
+            style={{ background: 'radial-gradient(ellipse at center, rgba(45,212,191,0.45), transparent 75%)' }}
+            aria-hidden="true"
+          />
+
           {/* Floating badge — canal único de EEG */}
           <div
-            className="absolute -bottom-5 -left-5 max-w-[170px] rounded-xl px-4 py-3 shadow-xl backdrop-blur-sm"
-            style={{ backgroundColor: 'rgba(10,22,40,0.92)', border: '1px solid rgba(45,212,191,0.25)' }}
+            className="absolute -bottom-5 -left-5 max-w-[170px] rounded-xl px-4 py-3 shadow-xl backdrop-blur-md"
+            style={{ backgroundColor: 'rgba(10,22,40,0.75)', border: '1px solid rgba(45,212,191,0.3)' }}
           >
             <p className="font-display text-xl font-bold" style={{ color: '#2dd4bf' }}>
               1 canal
@@ -177,9 +185,14 @@ export default function Hero() {
 
           {/* Floating badge — tempo real */}
           <div
-            className="absolute -right-4 -top-4 rounded-xl px-3.5 py-2.5 shadow-xl backdrop-blur-sm sm:-right-6"
-            style={{ backgroundColor: 'rgba(10,22,40,0.92)', border: '1px solid rgba(45,212,191,0.25)' }}
+            className="absolute -right-4 -top-4 flex items-center gap-2 rounded-xl px-3.5 py-2.5 shadow-xl backdrop-blur-md sm:-right-6"
+            style={{ backgroundColor: 'rgba(10,22,40,0.75)', border: '1px solid rgba(45,212,191,0.3)' }}
           >
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: '#2dd4bf', boxShadow: '0 0 6px 1px rgba(45,212,191,0.8)' }}
+              aria-hidden="true"
+            />
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: '#5eead4' }}>
               Tempo real
             </p>

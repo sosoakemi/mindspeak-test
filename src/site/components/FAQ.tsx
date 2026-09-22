@@ -43,14 +43,14 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
+    <section className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#0a1628]">
       <div className="mx-auto max-w-3xl">
         <Reveal className="flex flex-col items-center text-center">
           <span className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-teal-500">
             Perguntas Frequentes
           </span>
           <h2 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-            <span className="text-navy-900">Tirando as </span>
+            <span className="text-navy-900 dark:text-white">Tirando as </span>
             <span className="text-teal-500">dúvidas</span>
           </h2>
         </Reveal>
@@ -61,19 +61,19 @@ export default function FAQ() {
 
             return (
               <Reveal key={item.question} delay={index * 60}>
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-[#111827]">
                   <button
                     type="button"
                     aria-expanded={isOpen}
                     onClick={() => setOpenIndex(isOpen ? null : index)}
                     className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left sm:px-6"
                   >
-                    <span className="text-sm font-semibold text-navy-900 sm:text-base">
+                    <span className="text-sm font-semibold text-navy-900 sm:text-base dark:text-white">
                       {item.question}
                     </span>
                     <ChevronDown
-                      className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-teal-500' : ''
+                      className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 dark:text-slate-500 ${
+                        isOpen ? 'rotate-180 text-teal-500 dark:text-teal-400' : ''
                       }`}
                     />
                   </button>
@@ -84,7 +84,7 @@ export default function FAQ() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="px-5 pb-4 text-sm leading-relaxed text-slate-600 sm:px-6">
+                      <p className="px-5 pb-4 text-sm leading-relaxed text-slate-600 sm:px-6 dark:text-slate-300">
                         {item.answer}
                       </p>
                     </div>

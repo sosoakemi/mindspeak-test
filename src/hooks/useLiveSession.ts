@@ -21,6 +21,10 @@ type LastSelected = {
 
 export type LiveSessionState = {
   status: ConnectionStatus
+  /** id numérico da sessão (não o external_session_id da URL) — usado pra
+   * chamadas REST tipo skipToNextWord. null até resolver via
+   * getSessionByExternalId. */
+  sessionDbId: number | null
   words: BackendWord[]
   scanningIndex: number
   focusLevel: number
@@ -60,6 +64,7 @@ type StatusMessage = LiveStatusMessage | SpeakMessage
 
 const INITIAL_STATE: LiveSessionState = {
   status: 'idle',
+  sessionDbId: null,
   words: [],
   scanningIndex: 0,
   focusLevel: 0,
@@ -119,6 +124,7 @@ export function useLiveSession(
         if (cancelled) return
         setState((prev) => ({
           ...prev,
+          sessionDbId: session.id,
           words,
           spokenHistory: selectionsPage.items.map((selection) => ({
             text: selection.utterance,

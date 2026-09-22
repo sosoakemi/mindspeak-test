@@ -1,11 +1,9 @@
 import {
   ArrowLeft,
   ArrowRight,
+  Cable,
   ChevronRight,
-  Headphones,
-  Power,
-  Speaker,
-  Target,
+  Usb,
   Zap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -23,61 +21,42 @@ type Step = {
   shortLabel: string
 }
 
+// Conteúdo real, tirado do manual (PASSO 1-3 "Como conectar o EEG com o
+// site") — a versão anterior descrevia um dispositivo genérico com botão
+// lateral, LED e barra de calibração na tela, nada disso existe no TGAM.
 const steps: Step[] = [
   {
     id: 1,
     label: 'PASSO 01',
-    title: 'Ligar o dispositivo',
+    title: 'Conectar o adaptador USB',
     description:
-      'Ligue o MindSpeak pressionando o botão na lateral. O LED indicador acenderá em verde quando estiver pronto.',
-    icon: Power,
-    iconBg: 'bg-red-500/10',
-    iconColor: 'text-red-500',
-    shortLabel: 'Ligar',
+      'Conecte o adaptador USB-TTL do sensor TGAM numa porta USB do computador que vai rodar o MindSpeak.',
+    icon: Usb,
+    iconBg: 'bg-sky-500/10',
+    iconColor: 'text-sky-500',
+    shortLabel: 'Conectar',
   },
   {
     id: 2,
     label: 'PASSO 02',
-    title: 'Posicionar o sensor',
+    title: 'Colocar a faixa',
     description:
-      'Coloque o sensor EEG sobre a testa, alinhado com o centro da cabeça. Ajuste a faixa para ficar confortável e firme, sem apertar demais.',
-    icon: Headphones,
+      'Aplique uma quantidade pequena de pasta condutora na parte de metal do sensor e coloque em contato com a testa.',
+    icon: Zap,
     iconBg: 'bg-amber-500/10',
     iconColor: 'text-amber-500',
-    shortLabel: 'Posicionar',
+    shortLabel: 'Faixa',
   },
   {
     id: 3,
     label: 'PASSO 03',
-    title: 'Calibrar atenção',
+    title: 'Prender o clipe',
     description:
-      'Siga as instruções na tela para calibrar seu nível de atenção. Concentre-se no alvo por alguns segundos até a barra de progresso completar.',
-    icon: Target,
+      'A pessoa que vai usar o EEG deve prender o clipe (prendedor) na região do lóbulo da orelha. Depois disso, o sensor já está pronto para receber os sinais.',
+    icon: Cable,
     iconBg: 'bg-emerald-500/10',
     iconColor: 'text-emerald-500',
-    shortLabel: 'Calibrar',
-  },
-  {
-    id: 4,
-    label: 'PASSO 04',
-    title: 'Selecionar frase',
-    description:
-      'Com a atenção calibrada, navegue pelas opções de frases na interface. Foque no item desejado para selecioná-lo e confirmar sua escolha.',
-    icon: Zap,
-    iconBg: 'bg-sky-500/10',
-    iconColor: 'text-sky-500',
-    shortLabel: 'Selecionar',
-  },
-  {
-    id: 5,
-    label: 'PASSO 05',
-    title: 'Ouvir a frase',
-    description:
-      'Após a seleção, o MindSpeak sintetiza a frase em voz alta. Você pode repetir ou escolher uma nova mensagem a qualquer momento.',
-    icon: Speaker,
-    iconBg: 'bg-violet-500/10',
-    iconColor: 'text-violet-500',
-    shortLabel: 'Ouvir',
+    shortLabel: 'Prender',
   },
 ]
 
@@ -133,14 +112,14 @@ export default function StepsGuide() {
   }
 
   return (
-    <section id="passos" className="bg-slate-50 px-6 py-16 lg:px-8 lg:py-24">
+    <section id="passos" className="bg-slate-50 px-6 py-16 lg:px-8 lg:py-24 dark:bg-[#0a1628]">
       <div className="mx-auto max-w-7xl">
         <Reveal className="text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl dark:text-white">
             Siga cada etapa com atenção
           </h2>
-          <p className="mt-3 text-base text-slate-600">
-            Cinco passos simples para começar a usar o MindSpeak.
+          <p className="mt-3 text-base text-slate-600 dark:text-slate-300">
+            Três passos simples para conectar o sensor.
           </p>
         </Reveal>
 
@@ -156,10 +135,10 @@ export default function StepsGuide() {
                   type="button"
                   onClick={() => setActiveStep(index)}
                   aria-current={isActive ? 'step' : undefined}
-                  className={`flex w-full items-center gap-4 rounded-2xl border bg-white p-4 text-left transition-all ${
+                  className={`flex w-full items-center gap-4 rounded-2xl border bg-white p-4 text-left transition-all dark:bg-[#111827] ${
                     isActive
-                      ? 'border-teal-500/40 shadow-md shadow-teal-500/5'
-                      : 'border-slate-100 hover:border-slate-200 hover:shadow-sm'
+                      ? 'border-teal-500/40 shadow-md shadow-teal-500/5 dark:border-teal-500/40'
+                      : 'border-slate-100 hover:border-slate-200 hover:shadow-sm dark:border-slate-800 dark:hover:border-slate-700'
                   }`}
                 >
                   <span
@@ -168,10 +147,10 @@ export default function StepsGuide() {
                     <StepIcon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">
                       {step.label}
                     </p>
-                    <p className="mt-0.5 font-display text-sm font-semibold text-navy-900 sm:text-base">
+                    <p className="mt-0.5 font-display text-sm font-semibold text-navy-900 sm:text-base dark:text-white">
                       {step.title}
                     </p>
                   </div>
@@ -183,15 +162,15 @@ export default function StepsGuide() {
             })}
           </nav>
 
-          <article className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+          <article className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-[#111827]">
             <span
-              className="pointer-events-none absolute right-6 top-4 font-display text-7xl font-bold text-rose-200/80 sm:text-8xl"
+              className="pointer-events-none absolute right-6 top-4 font-display text-7xl font-bold text-rose-200/80 sm:text-8xl dark:text-rose-500/10"
               aria-hidden="true"
             >
               {String(current.id).padStart(2, '0')}
             </span>
 
-            <div className="border-b border-slate-50 bg-gradient-to-b from-teal-500/5 to-transparent px-6 py-8 sm:px-10">
+            <div className="border-b border-slate-50 bg-gradient-to-b from-teal-500/5 to-transparent px-6 py-8 sm:px-10 dark:border-slate-800">
               <StepIllustration />
             </div>
 
@@ -202,12 +181,12 @@ export default function StepsGuide() {
                 >
                   <Icon className="h-5 w-5" strokeWidth={1.75} />
                 </span>
-                <h3 className="font-display text-xl font-bold text-navy-900 sm:text-2xl">
+                <h3 className="font-display text-xl font-bold text-navy-900 sm:text-2xl dark:text-white">
                   {current.title}
                 </h3>
               </div>
 
-              <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-600">
+              <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-600 dark:text-slate-300">
                 {current.description}
               </p>
 
@@ -227,18 +206,18 @@ export default function StepsGuide() {
                     className={`h-1.5 rounded-full transition-all ${
                       index === activeStep
                         ? 'w-8 bg-teal-500'
-                        : 'w-1.5 bg-slate-200 hover:bg-slate-300'
+                        : 'w-1.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600'
                     }`}
                   />
                 ))}
               </div>
 
-              <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6">
+              <div className="mt-8 flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => goTo(activeStep - 1)}
                   disabled={activeStep === 0}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-navy-900 disabled:pointer-events-none disabled:opacity-40"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 transition-colors hover:text-navy-900 disabled:pointer-events-none disabled:opacity-40 dark:text-slate-400 dark:hover:text-white"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Anterior
@@ -257,7 +236,7 @@ export default function StepsGuide() {
           </article>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-5 sm:gap-4">
+        <div className="mt-10 grid grid-cols-3 gap-3 sm:gap-4">
           {steps.map((step, index) => {
             const StepIcon = step.icon
             return (
@@ -265,10 +244,10 @@ export default function StepsGuide() {
                 <button
                   type="button"
                   onClick={() => setActiveStep(index)}
-                  className={`flex w-full flex-col items-center gap-2 rounded-xl border bg-white px-3 py-4 transition-all ${
+                  className={`flex w-full flex-col items-center gap-2 rounded-xl border bg-white px-3 py-4 transition-all dark:bg-[#111827] ${
                     index === activeStep
-                      ? 'border-teal-500/30 shadow-sm'
-                      : 'border-slate-100 hover:border-slate-200'
+                      ? 'border-teal-500/30 shadow-sm dark:border-teal-500/40'
+                      : 'border-slate-100 hover:border-slate-200 dark:border-slate-800 dark:hover:border-slate-700'
                   }`}
                 >
                   <span
@@ -276,7 +255,7 @@ export default function StepsGuide() {
                   >
                     <StepIcon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
-                  <span className="text-xs font-medium text-slate-700">
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
                     {step.shortLabel}
                   </span>
                 </button>

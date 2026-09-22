@@ -6,6 +6,7 @@ import {
   Pause,
   Play,
   Radio,
+  SkipForward,
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
@@ -14,6 +15,7 @@ import { getPhraseVisual } from './patientPhraseIcons'
 import { getPatientSession } from '../../lib/patientSession'
 import { getPatientPreferences } from '../../lib/patientPreferences'
 import { isSpeechSupported, listVoices, primeSpeech, speakTextAI } from '../../lib/speech'
+import { skipToNextWord } from '../../lib/backendApi'
 import { incrementTodaySelectionCount } from '../../lib/patientStats'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button } from '../../components/shared/Button'
@@ -69,6 +71,7 @@ export function PatientCommunicatePage() {
   const [flashCardIndex, setFlashCardIndex] = useState<number | null>(null)
   const [barFlash, setBarFlash] = useState(false)
   const [liveStarted, setLiveStarted] = useState(false)
+  const [skipping, setSkipping] = useState(false)
 
   const attentionRef = useRef(45)
   const lockMsRef = useRef(0)
@@ -259,6 +262,21 @@ export function PatientCommunicatePage() {
     setLiveStarted(true)
   }
 
+  // Atalho de operador/teste (ensaio antes de apresentação): avança a
+  // varredura na hora, sem esperar o timer. Não substitui o controle real
+  // — o motor de decisão continua rodando 100% pelo sinal do sensor; isto
+  // só pula o destaque adiante, do jeito que o timer faria sozinho depois.
+  const skipWord = () => {
+    if (!live.sessionDbId || skipping) return
+    setSkipping(true)
+    skipToNextWord(live.sessionDbId)
+      .catch(() => {
+        // falha de rede pontual — o timer automático ainda cobre a
+        // varredura, não precisa travar a tela por causa disto.
+      })
+      .finally(() => setSkipping(false))
+  }
+
   const attClamped = isLive
     ? Math.min(100, Math.max(0, Math.round(live.focusLevel)))
     : Math.min(100, Math.max(0, attention))
@@ -437,7 +455,20 @@ export function PatientCommunicatePage() {
                 Iniciar sessão ao vivo
               </Button>
             ) : (
-              <p className="text-xs text-slate-300">{liveStatusLabel[live.status]}</p>
+              <>
+                <p className="text-xs text-slate-300">{liveStatusLabel[live.status]}</p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  icon={<SkipForward className="h-4 w-4" aria-hidden />}
+                  onClick={skipWord}
+                  disabled={!live.sessionDbId || skipping}
+                  title="Adianta a varredura pra próxima palavra sem esperar o timer — atalho de teste, não substitui o controle por foco"
+                >
+                  Próxima palavra
+                </Button>
+              </>
             )}
           </>
         ) : (

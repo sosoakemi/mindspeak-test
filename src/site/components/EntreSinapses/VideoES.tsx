@@ -1,6 +1,6 @@
 // Video section: "Veja em ação"
-import { Play } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Loader2, Play } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Reveal } from '../Reveal'
 
 const videoSrc = '/video/video-entresinapses.mp4'
@@ -10,7 +10,15 @@ const videoPoster = '/images/game.img.home.png'
 
 export default function VideoES() {
   const [playing, setPlaying] = useState(false)
+  const [buffering, setBuffering] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  // Começa a baixar o vídeo assim que a seção existe, não só no clique —
+  // sem isso o navegador só busca os 5MB depois do play(), e a espera
+  // parecia trava/delay em vez de carregamento.
+  useEffect(() => {
+    videoRef.current?.load()
+  }, [])
 
   const play = () => {
     setPlaying(true)
@@ -21,14 +29,14 @@ export default function VideoES() {
   }
 
   return (
-    <section id="videos" className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28">
+    <section id="videos" className="bg-slate-50 px-6 py-20 lg:px-8 lg:py-28 dark:bg-[#0a1628]">
       <div className="mx-auto max-w-4xl">
         {/* Section header */}
         <Reveal className="text-center mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-500 mb-2">
             Gameplay
           </p>
-          <h2 className="font-display text-3xl font-black tracking-tight text-navy-900 sm:text-4xl">
+          <h2 className="font-display text-3xl font-black tracking-tight text-navy-900 sm:text-4xl dark:text-white">
             Veja em ação
           </h2>
         </Reveal>
@@ -41,8 +49,17 @@ export default function VideoES() {
             poster={videoPoster}
             controls={playing}
             playsInline
+            preload="auto"
+            onWaiting={() => setBuffering(true)}
+            onPlaying={() => setBuffering(false)}
             className="absolute inset-0 h-full w-full object-cover"
           />
+
+          {buffering && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-navy-900/40">
+              <Loader2 className="h-10 w-10 animate-spin text-white" aria-label="Carregando vídeo" />
+            </div>
+          )}
 
           {!playing && (
             <button
