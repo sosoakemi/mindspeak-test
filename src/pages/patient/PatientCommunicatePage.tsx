@@ -6,6 +6,7 @@ import {
   Pause,
   Play,
   Radio,
+  ShieldAlert,
   SkipForward,
   X,
 } from 'lucide-react'
@@ -29,6 +30,20 @@ const OVERLAY_MS = 2000
 const FLASH_CARD_MS = 1000
 const FLASH_BAR_MS = 1000
 const FORCE_FOCUS_MS = 3000
+
+// --- Modo contingência (fallback) ------------------------------------
+// Plano B pra quando o sinal do sensor não está dando pra confirmar nada
+// (eletrodo ruim, bateria, sensor caiu) — NUNCA deve parecer uma seleção
+// real do BCI. Por isso o overlay abaixo é visualmente diferente da
+// confirmação normal (âmbar + rótulo explícito "Modo contingência") e
+// isto nunca grava nada no histórico da sessão no backend: é 100% local,
+// não finge que o sensor escolheu a palavra.
+const FALLBACK_WORDS = ['Sim', 'Não', 'Ajuda'] as const
+const FALLBACK_TRIGGER_KEY = 'a'
+const FALLBACK_HISTORY_MS = 8000
+const FALLBACK_COOLDOWN_MS = 4000
+
+type FocusSample = { word: string; focus: number; ts: number }
 
 function rand(min: number, max: number) {
   return min + Math.random() * (max - min)
@@ -72,6 +87,7 @@ export function PatientCommunicatePage() {
   const [barFlash, setBarFlash] = useState(false)
   const [liveStarted, setLiveStarted] = useState(false)
   const [skipping, setSkipping] = useState(false)
+  const [fallbackWord, setFallbackWord] = useState<string | null>(null)
 
   const attentionRef = useRef(45)
   const lockMsRef = useRef(0)
@@ -85,6 +101,8 @@ export function PatientCommunicatePage() {
   const scanIndexRef = useRef(scanIndex)
   const scanPausedRef = useRef(scanPaused)
   const overlayBlockRef = useRef(false)
+  const focusHistoryRef = useRef<FocusSample[]>([])
+  const fallbackCooldownUntilRef = useRef(0)
   phrasesRef.current = phrases
   scanIndexRef.current = scanIndex
   scanPausedRef.current = scanPaused
@@ -277,6 +295,69 @@ export function PatientCommunicatePage() {
       .finally(() => setSkipping(false))
   }
 
+  // Acumula leituras recentes de foco por palavra (sessão ao vivo) pra
+  // decisão de contingência ter contexto real pra escolher, em vez de
+  // sortear — não precisa ter concluído confirmação nenhuma, só pega o
+  // nível de foco de cada janela do motor.
+  useEffect(() => {
+    if (!isLive || !live.candidateWord) return
+    const now = performance.now()
+    focusHistoryRef.current.push({
+      word: live.candidateWord,
+      focus: live.focusLevel,
+      ts: now,
+    })
+    const cutoff = now - FALLBACK_HISTORY_MS
+    focusHistoryRef.current = focusHistoryRef.current.filter((s) => s.ts >= cutoff)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLive, live.candidateWord, live.focusLevel])
+
+  // Modo contingência: escolhe, entre as 3 palavras de emergência, a que
+  // teve o foco médio mais alto nas últimas leituras — aproveita sinal
+  // "quase lá" que o motor normal (que exige confirmação completa) teria
+  // descartado. Sem leitura nenhuma pra nenhuma das 3 (sinal caiu de vez),
+  // cai pra 1ª da lista como último recurso — mas SEMPRE marcado na tela
+  // como escolha manual, nunca como seleção do sensor.
+  const triggerFallback = useCallback(() => {
+    const now = performance.now()
+    if (now < fallbackCooldownUntilRef.current) return
+    if (overlayBlockRef.current || fallbackWord) return
+    fallbackCooldownUntilRef.current = now + FALLBACK_COOLDOWN_MS
+
+    const cutoff = now - FALLBACK_HISTORY_MS
+    const recent = focusHistoryRef.current.filter((s) => s.ts >= cutoff)
+
+    let chosen: string = FALLBACK_WORDS[0]
+    let bestAvg = -Infinity
+    for (const word of FALLBACK_WORDS) {
+      const samples = recent.filter((s) => s.word === word)
+      if (samples.length === 0) continue
+      const avg = samples.reduce((sum, s) => sum + s.focus, 0) / samples.length
+      if (avg > bestAvg) {
+        bestAvg = avg
+        chosen = word
+      }
+    }
+
+    speakPhrase(chosen)
+    setFallbackWord(chosen)
+    window.setTimeout(() => setFallbackWord(null), OVERLAY_MS)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fallbackWord])
+
+  // Atalho de teclado como gatilho — só isso. O acionamento sempre aparece
+  // marcado na tela (overlay âmbar "Modo contingência" abaixo), nunca
+  // escondido: é um plano B assumido, não uma simulação do sensor.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.repeat) return
+      if (e.key.toLowerCase() !== FALLBACK_TRIGGER_KEY) return
+      triggerFallback()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [triggerFallback])
+
   const attClamped = isLive
     ? Math.min(100, Math.max(0, Math.round(live.focusLevel)))
     : Math.min(100, Math.max(0, attention))
@@ -430,6 +511,25 @@ export function PatientCommunicatePage() {
             <CheckCircle2 className="h-20 w-20 text-emerald-400 sm:h-24 sm:w-24" aria-hidden />
             <p className="max-w-full text-balance px-2 text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
               {overlayPhrase}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {fallbackWord ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-[2px]"
+          role="alertdialog"
+          aria-live="assertive"
+          aria-label="Modo contingência"
+        >
+          <div className="flex max-w-[95vw] flex-col items-center gap-4 text-center">
+            <ShieldAlert className="h-20 w-20 text-amber-400 sm:h-24 sm:w-24" aria-hidden />
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+              Modo contingência — escolha manual
+            </p>
+            <p className="max-w-full text-balance px-2 text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+              {fallbackWord}
             </p>
           </div>
         </div>
