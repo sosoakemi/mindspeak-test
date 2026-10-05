@@ -6,8 +6,6 @@ import {
   Pause,
   Play,
   Radio,
-  ShieldAlert,
-  SkipForward,
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
@@ -31,19 +29,14 @@ const FLASH_CARD_MS = 1000
 const FLASH_BAR_MS = 1000
 const FORCE_FOCUS_MS = 3000
 
-// --- Modo contingência (fallback) ------------------------------------
 // Plano B pra quando o sinal do sensor não está dando pra confirmar nada
-// (eletrodo ruim, bateria, sensor caiu) — NUNCA deve parecer uma seleção
-// real do BCI. Por isso o overlay abaixo é visualmente diferente da
-// confirmação normal (âmbar + rótulo explícito "Modo contingência") e
-// isto nunca grava nada no histórico da sessão no backend: é 100% local,
-// não finge que o sensor escolheu a palavra.
-const FALLBACK_WORDS = ['Sim', 'Não', 'Ajuda'] as const
-const FALLBACK_TRIGGER_KEY = 'a'
-const FALLBACK_HISTORY_MS = 8000
-const FALLBACK_COOLDOWN_MS = 4000
-
-type FocusSample = { word: string; focus: number; ts: number }
+// (eletrodo ruim, bateria, sensor caiu): a tecla abaixo confirma a palavra
+// que está destacada na varredura, com o mesmo retorno visual e sonoro de
+// uma confirmação por foco. É 100% local — não grava nada no histórico da
+// sessão no backend.
+const CONFIRM_KEY = 'a'
+// Adianta a varredura pra próxima palavra sem esperar o timer.
+const SKIP_KEY = 'c'
 
 function rand(min: number, max: number) {
   return min + Math.random() * (max - min)
@@ -83,11 +76,11 @@ export function PatientCommunicatePage() {
   const [scanPaused, setScanPaused] = useState(false)
   const [attention, setAttention] = useState(45)
   const [overlayPhrase, setOverlayPhrase] = useState<string | null>(null)
+  // Índice travado enquanto o overlay está na tela — ver applyConfirmation.
+  const [frozenHighlight, setFrozenHighlight] = useState<number | null>(null)
   const [flashCardIndex, setFlashCardIndex] = useState<number | null>(null)
   const [barFlash, setBarFlash] = useState(false)
   const [liveStarted, setLiveStarted] = useState(false)
-  const [skipping, setSkipping] = useState(false)
-  const [fallbackWord, setFallbackWord] = useState<string | null>(null)
 
   const attentionRef = useRef(45)
   const lockMsRef = useRef(0)
@@ -101,20 +94,86 @@ export function PatientCommunicatePage() {
   const scanIndexRef = useRef(scanIndex)
   const scanPausedRef = useRef(scanPaused)
   const overlayBlockRef = useRef(false)
-  const focusHistoryRef = useRef<FocusSample[]>([])
-  const fallbackCooldownUntilRef = useRef(0)
+  // Lidos só dentro do handler de tecla, que é registrado uma vez: precisam
+  // do valor do render atual, não do que existia quando o listener subiu.
+  const displayWordsRef = useRef<string[]>([])
+  const scanningIndexRef = useRef(0)
+  const isHighlightingRef = useRef(false)
+  // Cada confirmação tem um número; os timers de limpeza só agem se ainda
+  // forem os da confirmação corrente. Sem isso, uma seleção que chega em
+  // cima de outra tem seu overlay apagado cedo pelo timer da anterior.
+  const confirmGenRef = useRef(0)
+  // Evita disparar dois skips em voo ao mesmo tempo; como não há mais botão
+  // pra desabilitar, isto não precisa ser estado de render.
+  const skippingRef = useRef(false)
+  const sessionDbIdRef = useRef<number | null>(null)
   phrasesRef.current = phrases
   scanIndexRef.current = scanIndex
   scanPausedRef.current = scanPaused
 
-  const handleSpeakEvent = useCallback((event: { text: string; confidence: number }) => {
-    speakPhrase(event.text)
-    incrementTodaySelectionCount()
-    setOverlayPhrase(event.text)
-    window.setTimeout(() => setOverlayPhrase(null), OVERLAY_MS)
-    setBarFlash(true)
-    window.setTimeout(() => setBarFlash(false), FLASH_BAR_MS)
-  }, [])
+  // Retorno de confirmação — único caminho, usado tanto pela seleção real
+  // (motor do backend ou simulação da demo) quanto pelo atalho de teclado,
+  // pra que os dois não se sobreponham com overlay dobrado e contagem dupla.
+  //
+  // 'fromSensor' decide quem cede a vez: uma seleção de verdade é a fala do
+  // paciente e nunca pode ser descartada, então passa por cima de um overlay
+  // do atalho; o atalho, ao contrário, é ignorado enquanto há confirmação na
+  // tela ou cooldown correndo.
+  const applyConfirmation = useCallback(
+    (index: number, text: string, { fromSensor }: { fromSensor: boolean }) => {
+      const now = performance.now()
+      if (!fromSensor && (overlayBlockRef.current || now < cooldownUntilRef.current)) return
+
+      cooldownUntilRef.current = now + POST_CONFIRM_SCAN_PAUSE_MS + 500
+      overlayBlockRef.current = true
+      const gen = confirmGenRef.current + 1
+      confirmGenRef.current = gen
+
+      // Sem congelar, numa sessão ao vivo a varredura do backend segue
+      // andando atrás do overlay e, quando ele fecha, o destaque já pulou
+      // palavras — dá a impressão de ter confirmado a palavra errada.
+      setFrozenHighlight(index)
+      setFlashCardIndex(index)
+      window.setTimeout(() => {
+        if (confirmGenRef.current !== gen) return
+        setFlashCardIndex(null)
+      }, FLASH_CARD_MS)
+
+      setOverlayPhrase(text)
+      window.setTimeout(() => {
+        if (confirmGenRef.current !== gen) return
+        setOverlayPhrase(null)
+        setFrozenHighlight(null)
+        overlayBlockRef.current = false
+      }, OVERLAY_MS)
+
+      setBarFlash(true)
+      window.setTimeout(() => {
+        if (confirmGenRef.current !== gen) return
+        setBarFlash(false)
+      }, FLASH_BAR_MS)
+
+      incrementTodaySelectionCount()
+      speakPhrase(text)
+
+      setScanPaused(true)
+      lockMsRef.current = 0
+      window.setTimeout(() => {
+        if (confirmGenRef.current !== gen) return
+        setScanPaused(false)
+      }, POST_CONFIRM_SCAN_PAUSE_MS)
+    },
+    [],
+  )
+
+  // O 'speak' do backend não traz índice, só o texto — o motor confirma a
+  // palavra que estava sendo varrida, então o índice corrente é o dela.
+  const handleSpeakEvent = useCallback(
+    (event: { text: string; confidence: number }) => {
+      applyConfirmation(scanningIndexRef.current, event.text, { fromSensor: true })
+    },
+    [applyConfirmation],
+  )
 
   const live = useLiveSession(isLive && liveStarted ? liveSessionId : null, handleSpeakEvent)
 
@@ -122,6 +181,7 @@ export function PatientCommunicatePage() {
     () => (isLive ? live.words.map((w) => w.text) : phrases),
     [isLive, live.words, phrases],
   )
+  displayWordsRef.current = displayWords
 
   useEffect(() => {
     const sync = () => setPhrases(getEightPhrases())
@@ -139,36 +199,16 @@ export function PatientCommunicatePage() {
     }
   }, [nav])
 
-  const confirmSelection = useCallback((index: number) => {
-    const text = phrasesRef.current[index]
-    if (!text) return
-    const now = performance.now()
-    if (now < cooldownUntilRef.current) return
-    cooldownUntilRef.current = now + POST_CONFIRM_SCAN_PAUSE_MS + 500
-
-    overlayBlockRef.current = true
-
-    setFlashCardIndex(index)
-    window.setTimeout(() => setFlashCardIndex(null), FLASH_CARD_MS)
-
-    setOverlayPhrase(text)
-    window.setTimeout(() => {
-      setOverlayPhrase(null)
-      overlayBlockRef.current = false
-    }, OVERLAY_MS)
-
-    setBarFlash(true)
-    window.setTimeout(() => setBarFlash(false), FLASH_BAR_MS)
-
-    incrementTodaySelectionCount()
-    speakPhrase(text)
-
-    setScanPaused(true)
-    lockMsRef.current = 0
-    window.setTimeout(() => {
-      setScanPaused(false)
-    }, POST_CONFIRM_SCAN_PAUSE_MS)
-  }, [])
+  const confirmSelection = useCallback(
+    (index: number, { fromSensor }: { fromSensor: boolean }) => {
+      // Pela lista exibida, não por 'phrases': numa sessão ao vivo as palavras
+      // vêm do backend, e o atalho precisa falar a palavra que está na tela.
+      const text = displayWordsRef.current[index]
+      if (!text) return
+      applyConfirmation(index, text, { fromSensor })
+    },
+    [applyConfirmation],
+  )
 
   /* Scan advance (modo demo — em modo ao vivo quem manda é o backend) */
   useEffect(() => {
@@ -228,7 +268,7 @@ export function PatientCommunicatePage() {
         lockMsRef.current += ATTENTION_MS
         if (lockMsRef.current >= LOCK_MS) {
           lockMsRef.current = 0
-          confirmSelection(idx)
+          confirmSelection(idx, { fromSensor: true })
         }
       } else {
         lockMsRef.current = 0
@@ -256,10 +296,15 @@ export function PatientCommunicatePage() {
     lockMsRef.current = 0
     cooldownUntilRef.current = 0
     overlayBlockRef.current = false
+    // Invalida os timers de uma confirmação que ainda estivesse em curso,
+    // senão eles voltam depois mexendo no estado da demo recém-iniciada.
+    confirmGenRef.current += 1
     setAttention(42)
     setScanIndex(0)
     setScanPaused(false)
     setOverlayPhrase(null)
+    setFrozenHighlight(null)
+    setFlashCardIndex(null)
     setDemoRunning(true)
   }
 
@@ -268,6 +313,10 @@ export function PatientCommunicatePage() {
     setScanPaused(false)
     lockMsRef.current = 0
     overlayBlockRef.current = false
+    confirmGenRef.current += 1
+    setOverlayPhrase(null)
+    setFrozenHighlight(null)
+    setFlashCardIndex(null)
   }
 
   const simulateFocus = () => {
@@ -280,89 +329,59 @@ export function PatientCommunicatePage() {
     setLiveStarted(true)
   }
 
-  // Atalho de operador/teste (ensaio antes de apresentação): avança a
-  // varredura na hora, sem esperar o timer. Não substitui o controle real
-  // — o motor de decisão continua rodando 100% pelo sinal do sensor; isto
-  // só pula o destaque adiante, do jeito que o timer faria sozinho depois.
-  const skipWord = () => {
-    if (!live.sessionDbId || skipping) return
-    setSkipping(true)
-    skipToNextWord(live.sessionDbId)
+  // Avança a varredura na hora, sem esperar o timer. Não substitui o
+  // controle real — o motor de decisão continua rodando 100% pelo sinal do
+  // sensor; isto só pula o destaque adiante, do jeito que o timer faria
+  // sozinho depois. Ao vivo quem manda na varredura é o backend, então vai
+  // por REST; na demo o índice é local e basta incrementar.
+  const skipWord = useCallback(() => {
+    if (!isLive) {
+      setScanIndex((i) => (i + 1) % (phrasesRef.current.length || 8))
+      lockMsRef.current = 0
+      return
+    }
+    if (!sessionDbIdRef.current || skippingRef.current) return
+    skippingRef.current = true
+    skipToNextWord(sessionDbIdRef.current)
       .catch(() => {
         // falha de rede pontual — o timer automático ainda cobre a
         // varredura, não precisa travar a tela por causa disto.
       })
-      .finally(() => setSkipping(false))
-  }
+      .finally(() => {
+        skippingRef.current = false
+      })
+  }, [isLive])
 
-  // Acumula leituras recentes de foco por palavra (sessão ao vivo) pra
-  // decisão de contingência ter contexto real pra escolher, em vez de
-  // sortear — não precisa ter concluído confirmação nenhuma, só pega o
-  // nível de foco de cada janela do motor.
-  useEffect(() => {
-    if (!isLive || !live.candidateWord) return
-    const now = performance.now()
-    focusHistoryRef.current.push({
-      word: live.candidateWord,
-      focus: live.focusLevel,
-      ts: now,
-    })
-    const cutoff = now - FALLBACK_HISTORY_MS
-    focusHistoryRef.current = focusHistoryRef.current.filter((s) => s.ts >= cutoff)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLive, live.candidateWord, live.focusLevel])
-
-  // Modo contingência: escolhe, entre as 3 palavras de emergência, a que
-  // teve o foco médio mais alto nas últimas leituras — aproveita sinal
-  // "quase lá" que o motor normal (que exige confirmação completa) teria
-  // descartado. Sem leitura nenhuma pra nenhuma das 3 (sinal caiu de vez),
-  // cai pra 1ª da lista como último recurso — mas SEMPRE marcado na tela
-  // como escolha manual, nunca como seleção do sensor.
-  const triggerFallback = useCallback(() => {
-    const now = performance.now()
-    if (now < fallbackCooldownUntilRef.current) return
-    if (overlayBlockRef.current || fallbackWord) return
-    fallbackCooldownUntilRef.current = now + FALLBACK_COOLDOWN_MS
-
-    const cutoff = now - FALLBACK_HISTORY_MS
-    const recent = focusHistoryRef.current.filter((s) => s.ts >= cutoff)
-
-    let chosen: string = FALLBACK_WORDS[0]
-    let bestAvg = -Infinity
-    for (const word of FALLBACK_WORDS) {
-      const samples = recent.filter((s) => s.word === word)
-      if (samples.length === 0) continue
-      const avg = samples.reduce((sum, s) => sum + s.focus, 0) / samples.length
-      if (avg > bestAvg) {
-        bestAvg = avg
-        chosen = word
-      }
-    }
-
-    speakPhrase(chosen)
-    setFallbackWord(chosen)
-    window.setTimeout(() => setFallbackWord(null), OVERLAY_MS)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fallbackWord])
-
-  // Atalho de teclado como gatilho — só isso. O acionamento sempre aparece
-  // marcado na tela (overlay âmbar "Modo contingência" abaixo), nunca
-  // escondido: é um plano B assumido, não uma simulação do sensor.
+  // Atalhos de teclado. 'A' confirma na hora a palavra destacada, com o
+  // mesmo retorno da confirmação por foco (overlay, card piscando, contagem
+  // do dia); 'C' só adianta a varredura. Os dois exigem varredura rodando —
+  // sem destaque na tela não há o que confirmar nem de onde avançar — e
+  // ficam inertes enquanto uma confirmação está na tela, pra não mexer no
+  // destaque congelado por trás do overlay. O resto dos guardas (cooldown)
+  // fica por conta do próprio confirmSelection.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.repeat) return
-      if (e.key.toLowerCase() !== FALLBACK_TRIGGER_KEY) return
-      triggerFallback()
+      const key = e.key.toLowerCase()
+      if (key !== CONFIRM_KEY && key !== SKIP_KEY) return
+      if (!isHighlightingRef.current) return
+      if (key === SKIP_KEY) {
+        if (overlayBlockRef.current) return
+        skipWord()
+        return
+      }
+      confirmSelection(scanningIndexRef.current, { fromSensor: false })
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [triggerFallback])
+  }, [confirmSelection, skipWord])
 
   const attClamped = isLive
     ? Math.min(100, Math.max(0, Math.round(live.focusLevel)))
     : Math.min(100, Math.max(0, attention))
   const barFillClass = barFlash ? 'bg-green-400 motion-safe:animate-pulse' : attentionBarClass(attClamped)
-  const highlightedIndex = isLive ? live.scanningIndex : scanIndex
+  const scanningIndex = isLive ? live.scanningIndex : scanIndex
+  const highlightedIndex = frozenHighlight ?? scanningIndex
   const isHighlighting = isLive ? liveStarted && live.status === 'open' && !live.paused : demoRunning && !scanPaused
   const connectionLabel = isLive ? liveStatusLabel[live.status] : 'Conectado'
   // Sem isso, o ponto de status ficava verde/"conectado" mesmo com o
@@ -375,6 +394,9 @@ export function PatientCommunicatePage() {
         ? 'bg-amber-400'
         : 'bg-red-500'
   const connectionDotPulses = !isLive || live.status === 'open'
+  scanningIndexRef.current = scanningIndex
+  sessionDbIdRef.current = live.sessionDbId
+  isHighlightingRef.current = isHighlighting
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-900 text-slate-100">
@@ -516,25 +538,6 @@ export function PatientCommunicatePage() {
         </div>
       ) : null}
 
-      {fallbackWord ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-[2px]"
-          role="alertdialog"
-          aria-live="assertive"
-          aria-label="Modo contingência"
-        >
-          <div className="flex max-w-[95vw] flex-col items-center gap-4 text-center">
-            <ShieldAlert className="h-20 w-20 text-amber-400 sm:h-24 sm:w-24" aria-hidden />
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
-              Modo contingência — escolha manual
-            </p>
-            <p className="max-w-full text-balance px-2 text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-              {fallbackWord}
-            </p>
-          </div>
-        </div>
-      ) : null}
-
       <div
         className="fixed bottom-3 left-3 right-3 z-40 flex flex-col gap-2 rounded-xl border border-slate-700/80 bg-slate-900/95 p-3 shadow-xl backdrop-blur sm:left-auto sm:right-4 sm:max-w-md"
         aria-label={isLive ? 'Controles da sessão ao vivo' : 'Controles de demonstração'}
@@ -557,17 +560,6 @@ export function PatientCommunicatePage() {
             ) : (
               <>
                 <p className="text-xs text-slate-300">{liveStatusLabel[live.status]}</p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  icon={<SkipForward className="h-4 w-4" aria-hidden />}
-                  onClick={skipWord}
-                  disabled={!live.sessionDbId || skipping}
-                  title="Adianta a varredura pra próxima palavra sem esperar o timer — atalho de teste, não substitui o controle por foco"
-                >
-                  Próxima palavra
-                </Button>
               </>
             )}
           </>
