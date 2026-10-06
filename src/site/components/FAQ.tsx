@@ -4,9 +4,9 @@ import { formattedTotalCost } from '../data/hardware'
 import { Reveal } from './Reveal'
 
 // Respostas honestas sobre o que o protótipo faz e não faz — nada de
-// prometer diagnóstico/uso clínico (ver CLAUDE.md: "não é equipamento
-// médico") nem "leitura de mente" (é foco sustentado + piscada, calibrados
-// por pessoa).
+// prometer diagnóstico/uso clínico (ver a documentação do projeto: "não é
+// equipamento médico") nem "leitura de mente" (é foco sustentado +
+// piscada, calibrados por pessoa).
 const faqItems = [
   {
     question: 'O MindSpeak é um dispositivo médico?',

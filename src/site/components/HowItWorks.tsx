@@ -2,9 +2,10 @@ import { ArrowRight, Brain, Cpu, Radio, Volume2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Reveal } from './Reveal'
 
-// Passo a passo real da arquitetura (ver CLAUDE.md seção 2) — nada de
-// "leitura de mente": o sensor capta atenção/piscada, o backend decide com
-// um modelo calibrado por paciente, e quem fala é o iPad (Web Speech API).
+// Passo a passo real da arquitetura (ver a documentação do projeto, seção 2)
+// — nada de "leitura de mente": o sensor capta atenção/piscada, o backend
+// decide com um modelo calibrado por paciente, e quem fala é o iPad (Web
+// Speech API).
 const steps = [
   {
     icon: Radio,

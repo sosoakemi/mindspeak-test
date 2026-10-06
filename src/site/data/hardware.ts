@@ -9,8 +9,9 @@ export interface ComponentItem {
 // Lista de hardware alinhada com a arquitetura atual (PC lê o TGAM direto por
 // serial; a fala sai no iPad via Web Speech API). Os itens do plano antigo
 // com ESP32/DFPlayer/SD/protoboard/eletrodos descartáveis foram retirados —
-// ver seção 2 do CLAUDE.md. Centralizado aqui pra /produto e a Home usarem o
-// mesmo custo, em vez de números fixos divergentes em cada lugar.
+// ver seção 2 da documentação do projeto. Centralizado aqui pra /produto e a
+// Home usarem o mesmo custo, em vez de números fixos divergentes em cada
+// lugar.
 export const componentsList: ComponentItem[] = [
   {
     id: 'tgam',

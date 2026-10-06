@@ -2,8 +2,9 @@
  * Um único build precisa servir dois cenários bem diferentes:
  *
  * 1) Sessão real (clínica/casa): PC com o sensor + backend local, iPad na
- *    mesma rede WiFi (ver CLAUDE.md). Aberto por localhost ou por um IP de
- *    rede local (192.168.x.x, 10.x.x.x, 172.16-31.x.x) ou hostname .local
+ *    mesma rede WiFi (ver a documentação do projeto). Aberto por localhost
+ *    ou por um IP de rede local (192.168.x.x, 10.x.x.x, 172.16-31.x.x) ou
+ *    hostname .local
  *    — o app assume que o backend está no mesmo host, na porta 8000.
  * 2) Demo pública (Vercel + backend hospedado à parte, ex. Render/Railway):
  *    aberto por um domínio público (ex. mindspeak-test.vercel.app) — não

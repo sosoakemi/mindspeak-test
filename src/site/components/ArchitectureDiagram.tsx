@@ -2,12 +2,13 @@ import { Brain, Smartphone, Usb, Wifi } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 /*
- * Diagrama da arquitetura real do MindSpeak (seção 2 do CLAUDE.md):
+ * Diagrama da arquitetura real do MindSpeak (seção 2 da documentação do
+ * projeto):
  * TGAM → UART → adaptador USB-TTL → USB → PC (FastAPI + DSP + IA)
  *   → WiFi/WebSocket → iPad (fala via Web Speech API)
  *
  * Substitui a imagem antiga do "diagrama explodido" (ESP32/DFPlayer/LiPo),
- * que não existe mais no projeto — ver seção 10 do CLAUDE.md.
+ * que não existe mais no projeto — ver seção 10 da documentação.
  */
 
 type NodeSpec = {

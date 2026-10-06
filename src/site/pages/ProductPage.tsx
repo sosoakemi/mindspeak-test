@@ -21,7 +21,7 @@ import { componentsList, totalComponentsCost, formattedTotalCost } from '../data
 
 // Specs alinhadas com a arquitetura atual: o PC lê o TGAM direto pela porta
 // serial (pyserial) e processa tudo em Python; a fala sai no iPad via Web
-// Speech API. Sem ESP32/DFPlayer/Bluetooth — ver seção 2 do CLAUDE.md.
+// Speech API. Sem ESP32/DFPlayer/Bluetooth — ver seção 2 da documentação.
 const systemSpecs = [
   {
     icon: Cpu,
