@@ -150,6 +150,13 @@ export function getSessionSelections(
   return getJson(`/sessions/${sessionId}/selections`)
 }
 
+// Encerra a sessão: marca como concluída no banco e libera o motor de
+// decisão da memória do servidor. Sem isto a sessão fica 'active' pra
+// sempre e o motor nunca sai do dicionário em memória do backend.
+export function endSession(sessionId: number): Promise<BackendSession> {
+  return postJson(`/sessions/${sessionId}/end`, {}, true)
+}
+
 // Atalho de operador/teste: avança a varredura na hora, sem esperar o
 // timer. Não substitui a decisão do motor — o paciente continua sendo
 // selecionado pelo sinal do sensor; isto só pula o destaque adiante.

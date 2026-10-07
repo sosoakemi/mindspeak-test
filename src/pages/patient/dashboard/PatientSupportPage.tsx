@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ChevronDown, Send } from 'lucide-react'
-import { Button } from '../../../components/shared/Button'
+import { ChevronDown, LifeBuoy } from 'lucide-react'
 import { getPatientSession } from '../../../lib/patientSession'
 import { usePatientSync } from '../../../hooks/usePatientSync'
-import { msCardPad, msInputBase, msInputBorder, msLabel } from '../../../lib/msStyles'
-import { cn } from '../../../lib/cn'
+import { msCardPad } from '../../../lib/msStyles'
 
 const FAQ = [
   {
@@ -25,58 +22,14 @@ const FAQ = [
   },
 ] as const
 
-type SupportStep = 'idle' | 'sending' | 'success' | 'error'
-
+// Esta página tinha um formulário de "solicitação de suporte" que não
+// enviava nada: esperava 1,6s, sorteava uma falha em 5% dos casos e dizia
+// "Sua mensagem foi registrada. A equipe clínica entrará em contato". Não
+// há canal de suporte no backend, então quem escrevesse ficaria esperando
+// um retorno que nunca viria. Trocado por orientação real: falar com o
+// profissional responsável, levando os dados do dispositivo logo abaixo.
 export function PatientSupportPage() {
   const { formatLastSync, sensorConnected } = usePatientSync()
-  const [supportOpen, setSupportOpen] = useState(false)
-  const [message, setMessage] = useState('')
-  const [step, setStep] = useState<SupportStep>('idle')
-  const [supportError, setSupportError] = useState<string | null>(null)
-  const dialogRef = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    const el = dialogRef.current
-    if (!el) return
-    if (supportOpen && !el.open) el.showModal()
-    if (!supportOpen && el.open) el.close()
-  }, [supportOpen])
-
-  const openSupport = () => {
-    setMessage('')
-    setStep('idle')
-    setSupportError(null)
-    setSupportOpen(true)
-  }
-
-  const closeSupport = () => {
-    setSupportOpen(false)
-  }
-
-  const onSubmitSupport = (e: FormEvent) => {
-    e.preventDefault()
-    const trimmed = message.trim()
-    if (!trimmed) {
-      setSupportError('Descreva brevemente o que precisa.')
-      return
-    }
-    if (trimmed.length < 10) {
-      setSupportError('Use pelo menos 10 caracteres para descrever o problema.')
-      return
-    }
-    setSupportError(null)
-    setStep('sending')
-    window.setTimeout(() => {
-      const fail = Math.random() < 0.05
-      if (fail) {
-        setStep('error')
-        setSupportError('Falha ao enviar. Verifique sua conexão e tente novamente.')
-        return
-      }
-      setStep('success')
-    }, 1600)
-  }
-
   const session = getPatientSession()
 
   return (
@@ -87,13 +40,24 @@ export function PatientSupportPage() {
       </div>
 
       <section className={msCardPad}>
-        <h2 className="text-lg font-semibold text-ms-primary">Precisa de ajuda?</h2>
-        <p className="mt-2 text-sm leading-relaxed text-ms-secondary">
-          Envie uma solicitação à equipe clínica. Resposta em até 24h (demonstração).
-        </p>
-        <Button type="button" variant="primary" className="mt-6" icon={<Send className="h-4 w-4" aria-hidden />} onClick={openSupport}>
-          Enviar solicitação de suporte
-        </Button>
+        <div className="flex items-start gap-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ms-subtle">
+            <LifeBuoy className="h-5 w-5 text-ms-accent" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-ms-primary">Precisa de ajuda?</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ms-secondary">
+              Fale com o profissional de saúde responsável pelo acompanhamento.
+              Ao descrever o problema, informe os dados do dispositivo que estão
+              no final desta página — eles ajudam a identificar a causa mais
+              rápido.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-ms-secondary">
+              Antes disso, vale conferir o FAQ abaixo: ele cobre as dúvidas mais
+              comuns, inclusive sensor que não conecta.
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className={msCardPad}>
@@ -139,67 +103,6 @@ export function PatientSupportPage() {
           </div>
         </dl>
       </section>
-
-      <dialog
-        ref={dialogRef}
-        className="ms-modal-panel max-h-[min(90dvh,28rem)] w-full overflow-y-auto backdrop:bg-black/50"
-        onClose={closeSupport}
-        onCancel={closeSupport}
-        aria-labelledby="support-dialog-title"
-      >
-        {step === 'success' ? (
-          <div className="text-center">
-            <h2 id="support-dialog-title" className="text-lg font-semibold text-ms-primary">
-              Solicitação enviada
-            </h2>
-            <p className="mt-3 text-sm text-ms-secondary">
-              Sua mensagem foi registrada. A equipe clínica entrará em contato em breve.
-            </p>
-            <Button type="button" variant="primary" fullWidth className="mt-6" onClick={closeSupport}>
-              Fechar
-            </Button>
-          </div>
-        ) : (
-          <>
-            <h2 id="support-dialog-title" className="text-lg font-semibold text-ms-primary">
-              Solicitação de suporte
-            </h2>
-            <p className="mt-2 text-sm text-ms-secondary">Descreva o que está acontecendo.</p>
-            <form className="mt-5 space-y-4" onSubmit={onSubmitSupport} noValidate>
-              <div>
-                <label htmlFor="support-message" className={msLabel}>
-                  Mensagem
-                </label>
-                <textarea
-                  id="support-message"
-                  value={message}
-                  onChange={(e) => {
-                    setMessage(e.target.value)
-                    if (supportError) setSupportError(null)
-                  }}
-                  rows={4}
-                  disabled={step === 'sending'}
-                  className={cn(msInputBase, msInputBorder, 'mt-2 resize-y')}
-                  placeholder="Ex.: O sensor não conecta após reiniciar o tablet…"
-                />
-                {supportError ? (
-                  <p className="mt-1.5 text-xs text-red-600" role="alert">
-                    {supportError}
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Button type="submit" variant="primary" fullWidth isLoading={step === 'sending'} icon={<Send className="h-4 w-4" aria-hidden />}>
-                  {step === 'sending' ? 'Enviando…' : 'Enviar'}
-                </Button>
-                <Button type="button" variant="secondary" fullWidth disabled={step === 'sending'} onClick={closeSupport}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </>
-        )}
-      </dialog>
     </div>
   )
 }

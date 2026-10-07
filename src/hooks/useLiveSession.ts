@@ -25,6 +25,9 @@ export type LiveSessionState = {
    * chamadas REST tipo skipToNextWord. null até resolver via
    * getSessionByExternalId. */
   sessionDbId: number | null
+  /** paciente dono da sessão — pra tela mostrar de quem é o sinal em vez
+   * de um nome fixo. null até resolver via getSessionByExternalId. */
+  patientId: number | null
   words: BackendWord[]
   scanningIndex: number
   focusLevel: number
@@ -65,6 +68,7 @@ type StatusMessage = LiveStatusMessage | SpeakMessage
 const INITIAL_STATE: LiveSessionState = {
   status: 'idle',
   sessionDbId: null,
+  patientId: null,
   words: [],
   scanningIndex: 0,
   focusLevel: 0,
@@ -125,6 +129,7 @@ export function useLiveSession(
         setState((prev) => ({
           ...prev,
           sessionDbId: session.id,
+          patientId: session.patient_id,
           words,
           spokenHistory: selectionsPage.items.map((selection) => ({
             text: selection.utterance,

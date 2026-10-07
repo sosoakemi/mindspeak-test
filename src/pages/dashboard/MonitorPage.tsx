@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
   CartesianGrid,
@@ -11,10 +11,11 @@ import {
   YAxis,
 } from 'recharts'
 import { Activity, Headset, MessageCircle, Radio, Wifi } from 'lucide-react'
-import { mockPatient } from '../../data/mockDashboard'
+import { listPatients } from '../../lib/backendApi'
 import { useChartTheme } from '../../hooks/useChartTheme'
 import { useLiveSession } from '../../hooks/useLiveSession'
 import { SessionConnect } from '../../components/shared/SessionConnect'
+import { cn } from '../../lib/cn'
 
 const liveStatusLabel: Record<'idle' | 'connecting' | 'open' | 'closed', string> = {
   idle: 'Sem sessão',
@@ -36,6 +37,31 @@ export function MonitorPage() {
   const [searchParams] = useSearchParams()
   const sessionId = searchParams.get('session')
   const live = useLiveSession(sessionId, undefined)
+  // Antes esta tela mostrava nome e leito de um paciente fictício por cima
+  // de sinal real — um clínico via dados verdadeiros atribuídos a outra
+  // pessoa. Agora o nome vem do paciente dono da sessão.
+  const [patientName, setPatientName] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (live.patientId === null) {
+      setPatientName(null)
+      return
+    }
+    let cancelled = false
+    const patientId = live.patientId
+    listPatients()
+      .then((patients) => {
+        if (cancelled) return
+        setPatientName(patients.find((p) => p.id === patientId)?.display_name ?? null)
+      })
+      .catch(() => {
+        // o nome é contexto, não o dado principal: falhar aqui não pode
+        // esconder o sinal ao vivo, que é pra que a tela serve.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [live.patientId])
   const waves = useMemo(() => {
     return Array.from({ length: 120 }).map((_, i) => {
       const x = i / 8
@@ -53,13 +79,22 @@ export function MonitorPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-emerald-950 dark:text-emerald-100">Monitoramento</h1>
           <p className="mt-1 text-sm text-ms-secondary">
-            Paciente {mockPatient.name} · {mockPatient.bed}
+            {sessionId
+              ? `Paciente ${patientName ?? '—'} · sessão ${sessionId}`
+              : 'Nenhuma sessão conectada'}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-900 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-100 dark:ring-emerald-800/60">
+          <span
+            className={cn(
+              'inline-flex items-center gap-2 rounded-full px-3 py-1 font-semibold ring-1',
+              live.status === 'open'
+                ? 'bg-emerald-50 text-emerald-900 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-100 dark:ring-emerald-800/60'
+                : 'bg-ms-subtle-strong text-ms-secondary ring-ms-border-subtle',
+            )}
+          >
             <Wifi className="h-4 w-4" aria-hidden />
-            Sincronizado
+            {liveStatusLabel[live.status]}
           </span>
           <span className="inline-flex items-center gap-2 rounded-full bg-ms-subtle-strong px-3 py-1 font-medium text-ms-secondary">
             <Headset className="h-4 w-4 text-ms-muted" aria-hidden />
@@ -154,12 +189,14 @@ export function MonitorPage() {
       <section className="rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-ms-primary">Interface neural</h2>
-          <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+          <span className="inline-flex items-center gap-2 text-xs font-semibold text-ms-muted">
             <Activity className="h-4 w-4" aria-hidden />
-            98,4% neural sync
+            Ilustrativo
           </span>
         </div>
-        <p className="mb-4 text-xs text-ms-muted">Ondas simuladas · Alpha (azul) e Beta (roxo)</p>
+        <p className="mb-4 text-xs text-ms-muted">
+          Formas de onda ilustrativas, não o sinal do sensor · Alpha (azul) e Beta (roxo)
+        </p>
         <div className="h-72 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={waves} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>

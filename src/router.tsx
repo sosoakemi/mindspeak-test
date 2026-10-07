@@ -1,79 +1,141 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from './layouts/AppShell'
-import { AccessSelectionPage } from './pages/access/AccessSelectionPage'
 import { SiteScope } from './site/SiteScope'
-import HomePage from './site/pages/HomePage'
-import ProductPage from './site/pages/ProductPage'
-import InstructionsPage from './site/pages/InstructionsPage'
-import TeamPage from './site/pages/TeamPage'
-import ReferencesPage from './site/pages/ReferencesPage'
-import GamePage from './site/pages/GamePage'
-import { LoginPage } from './pages/auth/LoginPage'
-import { RegisterPage } from './pages/auth/RegisterPage'
-import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
-import { ClinicalLoginPage } from './pages/auth/clinical/ClinicalLoginPage'
-import { ClinicalRegisterPage } from './pages/auth/clinical/ClinicalRegisterPage'
-import { ClinicalForgotPasswordPage } from './pages/auth/clinical/ClinicalForgotPasswordPage'
-import { PatientPage } from './pages/patient/PatientPage'
-import { PatientDashboardLayout } from './pages/patient/PatientDashboardLayout'
-import { PatientCommunicationPage } from './pages/patient/dashboard/PatientCommunicationPage'
-import { PatientSignalsPage } from './pages/patient/dashboard/PatientSignalsPage'
-import { PatientHistoryPage } from './pages/patient/dashboard/PatientHistoryPage'
-import { PatientSupportPage } from './pages/patient/dashboard/PatientSupportPage'
-import { PatientCommunicatePage } from './pages/patient/PatientCommunicatePage'
-import { PatientPhrasesWorkspacePage } from './pages/patient/dashboard/PatientPhrasesWorkspacePage'
-import { PatientSettingsPage } from './pages/patient/dashboard/PatientSettingsPage'
-import { DashboardLayout } from './pages/dashboard/DashboardLayout'
-import { DashboardOverviewPage } from './pages/dashboard/DashboardOverviewPage'
-import { MonitorPage } from './pages/dashboard/MonitorPage'
-import { HistoryPage } from './pages/dashboard/HistoryPage'
-import { AlertsPage } from './pages/dashboard/AlertsPage'
-import { SettingsPage } from './pages/dashboard/SettingsPage'
-import { PhrasesPage } from './pages/dashboard/PhrasesPage'
-import { PatientsPage } from './pages/dashboard/PatientsPage'
 
+// As páginas entram por `lazy` em vez de import direto: cada rota vira um
+// chunk próprio e o primeiro acesso deixa de baixar o app inteiro (o bundle
+// único passava de 1,1 MB, acima do limite de aviso do Vite). Só os dois
+// shells acima ficam no bundle inicial, porque todo caminho passa por eles.
+// Os layouts de dashboard também são lazy: quem só visita o site nunca
+// carrega os portais.
 export const router = createBrowserRouter([
   {
     element: <SiteScope />,
     children: [
-      { path: '/', element: <HomePage /> },
-      { path: '/produto', element: <ProductPage /> },
-      { path: '/instrucoes', element: <InstructionsPage /> },
-      { path: '/equipe', element: <TeamPage /> },
-      { path: '/referencias', element: <ReferencesPage /> },
-      { path: '/jogo', element: <GamePage /> },
+      { path: '/', lazy: async () => ({ Component: (await import('./site/pages/HomePage')).default }) },
+      { path: '/produto', lazy: async () => ({ Component: (await import('./site/pages/ProductPage')).default }) },
+      {
+        path: '/instrucoes',
+        lazy: async () => ({ Component: (await import('./site/pages/InstructionsPage')).default }),
+      },
+      { path: '/equipe', lazy: async () => ({ Component: (await import('./site/pages/TeamPage')).default }) },
+      {
+        path: '/referencias',
+        lazy: async () => ({ Component: (await import('./site/pages/ReferencesPage')).default }),
+      },
+      { path: '/jogo', lazy: async () => ({ Component: (await import('./site/pages/GamePage')).default }) },
     ],
   },
   {
     element: <AppShell />,
     children: [
-      { path: '/acesso', element: <AccessSelectionPage /> },
-      { path: '/familiar/login', element: <LoginPage /> },
-      { path: '/familiar/cadastro', element: <RegisterPage /> },
-      { path: '/familiar/forgot-password', element: <ForgotPasswordPage /> },
-      { path: '/clinico/login', element: <ClinicalLoginPage /> },
-      { path: '/clinico/cadastro', element: <ClinicalRegisterPage /> },
-      { path: '/clinico/forgot-password', element: <ClinicalForgotPasswordPage /> },
+      {
+        path: '/acesso',
+        lazy: async () => ({
+          Component: (await import('./pages/access/AccessSelectionPage')).AccessSelectionPage,
+        }),
+      },
+      {
+        path: '/familiar/login',
+        lazy: async () => ({ Component: (await import('./pages/auth/LoginPage')).LoginPage }),
+      },
+      {
+        path: '/familiar/cadastro',
+        lazy: async () => ({ Component: (await import('./pages/auth/RegisterPage')).RegisterPage }),
+      },
+      {
+        path: '/familiar/forgot-password',
+        lazy: async () => ({
+          Component: (await import('./pages/auth/ForgotPasswordPage')).ForgotPasswordPage,
+        }),
+      },
+      {
+        path: '/clinico/login',
+        lazy: async () => ({
+          Component: (await import('./pages/auth/clinical/ClinicalLoginPage')).ClinicalLoginPage,
+        }),
+      },
+      {
+        path: '/clinico/cadastro',
+        lazy: async () => ({
+          Component: (await import('./pages/auth/clinical/ClinicalRegisterPage')).ClinicalRegisterPage,
+        }),
+      },
+      {
+        path: '/clinico/forgot-password',
+        lazy: async () => ({
+          Component: (await import('./pages/auth/clinical/ClinicalForgotPasswordPage'))
+            .ClinicalForgotPasswordPage,
+        }),
+      },
       { path: '/login', element: <Navigate to="/familiar/login" replace /> },
       { path: '/cadastro', element: <Navigate to="/familiar/cadastro" replace /> },
       { path: '/forgot-password', element: <Navigate to="/familiar/forgot-password" replace /> },
       { path: '/patient', element: <Navigate to="/patient/dashboard" replace /> },
-      { path: '/patient/demo', element: <PatientPage /> },
+      {
+        path: '/patient/demo',
+        lazy: async () => ({ Component: (await import('./pages/patient/PatientPage')).PatientPage }),
+      },
       { path: '/patient/login', element: <Navigate to="/familiar/login" replace /> },
       { path: '/patient/register', element: <Navigate to="/familiar/cadastro" replace /> },
-      { path: '/patient/communicate', element: <PatientCommunicatePage /> },
+      {
+        path: '/patient/communicate',
+        lazy: async () => ({
+          Component: (await import('./pages/patient/PatientCommunicatePage')).PatientCommunicatePage,
+        }),
+      },
       { path: '/patient/bci', element: <Navigate to="/patient/communicate" replace /> },
       {
         path: '/patient/dashboard',
-        element: <PatientDashboardLayout />,
+        lazy: async () => ({
+          Component: (await import('./pages/patient/PatientDashboardLayout')).PatientDashboardLayout,
+        }),
         children: [
-          { index: true, element: <PatientCommunicationPage /> },
-          { path: 'comunicacao', element: <PatientCommunicationPage /> },
-          { path: 'sinais', element: <PatientSignalsPage /> },
-          { path: 'historico', element: <PatientHistoryPage /> },
-          { path: 'suporte', element: <PatientSupportPage /> },
-          { path: 'palavras', element: <PatientPhrasesWorkspacePage /> },
-          { path: 'configuracoes', element: <PatientSettingsPage /> },
+          {
+            index: true,
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientCommunicationPage'))
+                .PatientCommunicationPage,
+            }),
+          },
+          {
+            path: 'comunicacao',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientCommunicationPage'))
+                .PatientCommunicationPage,
+            }),
+          },
+          {
+            path: 'sinais',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientSignalsPage')).PatientSignalsPage,
+            }),
+          },
+          {
+            path: 'historico',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientHistoryPage')).PatientHistoryPage,
+            }),
+          },
+          {
+            path: 'suporte',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientSupportPage')).PatientSupportPage,
+            }),
+          },
+          {
+            path: 'palavras',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientPhrasesWorkspacePage'))
+                .PatientPhrasesWorkspacePage,
+            }),
+          },
+          {
+            path: 'configuracoes',
+            lazy: async () => ({
+              Component: (await import('./pages/patient/dashboard/PatientSettingsPage')).PatientSettingsPage,
+            }),
+          },
           { path: 'editor', element: <Navigate to="/patient/dashboard/palavras" replace /> },
           { path: 'adicionar', element: <Navigate to="/patient/dashboard/palavras" replace /> },
           { path: '*', element: <Navigate to="/patient/dashboard" replace /> },
@@ -81,15 +143,40 @@ export const router = createBrowserRouter([
       },
       {
         path: '/dashboard',
-        element: <DashboardLayout />,
+        lazy: async () => ({
+          Component: (await import('./pages/dashboard/DashboardLayout')).DashboardLayout,
+        }),
         children: [
-          { index: true, element: <DashboardOverviewPage /> },
-          { path: 'patients', element: <PatientsPage /> },
-          { path: 'monitor', element: <MonitorPage /> },
-          { path: 'history', element: <HistoryPage /> },
-          { path: 'alerts', element: <AlertsPage /> },
-          { path: 'settings', element: <SettingsPage /> },
-          { path: 'phrases', element: <PhrasesPage /> },
+          {
+            index: true,
+            lazy: async () => ({
+              Component: (await import('./pages/dashboard/DashboardOverviewPage')).DashboardOverviewPage,
+            }),
+          },
+          {
+            path: 'patients',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/PatientsPage')).PatientsPage }),
+          },
+          {
+            path: 'monitor',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/MonitorPage')).MonitorPage }),
+          },
+          {
+            path: 'history',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/HistoryPage')).HistoryPage }),
+          },
+          {
+            path: 'alerts',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/AlertsPage')).AlertsPage }),
+          },
+          {
+            path: 'settings',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/SettingsPage')).SettingsPage }),
+          },
+          {
+            path: 'phrases',
+            lazy: async () => ({ Component: (await import('./pages/dashboard/PhrasesPage')).PhrasesPage }),
+          },
           { path: '*', element: <Navigate to="/dashboard" replace /> },
         ],
       },

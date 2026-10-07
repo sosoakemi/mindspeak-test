@@ -17,6 +17,7 @@ import {
   createDevice,
   createPatient,
   createSession,
+  endSession,
   getCalibrationStatus,
   listDevices,
   listPatientSessions,
@@ -314,15 +315,18 @@ function CalibrationCard({
   devices,
   sessions,
   onSessionCreated,
+  onSessionEnded,
 }: {
   patientId: number
   devices: BackendDevice[]
   sessions: BackendSession[]
   onSessionCreated: (session: BackendSession) => void
+  onSessionEnded: (session: BackendSession) => void
 }) {
   const [deviceId, setDeviceId] = useState<number | ''>('')
   const [externalSessionId, setExternalSessionId] = useState('')
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const [endingSessionId, setEndingSessionId] = useState<number | null>(null)
   const [sessionFeedback, setSessionFeedback] = useState<Feedback | null>(null)
 
   const [activeExternalSessionId, setActiveExternalSessionId] = useState('')
@@ -424,6 +428,29 @@ function CalibrationCard({
     }
   }
 
+  // Encerrar é o único caminho que libera o motor de decisão da memória do
+  // backend; sem isto a sessão fica 'active' pra sempre e o motor fica
+  // pendurado no servidor.
+  const onEndSession = async (session: BackendSession) => {
+    setEndingSessionId(session.id)
+    setSessionFeedback(null)
+    try {
+      const ended = await endSession(session.id)
+      onSessionEnded(ended)
+      if (activeExternalSessionId === session.external_session_id) {
+        setActiveExternalSessionId('')
+      }
+      setSessionFeedback({ kind: 'ok', text: `Sessão "${session.external_session_id}" encerrada.` })
+    } catch (error) {
+      setSessionFeedback({
+        kind: 'error',
+        text: apiErrorText(error, 'Não foi possível encerrar a sessão.'),
+      })
+    } finally {
+      setEndingSessionId(null)
+    }
+  }
+
   const activeSessions = sessions.filter((s) => s.status === 'active')
 
   return (
@@ -479,19 +506,32 @@ function CalibrationCard({
       {activeSessions.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {activeSessions.map((session) => (
-            <button
-              key={session.id}
-              type="button"
-              onClick={() => setActiveExternalSessionId(session.external_session_id)}
-              className={cn(
-                msPill,
-                'cursor-pointer',
-                activeExternalSessionId === session.external_session_id &&
-                  'bg-emerald-50 text-emerald-950 ring-1 ring-emerald-200 dark:bg-blue-950/60 dark:text-blue-100 dark:ring-blue-800',
-              )}
-            >
-              {session.external_session_id}
-            </button>
+            <span key={session.id} className="inline-flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setActiveExternalSessionId(session.external_session_id)}
+                className={cn(
+                  msPill,
+                  'cursor-pointer',
+                  activeExternalSessionId === session.external_session_id &&
+                    'bg-emerald-50 text-emerald-950 ring-1 ring-emerald-200 dark:bg-blue-950/60 dark:text-blue-100 dark:ring-blue-800',
+                )}
+              >
+                {session.external_session_id}
+              </button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                isLoading={endingSessionId === session.id}
+                disabled={endingSessionId !== null}
+                onClick={() => void onEndSession(session)}
+                title="Encerra a sessão e libera o motor de decisão no servidor"
+                aria-label={`Encerrar sessão ${session.external_session_id}`}
+              >
+                Encerrar
+              </Button>
+            </span>
           ))}
         </div>
       ) : null}
@@ -624,6 +664,9 @@ function PatientDetailPanel({ patient }: { patient: BackendPatient }) {
         devices={devices}
         sessions={sessions}
         onSessionCreated={(session) => setSessions((prev) => [session, ...prev])}
+        onSessionEnded={(ended) =>
+          setSessions((prev) => prev.map((s) => (s.id === ended.id ? ended : s)))
+        }
       />
     </div>
   )
