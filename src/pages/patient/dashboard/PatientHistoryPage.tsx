@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getPatientTimeline, type TimelineEntry } from '../../../lib/backendApi'
-import { usePortalPatient } from '../../../hooks/usePortalPatient'
+import { usePortalPatient } from '../portal-patient-context'
 import { Button } from '../../../components/shared/Button'
 import { formatDateTime, severityMeta } from '../../../lib/severity'
 import { cn } from '../../../lib/cn'

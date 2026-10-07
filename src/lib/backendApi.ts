@@ -469,3 +469,30 @@ export type DecisionConfig = {
 export function getDecisionConfig(): Promise<DecisionConfig> {
   return getJson('/config/decision')
 }
+
+// --- acesso do familiar ---------------------------------------------------
+
+export function listPatientCaregivers(patientId: number): Promise<BackendUser[]> {
+  return getJson(`/patients/${patientId}/caregivers`)
+}
+
+export type CaregiverPasswordReset = {
+  user_id: number
+  email: string
+  full_name: string
+  /** devolvida UMA vez; o banco guarda só o hash */
+  temporary_password: string
+}
+
+// Não há recuperação por e-mail (o backend não tem envio), então quem
+// esquece a senha depende disto para voltar ao portal.
+export function resetCaregiverPassword(
+  patientId: number,
+  caregiverUserId: number,
+): Promise<CaregiverPasswordReset> {
+  return postJson(
+    `/patients/${patientId}/caregivers/${caregiverUserId}/reset-password`,
+    {},
+    true,
+  )
+}

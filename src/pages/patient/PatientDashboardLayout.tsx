@@ -15,6 +15,7 @@ import { cn } from '../../lib/cn'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { Button, LinkButton } from '../../components/shared/Button'
 import { PatientHeaderActions } from '../../components/patient/PatientHeaderActions'
+import { PortalPatientProvider, usePortalPatient } from './portal-patient-context'
 import { PatientSyncButton } from '../../components/patient/PatientSyncButton'
 import { clearPatientSession, getPatientSession } from '../../lib/patientSession'
 import { clearAuthSession } from '../../lib/authSession'
@@ -37,7 +38,38 @@ const navItems = [
   { to: '/patient/dashboard/suporte', label: 'Suporte', icon: HelpCircle, match: (p: string) => p.endsWith('/suporte') },
 ] as const
 
-export function PatientDashboardLayout() {
+// Um familiar pode responder por mais de uma pessoa. Sem isto a tela
+// pegava a primeira da lista em silêncio, o que mostraria o histórico da
+// pessoa errada sem nenhum aviso. Só aparece quando há de fato escolha.
+function PortalPatientPicker() {
+  const { patients, patient, selectPatient } = usePortalPatient()
+  if (patients.length < 2) return null
+
+  return (
+    <div className="min-w-0">
+      <label
+        htmlFor="portal-patient"
+        className="text-[11px] font-medium uppercase tracking-wide text-ms-muted"
+      >
+        Acompanhando
+      </label>
+      <select
+        id="portal-patient"
+        value={patient?.id ?? ''}
+        onChange={(e) => selectPatient(Number(e.target.value))}
+        className="block w-full max-w-[12rem] truncate rounded-lg border border-ms-border bg-ms-surface px-2 py-1 text-sm font-semibold text-ms-primary"
+      >
+        {patients.map((p) => (
+          <option key={p.id} value={p.id}>
+            {p.display_name}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
+function PatientDashboardShell() {
   const nav = useNavigate()
   const location = useLocation()
   const session = getPatientSession()
@@ -177,12 +209,23 @@ export function PatientDashboardLayout() {
           >
             <Menu className="h-5 w-5" aria-hidden />
           </button>
-          <PatientHeaderActions />
+          <div className="flex min-w-0 items-center gap-3">
+            <PortalPatientPicker />
+            <PatientHeaderActions />
+          </div>
         </header>
         <main className={cn('flex-1 overflow-x-hidden overflow-y-auto', msMainPad)}>
           <Outlet />
         </main>
       </div>
     </div>
+  )
+}
+
+export function PatientDashboardLayout() {
+  return (
+    <PortalPatientProvider>
+      <PatientDashboardShell />
+    </PortalPatientProvider>
   )
 }

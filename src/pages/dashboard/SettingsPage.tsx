@@ -1,12 +1,17 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { UserPlus } from 'lucide-react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { KeyRound, UserPlus } from 'lucide-react'
 import { Button } from '../../components/shared/Button'
 import {
   assignCaregiver,
   BackendApiError,
   getDecisionConfig,
+  listPatientCaregivers,
+  resetCaregiverPassword,
+  type BackendUser,
+  type CaregiverPasswordReset,
   type DecisionConfig,
 } from '../../lib/backendApi'
+import { useDashboard } from './dashboard-context'
 
 function AssignCaregiverCard() {
   const [patientId, setPatientId] = useState('')
@@ -93,6 +98,128 @@ function AssignCaregiverCard() {
         </p>
       ) : null}
     </form>
+  )
+}
+
+// Não existe recuperação de senha por e-mail: o backend não tem
+// infraestrutura de envio. Sem esta tela, um familiar que esquecesse a
+// senha simplesmente ficava de fora do portal, sem caminho de volta — e
+// a tela de "Esqueci minha senha" manda procurar a equipe clínica, o que
+// só é verdade se a equipe tiver como resolver. É esta tela.
+function CaregiverAccessCard() {
+  const { selectedPatient } = useDashboard()
+  const [caregivers, setCaregivers] = useState<BackendUser[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<number | null>(null)
+  const [reset, setReset] = useState<CaregiverPasswordReset | null>(null)
+
+  const patientId = selectedPatient?.id ?? null
+
+  const carregar = useCallback(() => {
+    if (patientId === null) {
+      setCaregivers([])
+      return
+    }
+    setLoading(true)
+    setError(null)
+    listPatientCaregivers(patientId)
+      .then(setCaregivers)
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : 'Falha ao carregar os familiares.')
+      })
+      .finally(() => setLoading(false))
+  }, [patientId])
+
+  useEffect(() => {
+    setReset(null)
+    carregar()
+  }, [carregar])
+
+  const redefinir = async (caregiver: BackendUser) => {
+    if (patientId === null) return
+    setBusyId(caregiver.id)
+    setError(null)
+    setReset(null)
+    try {
+      setReset(await resetCaregiverPassword(patientId, caregiver.id))
+    } catch (err) {
+      setError(
+        err instanceof BackendApiError ? err.message : 'Não foi possível redefinir a senha.',
+      )
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <section className="space-y-4 rounded-2xl border border-ms-border bg-ms-surface p-6 shadow-sm">
+      <div>
+        <h2 className="text-sm font-semibold text-ms-primary">Acesso do familiar</h2>
+        <p className="mt-1 text-xs leading-relaxed text-ms-muted">
+          Quem tem acesso ao portal de{' '}
+          <strong className="text-ms-secondary">
+            {selectedPatient?.display_name ?? 'nenhum paciente selecionado'}
+          </strong>
+          . Não há recuperação de senha por e-mail, então é aqui que se restabelece o acesso de
+          quem esqueceu a senha.
+        </p>
+      </div>
+
+      {error ? (
+        <p
+          className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-200"
+          role="alert"
+        >
+          {error}
+        </p>
+      ) : null}
+
+      {reset ? (
+        <div className="rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200 dark:bg-amber-950/40 dark:ring-amber-900">
+          <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+            Senha provisória de {reset.full_name}
+          </p>
+          <p className="mt-2 select-all rounded-lg bg-white px-3 py-2 font-mono text-base font-bold tracking-wide text-amber-950 dark:bg-amber-950 dark:text-amber-100">
+            {reset.temporary_password}
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-amber-900 dark:text-amber-200">
+            Anote agora: ela aparece uma única vez e não pode ser consultada depois. Entregue à
+            pessoa pelo canal que você já usa com a família.
+          </p>
+        </div>
+      ) : null}
+
+      {loading ? (
+        <p className="text-sm text-ms-secondary">Carregando familiares…</p>
+      ) : caregivers.length === 0 ? (
+        <p className="text-sm text-ms-secondary">
+          Nenhum familiar vinculado ainda. Use o formulário abaixo para dar acesso.
+        </p>
+      ) : (
+        <ul className="divide-y divide-ms-border-subtle">
+          {caregivers.map((caregiver) => (
+            <li key={caregiver.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-ms-primary">{caregiver.full_name}</p>
+                <p className="truncate text-xs text-ms-muted">{caregiver.email}</p>
+              </div>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={busyId !== null}
+                isLoading={busyId === caregiver.id}
+                icon={<KeyRound className="h-4 w-4" aria-hidden />}
+                onClick={() => void redefinir(caregiver)}
+              >
+                Redefinir senha
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }
 
@@ -195,9 +322,11 @@ export function SettingsPage() {
           Configurações
         </h1>
         <p className="mt-1 text-sm text-ms-secondary">
-          Vínculo de cuidador e parâmetros do motor de decisão.
+          Acesso dos familiares e parâmetros do motor de decisão.
         </p>
       </div>
+
+      <CaregiverAccessCard />
 
       <AssignCaregiverCard />
 

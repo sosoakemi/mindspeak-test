@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { getPatientReadings, type ReadingPoint } from '../../../lib/backendApi'
-import { usePortalPatient } from '../../../hooks/usePortalPatient'
+import { usePortalPatient } from '../portal-patient-context'
 import { useChartTheme } from '../../../hooks/useChartTheme'
 import { formatTimeOfDay } from '../../../lib/severity'
 import { cn } from '../../../lib/cn'

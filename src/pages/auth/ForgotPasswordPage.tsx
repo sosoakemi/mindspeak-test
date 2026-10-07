@@ -3,11 +3,14 @@ import { ArrowLeft, KeyRound } from 'lucide-react'
 import { FamilyAuthShell } from '../../components/layout/FamilyAuthShell'
 import { AuthAlert, AuthCard } from '../../components/ui/family-auth'
 
-// Não existe recuperação automática: o backend não tem endpoint de reset
-// nem infraestrutura de e-mail. Esta tela antes simulava o envio (esperava
-// 2s e dizia "E-mail enviado"), o que deixava quem perdeu a senha esperando
-// uma mensagem que nunca chegaria. Enquanto o fluxo real não existe, ela
-// diz a verdade e aponta o único caminho que de fato funciona.
+// Não existe recuperação por e-mail: o backend não tem infraestrutura de
+// envio. Esta tela antes simulava o envio (esperava 2s e dizia "E-mail
+// enviado"), deixando quem perdeu a senha esperando uma mensagem que nunca
+// chegaria.
+//
+// O caminho que ela aponta funciona de verdade: a equipe clínica tem, em
+// Configurações > Acesso do familiar, como gerar uma senha provisória e
+// entregar à pessoa.
 export function ForgotPasswordPage() {
   return (
     <FamilyAuthShell maxWidth="md">
@@ -27,7 +30,7 @@ export function ForgotPasswordPage() {
 
         <p className="mt-6 text-center text-sm leading-relaxed text-[var(--fa-text-muted)]">
           Para recuperar o acesso, fale com a equipe clínica responsável pelo
-          paciente. Ela pode cadastrar um novo acesso de familiar para você.
+          paciente. Ela consegue gerar uma senha provisória e entregar a você.
         </p>
 
         <AuthAlert variant="info" className="mt-6 text-left">
