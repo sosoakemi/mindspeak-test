@@ -423,6 +423,13 @@ export function listOrganizationWords(): Promise<BackendWord[]> {
   return getJson('/words')
 }
 
+// A grade de um paciente, na ordem da varredura. Existe separado de
+// listOrganizationWords porque aquele é só para equipe clínica; este o
+// familiar vinculado e o próprio paciente conseguem ler.
+export function listPatientWords(patientId: number): Promise<BackendWord[]> {
+  return getJson(`/patients/${patientId}/words`)
+}
+
 export function createWord(text: string, severity: WordSeverity): Promise<BackendWord> {
   return postJson('/words', { text, severity }, true)
 }

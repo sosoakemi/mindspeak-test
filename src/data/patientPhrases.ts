@@ -21,6 +21,9 @@ function padEight(list: string[]): string[] {
   return next.slice(0, 8)
 }
 
+// Só o modo demo usa esta lista. Numa sessão ao vivo a grade vem do
+// backend (useLiveSession -> live.words), que é a fonte de verdade; o
+// que estiver guardado aqui não tem efeito nenhum sobre ela.
 export function getEightPhrases(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -31,23 +34,5 @@ export function getEightPhrases(): string[] {
     return padEight(cleaned)
   } catch {
     return [...DEFAULT_PATIENT_PHRASES]
-  }
-}
-
-export function setEightPhrases(phrases: string[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(padEight(phrases)))
-    window.dispatchEvent(new CustomEvent(PHRASES_CHANGED_EVENT))
-  } catch {
-    // ignore
-  }
-}
-
-export function resetPhrasesToDefault() {
-  try {
-    localStorage.removeItem(STORAGE_KEY)
-    window.dispatchEvent(new CustomEvent(PHRASES_CHANGED_EVENT))
-  } catch {
-    // ignore
   }
 }
