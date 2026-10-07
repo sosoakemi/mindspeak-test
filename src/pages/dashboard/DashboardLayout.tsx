@@ -13,7 +13,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '../../lib/cn'
-import { DashboardAlertsProvider, useDashboardAlerts } from './alerts-context'
+import { DashboardProvider, useDashboard } from './dashboard-context'
 import { Button } from '../../components/shared/Button'
 import { MindSpeakLogo } from '../../components/brand/MindSpeakLogo'
 import { ThemeToggle } from '../../components/shared/ThemeToggle'
@@ -41,12 +41,50 @@ const nav = [
 ]
 
 function UnreadAlertsBadge() {
-  const { unreadCount } = useDashboardAlerts()
+  const { unreadCount } = useDashboard()
   if (!unreadCount) return null
   return (
     <span className="rounded-full bg-red-600 px-2 py-0.5 text-[11px] font-bold text-white tabular-nums">
       {unreadCount > 9 ? '9+' : unreadCount}
     </span>
+  )
+}
+
+// Todas as telas de acompanhamento falam de um paciente só; a escolha
+// mora no cabeçalho pra ficar visível de qualquer página, em vez de
+// repetida (ou pior, implícita) em cada uma.
+function PatientPicker() {
+  const { patients, selectedPatient, selectPatient, patientsLoading } = useDashboard()
+
+  if (patientsLoading) {
+    return <p className="hidden text-xs text-ms-muted sm:block">Carregando pacientes…</p>
+  }
+  if (patients.length === 0) {
+    return (
+      <p className="hidden text-xs text-ms-muted sm:block">
+        Nenhum paciente cadastrado
+      </p>
+    )
+  }
+
+  return (
+    <div className="hidden min-w-0 sm:block">
+      <label htmlFor="dashboard-patient" className="text-xs font-medium uppercase tracking-wide text-ms-muted">
+        Paciente
+      </label>
+      <select
+        id="dashboard-patient"
+        value={selectedPatient?.id ?? ''}
+        onChange={(e) => selectPatient(Number(e.target.value))}
+        className="block w-full max-w-[14rem] truncate rounded-lg border border-ms-border bg-ms-surface px-2 py-1 text-sm font-semibold text-ms-primary"
+      >
+        {patients.map((patient) => (
+          <option key={patient.id} value={patient.id}>
+            {patient.display_name}
+          </option>
+        ))}
+      </select>
+    </div>
   )
 }
 
@@ -163,6 +201,7 @@ function DashboardShell() {
               <p className="text-xs font-medium uppercase tracking-wide text-ms-muted">Profissional logado</p>
               <p className="truncate text-sm font-semibold text-ms-primary">{session.user.fullName}</p>
             </div>
+            <PatientPicker />
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle size="compact" />
@@ -197,8 +236,8 @@ function DashboardShell() {
 
 export function DashboardLayout() {
   return (
-    <DashboardAlertsProvider>
+    <DashboardProvider>
       <DashboardShell />
-    </DashboardAlertsProvider>
+    </DashboardProvider>
   )
 }

@@ -13,6 +13,10 @@ export class BackendApiError extends Error {
 export type BackendWord = {
   id: number
   text: string
+  /** urgência definida pelo clínico; acima de 'informativo' vira alerta */
+  severity: WordSeverity
+  /** ordem na varredura da grade do paciente */
+  position: number
 }
 
 export type BackendSession = {
@@ -115,6 +119,30 @@ function authHeaders(): Record<string, string> {
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${getApiBaseUrl()}${path}`, { headers: authHeaders() })
+  if (!response.ok) {
+    throw new BackendApiError(response.status, await extractErrorMessage(response))
+  }
+  return (await response.json()) as T
+}
+
+async function putJson<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    throw new BackendApiError(response.status, await extractErrorMessage(response))
+  }
+  return (await response.json()) as T
+}
+
+async function patchJson<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(body),
+  })
   if (!response.ok) {
     throw new BackendApiError(response.status, await extractErrorMessage(response))
   }
@@ -285,4 +313,152 @@ export async function synthesizeAiSpeech(
     throw new BackendApiError(response.status, await extractErrorMessage(response))
   }
   return response.blob()
+}
+
+
+// --- acompanhamento (dashboard clínico e portal do paciente) -------------
+
+export type WordSeverity = 'critico' | 'moderado' | 'informativo'
+
+export type PatientStats = {
+  total_selections: number
+  sessions: number
+  /** null quando não houve seleção no período — não é zero, é "sem medida" */
+  avg_confidence: number | null
+  /** null com menos de duas seleções: não há intervalo a medir */
+  avg_seconds_between_selections: number | null
+  /** null quando nenhuma leitura do sensor chegou no período */
+  avg_signal_quality: number | null
+  period_start: string
+  period_end: string
+}
+
+export type PatientAlert = {
+  id: number
+  session_id: number
+  word_id: number
+  utterance: string
+  severity: WordSeverity
+  confidence: number
+  selected_at: string
+  acknowledged_at: string | null
+}
+
+export type TimelineEntry = {
+  id: number
+  session_id: number
+  utterance: string
+  severity: WordSeverity
+  confidence: number
+  selected_at: string
+}
+
+export type ReadingPoint = {
+  seq: number
+  attention: number
+  meditation: number
+  signal_quality: number
+  delta: number
+  theta: number
+  low_alpha: number
+  high_alpha: number
+  low_beta: number
+  high_beta: number
+  low_gamma: number
+  mid_gamma: number
+  at: string
+}
+
+// O período vai explícito porque "hoje" depende do fuso de quem olha a
+// tela, e o servidor não tem como saber qual é.
+export function getPatientStats(
+  patientId: number,
+  period: { start: Date; end: Date },
+): Promise<PatientStats> {
+  const params = new URLSearchParams({
+    start: period.start.toISOString(),
+    end: period.end.toISOString(),
+  })
+  return getJson(`/patients/${patientId}/stats?${params}`)
+}
+
+export function listPatientAlerts(
+  patientId: number,
+  options: { unacknowledgedOnly?: boolean; limit?: number } = {},
+): Promise<{ items: PatientAlert[]; next_cursor: string | null; unacknowledged_count: number }> {
+  const params = new URLSearchParams()
+  if (options.unacknowledgedOnly) params.set('unacknowledged_only', 'true')
+  if (options.limit) params.set('limit', String(options.limit))
+  const query = params.toString()
+  return getJson(`/patients/${patientId}/alerts${query ? `?${query}` : ''}`)
+}
+
+export function acknowledgeAlerts(
+  patientId: number,
+  payload: { selectionIds?: number[]; all?: boolean },
+): Promise<{ acknowledged: number }> {
+  return postJson(
+    `/patients/${patientId}/alerts/acknowledge`,
+    { selection_ids: payload.selectionIds ?? [], all: payload.all ?? false },
+    true,
+  )
+}
+
+export function getPatientTimeline(
+  patientId: number,
+  options: { limit?: number; cursor?: string } = {},
+): Promise<{ items: TimelineEntry[]; next_cursor: string | null }> {
+  const params = new URLSearchParams()
+  if (options.limit) params.set('limit', String(options.limit))
+  if (options.cursor) params.set('cursor', options.cursor)
+  const query = params.toString()
+  return getJson(`/patients/${patientId}/timeline${query ? `?${query}` : ''}`)
+}
+
+export function getPatientReadings(patientId: number, limit = 120): Promise<ReadingPoint[]> {
+  return getJson(`/patients/${patientId}/readings?limit=${limit}`)
+}
+
+export function listOrganizationWords(): Promise<BackendWord[]> {
+  return getJson('/words')
+}
+
+export function createWord(text: string, severity: WordSeverity): Promise<BackendWord> {
+  return postJson('/words', { text, severity }, true)
+}
+
+export function reorderWords(orderedIds: number[]): Promise<BackendWord[]> {
+  return putJson('/words/order', { ordered_ids: orderedIds })
+}
+
+export async function deleteWord(wordId: number): Promise<void> {
+  const response = await fetch(`${getApiBaseUrl()}/words/${wordId}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  })
+  if (!response.ok) {
+    throw new BackendApiError(response.status, await extractErrorMessage(response))
+  }
+}
+
+export function updateWordSeverity(wordId: number, severity: WordSeverity): Promise<BackendWord> {
+  return patchJson(`/words/${wordId}`, { severity })
+}
+
+export type DecisionConfig = {
+  scan_interval_seconds: number
+  sustained_focus_windows: number
+  focus_probability_threshold: number
+  strong_blink_threshold: number
+  confirmation_detections: number
+  poor_signal_threshold: number
+  uncertain_margin: number
+  selection_cooldown_seconds: number
+  highlight_settle_seconds: number
+  focus_smoothing_alpha: number
+  blink_contamination_threshold: number
+}
+
+export function getDecisionConfig(): Promise<DecisionConfig> {
+  return getJson('/config/decision')
 }
